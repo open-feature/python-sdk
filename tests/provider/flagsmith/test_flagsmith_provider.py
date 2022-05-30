@@ -33,10 +33,10 @@ def test_should_get_number_flag_from_flagsmith():
     OpenFeature.set_provider(FlagsmithProvider(flagsmith=flagsmith_mock))
     provider = OpenFeature.get_provider()
     # When
-    flag = provider.get_string_value("Key", -1)
+    flag = provider.get_number_value("Key", -1)
     # Then
     flagsmith_mock.get_value.assert_called_once()
-    assert flag is 100
+    assert flag == 100
     assert isinstance(flag, Number)
 
 
@@ -50,5 +50,5 @@ def test_should_get_string_flag_from_flagsmith():
     flag = provider.get_string_value("Key", "Not A String")
     # Then
     flagsmith_mock.get_value.assert_called_once()
-    assert flag is "String"
+    assert flag == "String"
     assert isinstance(flag, str)
