@@ -10,7 +10,7 @@ class OpenFeature:
     @staticmethod
     def set_provider(provider_type: AbstractProvider):
         if provider_type is None:
-            print("No provider")
+            raise TypeError("No provider")
         global provider
         provider = provider_type
 

@@ -25,13 +25,3 @@ repos:
     hooks:
       - id: flake8
         additional_dependencies: [ "flake8-print", "flake8-builtins", "flake8-functions==0.0.4" ]
-
-  - repo: local
-    hooks:
-      - id: tests
-        name: Unit Tests
-        entry: pipenv run tests
-        language: python
-        'types': [ python ]
-        pass_filenames: false
-        stages: [ push ]

@@ -1,3 +1,4 @@
+import typing
 from numbers import Number
 from os import environ
 
@@ -15,29 +16,50 @@ class FlagsmithProvider(AbstractProvider):
         else:
             self.flagsmith_provider = flagsmith
 
-    def get_boolean_value(self, key: str, defaultValue: bool) -> bool:
+    def get_boolean_value(
+        self,
+        key: str,
+        default_value: bool,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> bool:
+
         value = self.flagsmith_provider.get_value(key)
         if not isinstance(value, bool):
             raise Exception()
         return value
 
-    def get_boolean_details(self, key: str, defaultValue: bool):
+    def get_boolean_details(self, key: str, default_value: bool):
         pass
 
-    def get_string_value(self, key: str, defaultValue: str) -> str:
+    def get_string_value(
+        self,
+        key: str,
+        default_value: str,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> str:
+
         value = self.flagsmith_provider.get_value(key)
         if not isinstance(value, str):
             raise Exception()
         return value
 
-    def get_string_details(self, key: str, defaultValue: str):
+    def get_string_details(self, key: str, default_value: str):
         pass
 
-    def get_number_value(self, key: str, defaultValue: Number) -> Number:
+    def get_number_value(
+        self,
+        key: str,
+        default_value: Number,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> Number:
+
         value = self.flagsmith_provider.get_value(key)
         if not isinstance(value, Number):
             raise Exception()
         return value
 
-    def get_number_details(self, key: str, defaultValue: Number):
+    def get_number_details(self, key: str, default_value: Number):
         pass

@@ -1,3 +1,4 @@
+import typing
 from numbers import Number
 
 from open_feature import OpenFeature
@@ -10,79 +11,103 @@ class OpenFeatureClient:
         self.version = version
         self.context = context
         self.hooks = hooks
+        self.provider = OpenFeature.get_provider()
 
     def get_boolean_value(
-        self, key: str, defaultValue: bool, evaluationContext, flagEvaluationOptions
+        self,
+        key: str,
+        default_value: bool,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
     ) -> bool:
         return self.evaluate_flag(
             FlagType.BOOLEAN,
             key,
-            defaultValue,
-            evaluationContext,
-            flagEvaluationOptions,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
         )
 
     def get_boolean_details(
-        self, key: str, defaultValue: bool, evaluationContext, flagEvaluationOptions
+        self,
+        key: str,
+        default_value: bool,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
     ):
-        return self.get_boolean_details(
-            key, defaultValue, evaluationContext, flagEvaluationOptions
+        return self.provider.get_boolean_details(
+            key, default_value, evaluation_context, flag_evaluation_options
         )
 
     def get_string_value(
-        self, key: str, defaultValue: bool, evaluationContext, flagEvaluationOptions
+        self,
+        key: str,
+        default_value: str,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
     ) -> str:
         return self.evaluate_flag(
-            FlagType.BOOLEAN,
+            FlagType.STRING,
             key,
-            defaultValue,
-            evaluationContext,
-            flagEvaluationOptions,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
         )
 
     def get_string_details(
-        self, key: str, defaultValue: bool, evaluationContext, flagEvaluationOptions
+        self,
+        key: str,
+        default_value: bool,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
     ):
-        return self.get_string_details(
-            key, defaultValue, evaluationContext, flagEvaluationOptions
+        return self.provider.get_string_details(
+            key, default_value, evaluation_context, flag_evaluation_options
         )
 
     def get_number_value(
-        self, key: str, defaultValue: bool, evaluationContext, flagEvaluationOptions
+        self,
+        key: str,
+        default_value: Number,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
     ) -> Number:
         return self.evaluate_flag(
-            FlagType.BOOLEAN,
+            FlagType.NUMBER,
             key,
-            defaultValue,
-            evaluationContext,
-            flagEvaluationOptions,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
         )
 
     def get_number_details(
-        self, key: str, defaultValue: bool, evaluationContext, flagEvaluationOptions
+        self,
+        key: str,
+        default_value: bool,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
     ):
-        return self.get_number_details(
-            key, defaultValue, evaluationContext, flagEvaluationOptions
+        return self.provider.get_number_details(
+            key, default_value, evaluation_context, flag_evaluation_options
         )
 
     def evaluate_flag(
         self,
         flag_type: FlagType,
         key: str,
-        defaultValue: bool,
-        evaluationContext,
-        flagEvaluationOptions,
+        default_value: bool,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
     ):
-        provider = OpenFeature.get_provider()
         if flag_type is FlagType.BOOLEAN:
-            return provider.getBooleanEvaluation(
-                key, defaultValue, evaluationContext, flagEvaluationOptions
+            return self.provider.get_boolean_value(
+                key, default_value, evaluation_context, flag_evaluation_options
             )
         if flag_type is FlagType.NUMBER:
-            return provider.getNumberEvaluation(
-                key, defaultValue, evaluationContext, flagEvaluationOptions
+            return self.provider.get_number_value(
+                key, default_value, evaluation_context, flag_evaluation_options
             )
         if flag_type is FlagType.STRING:
-            return provider.getStringEvaluation(
-                key, defaultValue, evaluationContext, flagEvaluationOptions
+            return self.provider.get_string_value(
+                key, default_value, evaluation_context, flag_evaluation_options
             )
