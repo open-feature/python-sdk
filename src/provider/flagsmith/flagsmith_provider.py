@@ -29,7 +29,13 @@ class FlagsmithProvider(AbstractProvider):
             raise Exception()
         return value
 
-    def get_boolean_details(self, key: str, default_value: bool):
+    def get_boolean_details(
+        self,
+        key: str,
+        default_value: bool,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
+    ):
         pass
 
     def get_string_value(
@@ -45,7 +51,13 @@ class FlagsmithProvider(AbstractProvider):
             raise Exception()
         return value
 
-    def get_string_details(self, key: str, default_value: str):
+    def get_string_details(
+        self,
+        key: str,
+        default_value: str,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
+    ):
         pass
 
     def get_number_value(
@@ -61,5 +73,11 @@ class FlagsmithProvider(AbstractProvider):
             raise Exception()
         return value
 
-    def get_number_details(self, key: str, default_value: Number):
+    def get_number_details(
+        self,
+        key: str,
+        default_value: Number,
+        evaluation_context: typing.Any = None,
+        flag_evaluation_options: typing.Any = None,
+    ):
         pass
