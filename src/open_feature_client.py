@@ -178,7 +178,7 @@ class OpenFeatureClient:
                     flag_evaluation_options,
                 )
             # Fallback case is a string object
-            elif flag_type is FlagType.OBJECT:
+            elif flag_type is FlagType.STRING:
                 return self.provider.get_string_details(
                     key,
                     default_value,

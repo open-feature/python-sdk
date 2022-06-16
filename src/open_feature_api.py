@@ -1,7 +1,7 @@
 from src.open_feature_client import OpenFeatureClient
 from src.provider.provider import AbstractProvider
 
-global provider
+provider = None
 
 
 class OpenFeatureAPI:
