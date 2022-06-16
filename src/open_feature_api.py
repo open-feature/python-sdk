@@ -8,10 +8,16 @@ class OpenFeatureAPI:
     def __init__(self):
         pass
 
+    @staticmethod
     def get_client(
-        self, name: str = None, version: str = None
+        name: str = None, version: str = None, provider=None
     ) -> OpenFeatureClient:
-        open_feature_provider = self.get_provider()
+        if provider is None:
+            open_feature_provider = OpenFeatureAPI.get_provider()
+        else:
+            OpenFeatureAPI.set_provider(provider)
+            open_feature_provider = provider
+
         return OpenFeatureClient(
             name=name, version=version, provider=open_feature_provider
         )
