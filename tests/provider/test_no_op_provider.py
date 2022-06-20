@@ -26,9 +26,8 @@ def test_should_get_boolean_flag_from_no_op():
 
 def test_should_get_number_flag_from_no_op():
     # Given
-    open_feature = OpenFeatureAPI()
-    open_feature.set_provider(NoOpProvider())
-    client = open_feature.get_client()
+    OpenFeatureAPI.set_provider(NoOpProvider())
+    client = OpenFeatureAPI.get_client()
     # When
     flag = client.get_number_details(key="Key", default_value=100)
     # Then
@@ -39,9 +38,8 @@ def test_should_get_number_flag_from_no_op():
 
 def test_should_get_string_flag_from_no_op():
     # Given
-    open_feature = OpenFeatureAPI()
-    open_feature.set_provider(NoOpProvider())
-    client = open_feature.get_client()
+    OpenFeatureAPI.set_provider(NoOpProvider())
+    client = OpenFeatureAPI.get_client()
     # When
     flag = client.get_string_details(key="Key", default_value="String")
     # Then
@@ -57,9 +55,8 @@ def test_should_get_object_flag_from_no_op():
         "Number": 2,
         "Boolean": True,
     }
-    open_feature = OpenFeatureAPI()
-    open_feature.set_provider(NoOpProvider())
-    client = open_feature.get_client()
+    OpenFeatureAPI.set_provider(NoOpProvider())
+    client = OpenFeatureAPI.get_client()
     # When
     flag = client.get_string_details(key="Key", default_value=return_value)
     # Then

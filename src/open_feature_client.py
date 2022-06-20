@@ -1,8 +1,7 @@
 import typing
 from numbers import Number
 
-from src.exception.general_error import GeneralError
-from src.exception.open_feature_error import OpenFeatureError
+from src.exception.exceptions import GeneralError, OpenFeatureError
 from src.flag_evaluation.error_code import ErrorCode
 from src.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from src.flag_evaluation.flag_type import FlagType
@@ -154,37 +153,23 @@ class OpenFeatureClient:
         flag_evaluation_options: typing.Any = None,
     ) -> FlagEvaluationDetails:
         try:
+            args = (
+                key,
+                default_value,
+                evaluation_context,
+                flag_evaluation_options,
+            )
             if flag_type is FlagType.BOOLEAN:
-                return self.provider.get_boolean_details(
-                    key,
-                    default_value,
-                    evaluation_context,
-                    flag_evaluation_options,
-                )
+                return self.provider.get_boolean_details(*args)
 
             elif flag_type is FlagType.NUMBER:
-                return self.provider.get_number_details(
-                    key,
-                    default_value,
-                    evaluation_context,
-                    flag_evaluation_options,
-                )
+                return self.provider.get_number_details(*args)
 
             elif flag_type is FlagType.OBJECT:
-                return self.provider.get_object_details(
-                    key,
-                    default_value,
-                    evaluation_context,
-                    flag_evaluation_options,
-                )
+                return self.provider.get_object_details(*args)
             # Fallback case is a string object
             elif flag_type is FlagType.STRING:
-                return self.provider.get_string_details(
-                    key,
-                    default_value,
-                    evaluation_context,
-                    flag_evaluation_options,
-                )
+                return self.provider.get_string_details(*args)
             else:
                 raise GeneralError(error_message="Unknown flag type")
 
