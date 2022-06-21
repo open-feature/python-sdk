@@ -1,35 +1,27 @@
+import typing
+
+from src.exception.exceptions import GeneralError
 from src.open_feature_client import OpenFeatureClient
 from src.provider.provider import AbstractProvider
 
-provider = None
+_provider = None
 
 
-class OpenFeatureAPI:
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def get_client(
-        name: str = None, version: str = None, provider=None
-    ) -> OpenFeatureClient:
-        if provider is None:
-            open_feature_provider = OpenFeatureAPI.get_provider()
-        else:
-            OpenFeatureAPI.set_provider(provider)
-            open_feature_provider = provider
-
-        return OpenFeatureClient(
-            name=name, version=version, provider=open_feature_provider
+def get_client(name: str = None, version: str = None) -> OpenFeatureClient:
+    if _provider is None:
+        raise GeneralError(
+            error_message="Provider not set. Call set_provider before using get_client"
         )
+    return OpenFeatureClient(name=name, version=version, provider=_provider)
 
-    @staticmethod
-    def set_provider(provider_type: AbstractProvider):
-        if provider_type is None:
-            raise TypeError("No provider")
-        global provider
-        provider = provider_type
 
-    @staticmethod
-    def get_provider() -> AbstractProvider:
-        global provider
-        return provider
+def set_provider(provider: AbstractProvider):
+    global _provider
+    if provider is None:
+        raise GeneralError(error_message="No provider")
+    _provider = provider
+
+
+def get_provider() -> typing.Optional[AbstractProvider]:
+    global _provider
+    return _provider

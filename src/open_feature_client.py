@@ -15,13 +15,13 @@ class OpenFeatureClient:
         name: str,
         version: str,
         context=None,
-        hooks: list = [],
+        hooks: list = None,
         provider: AbstractProvider = None,
     ):
         self.name = name
         self.version = version
         self.context = context
-        self.hooks = hooks
+        self.hooks = hooks or []
         self.provider = provider
 
     def get_boolean_value(

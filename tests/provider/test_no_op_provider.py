@@ -1,21 +1,19 @@
 from numbers import Number
 
-from src.open_feature_api import OpenFeatureAPI
+from src import open_feature_api as api
 from src.provider.no_op_provider import NoOpProvider
 
 
 def setup():
-    open_feature = OpenFeatureAPI
-    open_feature.set_provider(NoOpProvider())
-    provider = open_feature.get_provider()
+    api.set_provider(NoOpProvider())
+    provider = api.get_provider()
     assert isinstance(provider, NoOpProvider)
 
 
 def test_should_get_boolean_flag_from_no_op():
     # Given
-    open_feature = OpenFeatureAPI()
-    open_feature.set_provider(NoOpProvider())
-    client = open_feature.get_client()
+    api.set_provider(NoOpProvider())
+    client = api.get_client()
     # When
     flag = client.get_boolean_details(key="Key", default_value=True)
     # Then
@@ -26,8 +24,8 @@ def test_should_get_boolean_flag_from_no_op():
 
 def test_should_get_number_flag_from_no_op():
     # Given
-    OpenFeatureAPI.set_provider(NoOpProvider())
-    client = OpenFeatureAPI.get_client()
+    api.set_provider(NoOpProvider())
+    client = api.get_client()
     # When
     flag = client.get_number_details(key="Key", default_value=100)
     # Then
@@ -38,8 +36,8 @@ def test_should_get_number_flag_from_no_op():
 
 def test_should_get_string_flag_from_no_op():
     # Given
-    OpenFeatureAPI.set_provider(NoOpProvider())
-    client = OpenFeatureAPI.get_client()
+    api.set_provider(NoOpProvider())
+    client = api.get_client()
     # When
     flag = client.get_string_details(key="Key", default_value="String")
     # Then
@@ -55,8 +53,8 @@ def test_should_get_object_flag_from_no_op():
         "Number": 2,
         "Boolean": True,
     }
-    OpenFeatureAPI.set_provider(NoOpProvider())
-    client = OpenFeatureAPI.get_client()
+    api.set_provider(NoOpProvider())
+    client = api.get_client()
     # When
     flag = client.get_string_details(key="Key", default_value=return_value)
     # Then
