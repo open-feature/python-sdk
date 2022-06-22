@@ -1,5 +1,10 @@
-# OpenFeature SDK for Python 
+# Open Feature Python SDK
+This SDK is still in an experimental phase.
+
+## Requirements
+- Python 3.8+
+
+## Installation
 
 
-> :warning: This repository is a placeholder for a future SDK implementation.
-> It is not ready for evaluation
+## How to use

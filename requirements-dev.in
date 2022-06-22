@@ -1,0 +1,11 @@
+pylint
+pep8
+autopep8
+pytest
+pytest-mock
+black
+pip-tools
+responses
+pre-commit
+flake8
+pytest-mock
