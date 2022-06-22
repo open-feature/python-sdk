@@ -1,12 +1,14 @@
 import typing
 from numbers import Number
 
-from src.exception.exceptions import GeneralError, OpenFeatureError
-from src.flag_evaluation.error_code import ErrorCode
-from src.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
-from src.flag_evaluation.flag_type import FlagType
-from src.flag_evaluation.reason import Reason
-from src.provider.provider import AbstractProvider
+from python_open_feature_sdk.exception.exceptions import GeneralError, OpenFeatureError
+from python_open_feature_sdk.flag_evaluation.error_code import ErrorCode
+from python_open_feature_sdk.flag_evaluation.flag_evaluation_details import (
+    FlagEvaluationDetails,
+)
+from python_open_feature_sdk.flag_evaluation.flag_type import FlagType
+from python_open_feature_sdk.flag_evaluation.reason import Reason
+from python_open_feature_sdk.provider.provider import AbstractProvider
 
 
 class OpenFeatureClient:

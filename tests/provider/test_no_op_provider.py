@@ -1,7 +1,7 @@
 from numbers import Number
 
-from src import open_feature_api as api
-from src.provider.no_op_provider import NoOpProvider
+from python_open_feature_sdk import open_feature_api as api
+from python_open_feature_sdk.provider.no_op_provider import NoOpProvider
 
 
 def setup():

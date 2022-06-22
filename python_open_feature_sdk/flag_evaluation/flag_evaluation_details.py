@@ -1,5 +1,5 @@
-from src.flag_evaluation.error_code import ErrorCode
-from src.flag_evaluation.reason import Reason
+from python_open_feature_sdk.flag_evaluation.error_code import ErrorCode
+from python_open_feature_sdk.flag_evaluation.reason import Reason
 
 
 class FlagEvaluationDetails:
