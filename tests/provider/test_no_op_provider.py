@@ -10,53 +10,47 @@ def setup():
     assert isinstance(provider, NoOpProvider)
 
 
-def test_should_get_boolean_flag_from_no_op():
+def test_should_get_boolean_flag_from_no_op(no_op_provider_client):
     # Given
-    api.set_provider(NoOpProvider())
-    client = api.get_client()
     # When
-    flag = client.get_boolean_details(key="Key", default_value=True)
+    flag = no_op_provider_client.get_boolean_details(key="Key", default_value=True)
     # Then
     assert flag is not None
     assert flag.value
     assert isinstance(flag.value, bool)
 
 
-def test_should_get_number_flag_from_no_op():
+def test_should_get_number_flag_from_no_op(no_op_provider_client):
     # Given
-    api.set_provider(NoOpProvider())
-    client = api.get_client()
     # When
-    flag = client.get_number_details(key="Key", default_value=100)
+    flag = no_op_provider_client.get_number_details(key="Key", default_value=100)
     # Then
     assert flag is not None
     assert flag.value == 100
     assert isinstance(flag.value, Number)
 
 
-def test_should_get_string_flag_from_no_op():
+def test_should_get_string_flag_from_no_op(no_op_provider_client):
     # Given
-    api.set_provider(NoOpProvider())
-    client = api.get_client()
     # When
-    flag = client.get_string_details(key="Key", default_value="String")
+    flag = no_op_provider_client.get_string_details(key="Key", default_value="String")
     # Then
     assert flag is not None
     assert flag.value == "String"
     assert isinstance(flag.value, str)
 
 
-def test_should_get_object_flag_from_no_op():
+def test_should_get_object_flag_from_no_op(no_op_provider_client):
     # Given
     return_value = {
         "String": "string",
         "Number": 2,
         "Boolean": True,
     }
-    api.set_provider(NoOpProvider())
-    client = api.get_client()
     # When
-    flag = client.get_string_details(key="Key", default_value=return_value)
+    flag = no_op_provider_client.get_string_details(
+        key="Key", default_value=return_value
+    )
     # Then
     assert flag is not None
     assert flag.value == return_value

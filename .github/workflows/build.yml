@@ -1,0 +1,81 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
+
+name: Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: python:3.8
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache virtualenvironment
+        uses: actions/cache@v2
+        with:
+          path: ~/.venv
+          key: ${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
+
+      - name: Upgrade pip
+        run: pip install --upgrade pip
+
+      - name: Create and activate Virtualenv
+        run: |
+          pip install virtualenv
+          [ ! -d ".venv" ] && virtualenv .venv
+          . .venv/bin/activate
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-dev.txt
+
+      - name: Run black formatter check
+        run: |
+          black --check .
+
+      - name: Run flake8 formatter check
+        run: |
+          flake8 .
+
+      - name: Run isort formatter check
+        run: |
+          isort .
+
+      - name: Test with pytest
+        run: |
+          pytest
+
+  package:
+    runs-on: ubuntu-latest
+    container: python:3.8
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache virtualenvironment
+        uses: actions/cache@v2
+        with:
+          path: ~/.venv
+          key: ${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
+
+      - name: Upgrade pip
+        run: pip install --upgrade pip
+
+      - name: Create and activate Virtualenv
+        run: |
+          pip install virtualenv
+          [ ! -d ".venv" ] && virtualenv .venv
+          . .venv/bin/activate
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt

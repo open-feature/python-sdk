@@ -1,3 +1,30 @@
+# pyproject.toml
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python_open_feature_sdk"
+version = "0.0.1"
+description = "Standardizing Feature Flagging for Everyone"
+readme = "README.md"
+authors = [{ name = "Real Python", email = "info@realpython.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: Apache",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = []
+dependencies = []
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+dev = ["black", "flake8", "isort", "pip-tools", "pytest", "pre-commit"]
+
+[project.urls]
+Homepage = "https://github.com/open-feature/python-sdk"
+
 [tool.isort]
 profile = "black"
 multi_line_output = 3
