@@ -60,4 +60,5 @@ Thanks so much to our contributors.
   <img src="https://contrib.rocks/image?repo=open-feature/python-sdk" />
 </a>
 
+
 Made with [contrib.rocks](https://contrib.rocks).
