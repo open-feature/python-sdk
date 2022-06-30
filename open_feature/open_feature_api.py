@@ -1,8 +1,8 @@
 import typing
 
-from src.exception.exceptions import GeneralError
-from src.open_feature_client import OpenFeatureClient
-from src.provider.provider import AbstractProvider
+from open_feature.exception.exceptions import GeneralError
+from open_feature.open_feature_client import OpenFeatureClient
+from open_feature.provider.provider import AbstractProvider
 
 _provider = None
 

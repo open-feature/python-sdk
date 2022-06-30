@@ -1,9 +1,9 @@
 import typing
 from numbers import Number
 
-from src.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
-from src.flag_evaluation.reason import Reason
-from src.provider.provider import AbstractProvider
+from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
+from open_feature.flag_evaluation.reason import Reason
+from open_feature.provider.provider import AbstractProvider
 
 PASSED_IN_DEFAULT = "Passed in default"
 
