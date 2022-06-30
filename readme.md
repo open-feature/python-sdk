@@ -40,8 +40,9 @@ pip install requirements.txt
 
 ### Configure it
 In order to use the sdk there is some minor configuration. Follow the script below:
+
 ```python
-from python_open_feature_sdk import open_feature_api
+from open_feature import open_feature_api
 
 open_feature_api.set_provider(NoOpProvider())
 open_feature_client = open_feature_api.get_client()

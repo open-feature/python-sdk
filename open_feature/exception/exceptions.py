@@ -1,4 +1,4 @@
-from python_open_feature_sdk.flag_evaluation.error_code import ErrorCode
+from open_feature.flag_evaluation.error_code import ErrorCode
 
 
 class OpenFeatureError(Exception):

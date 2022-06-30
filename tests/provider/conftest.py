@@ -1,7 +1,7 @@
 import pytest
 
-from python_open_feature_sdk import open_feature_api as api
-from python_open_feature_sdk.provider.no_op_provider import NoOpProvider
+from open_feature import open_feature_api as api
+from open_feature.provider.no_op_provider import NoOpProvider
 
 
 @pytest.fixture()
