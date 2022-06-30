@@ -43,8 +43,7 @@ jobs:
 
       - name: Run flake8 formatter check
         run: |
-          flake8 python_open_feature_sdk
-          flake8 tests
+          flake8 .
 
       - name: Run isort formatter check
         run: |
