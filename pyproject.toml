@@ -8,7 +8,7 @@ name = "python_open_feature_sdk"
 version = "0.0.1"
 description = "Standardizing Feature Flagging for Everyone"
 readme = "README.md"
-authors = [{ name = "Real Python", email = "info@realpython.com" }]
+authors = [{ name = "Open Feature", email = "opensource@dynatrace.com" }]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: Apache",
