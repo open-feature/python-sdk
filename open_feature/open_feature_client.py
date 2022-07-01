@@ -155,8 +155,9 @@ class OpenFeatureClient:
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
         try:
-            # The merge below will pull in Evaluation contexts from Hooks
-            invocation_context = EvaluationContext.merge(None, evaluation_context)
+            # The merge below will eventually pull in Evaluation contexts from Hooks
+            invocation_context = EvaluationContext()
+            invocation_context.merge(ctx1=EvaluationContext(), ctx2=evaluation_context)
             return self.create_provider_evaluation(
                 flag_type,
                 key,
