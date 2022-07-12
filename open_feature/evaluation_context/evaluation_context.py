@@ -1,7 +1,7 @@
 class EvaluationContext:
-    def __init__(self, targeting_key: str = None, attributes: dict = {}):
+    def __init__(self, targeting_key: str = None, attributes: dict = None):
         self.targeting_key = targeting_key
-        self.attributes = attributes
+        self.attributes = attributes or {}
 
     def merge(
         self, ctx1: "EvaluationContext", ctx2: "EvaluationContext"
