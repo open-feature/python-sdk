@@ -157,7 +157,7 @@ class OpenFeatureClient:
         try:
             # The merge below will eventually pull in Evaluation contexts from Hooks
             invocation_context = EvaluationContext()
-            invocation_context.merge(ctx1=EvaluationContext(), ctx2=evaluation_context)
+            invocation_context.merge(ctx2=evaluation_context)
             return self.create_provider_evaluation(
                 flag_type,
                 key,
@@ -198,16 +198,15 @@ class OpenFeatureClient:
             evaluation_context,
             flag_evaluation_options,
         )
-        if flag_type is FlagType.BOOLEAN:
-            return self.provider.get_boolean_details(*args)
 
-        elif flag_type is FlagType.NUMBER:
-            return self.provider.get_number_details(*args)
+        get_details_callable = {
+            FlagType.BOOLEAN: self.provider.get_boolean_details,
+            FlagType.NUMBER: self.provider.get_number_details,
+            FlagType.OBJECT: self.provider.get_object_details,
+            FlagType.STRING: self.provider.get_string_details,
+        }.get(flag_type)
 
-        elif flag_type is FlagType.OBJECT:
-            return self.provider.get_object_details(*args)
-        # Fallback case is a string object
-        elif flag_type is FlagType.STRING:
-            return self.provider.get_string_details(*args)
-        else:
+        if not get_details_callable:
             raise GeneralError(error_message="Unknown flag type")
+
+        return get_details_callable(*args)
