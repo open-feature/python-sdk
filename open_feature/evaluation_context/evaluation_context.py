@@ -4,7 +4,7 @@ class EvaluationContext:
         self.attributes = attributes or {}
 
     def merge(self, ctx2: "EvaluationContext") -> "EvaluationContext":
-        self.attributes = self.attributes | ctx2.attributes
+        self.attributes = {**self.attributes, **ctx2.attributes}
         self.targeting_key = ctx2.targeting_key or self.targeting_key
 
         return self
