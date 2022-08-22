@@ -1,3 +1,4 @@
+import logging
 import typing
 from numbers import Number
 
@@ -15,6 +16,7 @@ from open_feature.hooks.hook_support import (
     error_hooks,
 )
 from open_feature.open_feature_evaluation_context import get_evaluation_context
+from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider
 
 
@@ -165,13 +167,15 @@ class OpenFeatureClient:
         flag_evaluation_options: typing.Any = None,
     ) -> FlagEvaluationDetails:
         """
+        Evaluate the flag requested by the user from the clients provider.
 
-        :param flag_type:
-        :param key:
-        :param default_value:
-        :param evaluation_context:
-        :param flag_evaluation_options:
-        :return:
+        :param flag_type: the type of the flag being returned
+        :param key: the string key of the selected flag
+        :param default_value: backup value returned if no result found by the provider
+        :param evaluation_context: Information for the purposes of flag evaluation
+        :param flag_evaluation_options: Additional flag evaluation information
+        :return: a FlagEvaluationDetails object with the fully evaluated flag from a
+        provider
         """
 
         if evaluation_context is None:
@@ -193,6 +197,7 @@ class OpenFeatureClient:
             )
             invocation_context.merge(ctx2=evaluation_context)
 
+            # merge of: API.context, client.context, invocation.context
             merged_context = (
                 get_evaluation_context().merge(self.context).merge(invocation_context)
             )
@@ -245,6 +250,10 @@ class OpenFeatureClient:
             evaluation_context,
             flag_evaluation_options,
         )
+
+        if not self.provider:
+            logging.info("No provider configured, using no-op provider.")
+            NoOpProvider()
 
         get_details_callable = {
             FlagType.BOOLEAN: self.provider.get_boolean_details,
