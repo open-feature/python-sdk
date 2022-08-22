@@ -1,27 +1,16 @@
+from unittest import mock
+
 import pytest
 
-from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
-from open_feature.flag_evaluation.flag_type import FlagType
-from open_feature.hooks.hook import Hook
-
-
-class TestHook(Hook):
-    def before(self, ctx, hints: dict):
-        pass
-
-    def after(self, ctx, details: FlagEvaluationDetails, hints: dict):
-        pass
-
-    def error(self, ctx, exception: Exception, hints: dict):
-        return "Error"
-
-    def finally_after(self, ctx, hints: dict):
-        pass
-
-    def supports_flag_value_type(self, flag_type: FlagType) -> bool:
-        return True
+from open_feature.evaluation_context.evaluation_context import EvaluationContext
 
 
 @pytest.fixture()
-def test_hook():
-    return TestHook()
+def mock_hook():
+    mock_hook = mock.MagicMock()
+    mock_hook.supports_flag_value_type.return_value = True
+    mock_hook.before.return_value = EvaluationContext()
+    mock_hook.after.return_value = None
+    mock_hook.error.return_value = None
+    mock_hook.finally_after.return_value = None
+    return mock_hook

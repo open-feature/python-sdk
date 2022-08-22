@@ -14,6 +14,7 @@ from open_feature.hooks.hook_support import (
     before_hooks,
     error_hooks,
 )
+from open_feature.open_feature_evaluation_context import get_evaluation_context
 from open_feature.provider.provider import AbstractProvider
 
 
@@ -193,10 +194,7 @@ class OpenFeatureClient:
             invocation_context.merge(ctx2=evaluation_context)
 
             merged_context = (
-                # Todo pull the evaluation context below from api
-                EvaluationContext()
-                .merge(self.context)
-                .merge(invocation_context)
+                get_evaluation_context().merge(self.context).merge(invocation_context)
             )
 
             flag_evaluation = self.create_provider_evaluation(
