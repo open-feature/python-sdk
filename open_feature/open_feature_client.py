@@ -6,6 +6,14 @@ from open_feature.exception.exceptions import GeneralError, OpenFeatureError
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.flag_evaluation.reason import Reason
+from open_feature.hooks.hook import Hook
+from open_feature.hooks.hook_context import HookContext
+from open_feature.hooks.hook_support import (
+    after_all_hooks,
+    after_hooks,
+    before_hooks,
+    error_hooks,
+)
 from open_feature.provider.provider import AbstractProvider
 
 
@@ -14,8 +22,8 @@ class OpenFeatureClient:
         self,
         name: str,
         version: str,
-        context=None,
-        hooks: list = None,
+        context: EvaluationContext = EvaluationContext(),
+        hooks: list[Hook] = None,
         provider: AbstractProvider = None,
     ):
         self.name = name
@@ -23,6 +31,9 @@ class OpenFeatureClient:
         self.context = context
         self.hooks = hooks or []
         self.provider = provider
+
+    def add_hooks(self, hooks: list[Hook]):
+        self.hooks = self.hooks + hooks
 
     def get_boolean_value(
         self,
@@ -152,26 +163,64 @@ class OpenFeatureClient:
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> FlagEvaluationDetails:
+        """
+
+        :param flag_type:
+        :param key:
+        :param default_value:
+        :param evaluation_context:
+        :param flag_evaluation_options:
+        :return:
+        """
+
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
+
+        hook_context = HookContext(
+            flag_key=key,
+            flag_type=flag_type,
+            default_value=default_value,
+            evaluation_context=evaluation_context,
+            client_metadata=None,
+            provider_metadata=None,
+        )
+        merged_hooks = []
+
         try:
-            # The merge below will eventually pull in Evaluation contexts from Hooks
-            invocation_context = EvaluationContext()
+            invocation_context = before_hooks(
+                flag_type, hook_context, merged_hooks, None
+            )
             invocation_context.merge(ctx2=evaluation_context)
-            return self.create_provider_evaluation(
+
+            merged_context = (
+                # Todo pull the evaluation context below from api
+                EvaluationContext()
+                .merge(self.context)
+                .merge(invocation_context)
+            )
+
+            flag_evaluation = self.create_provider_evaluation(
                 flag_type,
                 key,
                 default_value,
-                invocation_context,
+                merged_context,
                 flag_evaluation_options,
             )
+
+            after_hooks(type, hook_context, flag_evaluation, merged_hooks, None)
+
+            return flag_evaluation
         except OpenFeatureError as ofe:
+            error_hooks(flag_type, hook_context, merged_hooks, None)
             return FlagEvaluationDetails(
                 key=key,
                 value=default_value,
                 reason=Reason.ERROR,
                 error_code=ofe.error_message,
             )
+
+        finally:
+            after_all_hooks(flag_type, hook_context, merged_hooks, None)
 
     def create_provider_evaluation(
         self,
