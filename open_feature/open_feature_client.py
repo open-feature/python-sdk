@@ -24,7 +24,7 @@ class OpenFeatureClient:
         name: str,
         version: str,
         context: EvaluationContext = EvaluationContext(),
-        hooks: list[Hook] = None,
+        hooks: typing.List[Hook] = None,
         provider: AbstractProvider = None,
     ):
         self.name = name
@@ -33,7 +33,7 @@ class OpenFeatureClient:
         self.hooks = hooks or []
         self.provider = provider
 
-    def add_hooks(self, hooks: list[Hook]):
+    def add_hooks(self, hooks: typing.List[Hook]):
         self.hooks = self.hooks + hooks
 
     def get_boolean_value(

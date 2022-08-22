@@ -1,4 +1,5 @@
 import logging
+import typing
 from functools import reduce
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
@@ -12,7 +13,7 @@ def error_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
     exception: Exception,
-    hooks: list[Hook],
+    hooks: typing.List[Hook],
     hints: dict,
 ):
     kwargs = {"ctx": hook_context, "exception": exception, "hints": hints}
@@ -32,7 +33,7 @@ def after_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
     details: FlagEvaluationDetails,
-    hooks: list[Hook],
+    hooks: typing.List[Hook],
     hints: dict,
 ):
     kwargs = {"ctx": hook_context, "details": details, "hints": hints}
@@ -42,7 +43,10 @@ def after_hooks(
 
 
 def before_hooks(
-    flag_type: FlagType, hook_context: HookContext, hooks: list[Hook], hints: dict
+    flag_type: FlagType,
+    hook_context: HookContext,
+    hooks: typing.List[Hook],
+    hints: dict,
 ) -> EvaluationContext:
     kwargs = {"ctx": hook_context, "hints": hints}
     executed_hooks = execute_hooks(
@@ -57,7 +61,7 @@ def before_hooks(
 
 
 def execute_hooks(
-    flag_type: FlagType, hooks: list[Hook], hook_method: str, **kwargs
+    flag_type: FlagType, hooks: typing.List[Hook], hook_method: str, **kwargs
 ) -> list:
     if hooks:
         filtered_hooks = list(
