@@ -1,12 +1,10 @@
 import typing
 
-from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.exception.exceptions import GeneralError
 from open_feature.open_feature_client import OpenFeatureClient
 from open_feature.provider.provider import AbstractProvider
 
 _provider = None
-_evaluation_context = EvaluationContext()
 
 
 def get_client(name: str = None, version: str = None) -> OpenFeatureClient:

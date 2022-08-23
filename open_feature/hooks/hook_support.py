@@ -7,6 +7,7 @@ from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationD
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.hooks.hook import Hook
 from open_feature.hooks.hook_context import HookContext
+from open_feature.hooks.hook_type import HookType
 
 
 def error_hooks(
@@ -16,16 +17,38 @@ def error_hooks(
     hooks: typing.List[Hook],
     hints: dict,
 ):
+    """
+
+    :param flag_type:
+    :param hook_context:
+    :param exception:
+    :param hooks:
+    :param hints:
+    :return:
+    """
     kwargs = {"ctx": hook_context, "exception": exception, "hints": hints}
-    execute_hooks(flag_type=flag_type, hooks=hooks, hook_method="error", **kwargs)
+    _execute_hooks(
+        flag_type=flag_type, hooks=hooks, hook_method=HookType.ERROR, **kwargs
+    )
 
 
 def after_all_hooks(
-    flag_type: FlagType, hook_context: HookContext, hooks: list, hints: dict
+    flag_type: FlagType,
+    hook_context: HookContext,
+    hooks: typing.List[Hook],
+    hints: dict,
 ):
+    """
+
+    :param flag_type:
+    :param hook_context:
+    :param hooks:
+    :param hints:
+    :return:
+    """
     kwargs = {"ctx": hook_context, "hints": hints}
-    execute_hooks(
-        flag_type=flag_type, hooks=hooks, hook_method="finally_after", **kwargs
+    _execute_hooks(
+        flag_type=flag_type, hooks=hooks, hook_method=HookType.FINALLY_AFTER, **kwargs
     )
 
 
@@ -36,9 +59,18 @@ def after_hooks(
     hooks: typing.List[Hook],
     hints: dict,
 ):
+    """
+
+    :param flag_type:
+    :param hook_context:
+    :param details:
+    :param hooks:
+    :param hints:
+    :return:
+    """
     kwargs = {"ctx": hook_context, "details": details, "hints": hints}
-    execute_hooks_unchecked(
-        flag_type=flag_type, hooks=hooks, hook_method="after", **kwargs
+    _execute_hooks_unchecked(
+        flag_type=flag_type, hooks=hooks, hook_method=HookType.AFTER, **kwargs
     )
 
 
@@ -49,19 +81,19 @@ def before_hooks(
     hints: dict,
 ) -> EvaluationContext:
     kwargs = {"ctx": hook_context, "hints": hints}
-    executed_hooks = execute_hooks(
-        flag_type=flag_type, hooks=hooks, hook_method="before", **kwargs
+    executed_hooks = _execute_hooks(
+        flag_type=flag_type, hooks=hooks, hook_method=HookType.BEFORE, **kwargs
     )
-    filtered_hooks = list(filter(lambda hook: hook is None, executed_hooks))
+    filtered_hooks = list(filter(lambda hook: hook is not None, executed_hooks))
 
     if filtered_hooks:
         return reduce(lambda a, b: a.merge(b), filtered_hooks)
-    else:
-        return EvaluationContext()
+
+    return EvaluationContext()
 
 
-def execute_hooks(
-    flag_type: FlagType, hooks: typing.List[Hook], hook_method: str, **kwargs
+def _execute_hooks(
+    flag_type: FlagType, hooks: typing.List[Hook], hook_method: HookType, **kwargs
 ) -> list:
     if hooks:
         filtered_hooks = list(
@@ -69,12 +101,14 @@ def execute_hooks(
                 lambda hook: hook.supports_flag_value_type(flag_type=flag_type), hooks
             )
         )
-        return [execute_checked(hook, hook_method, **kwargs) for hook in filtered_hooks]
+        return [
+            _execute_checked(hook, hook_method, **kwargs) for hook in filtered_hooks
+        ]
     return []
 
 
-def execute_hooks_unchecked(
-    flag_type: FlagType, hooks, hook_method: str, **kwargs
+def _execute_hooks_unchecked(
+    flag_type: FlagType, hooks, hook_method: HookType, **kwargs
 ) -> list:
     if hooks:
         filtered_hooks = list(
@@ -82,11 +116,13 @@ def execute_hooks_unchecked(
                 lambda hook: hook.supports_flag_value_type(flag_type=flag_type), hooks
             )
         )
-        return [getattr(hook, hook_method)(**kwargs) for hook in filtered_hooks]
+        return [getattr(hook, hook_method.value)(**kwargs) for hook in filtered_hooks]
+
+    return []
 
 
-def execute_checked(hook: Hook, hook_method: str, **kwargs):
+def _execute_checked(hook: Hook, hook_method: HookType, **kwargs):
     try:
-        getattr(hook, hook_method)(**kwargs)
+        getattr(hook, hook_method.value)(**kwargs)
     except Exception:
-        logging.error(f"Exception when running {hook_method} hooks")
+        logging.error(f"Exception when running {hook_method.value} hooks")

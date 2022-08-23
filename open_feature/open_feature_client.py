@@ -25,13 +25,13 @@ class OpenFeatureClient:
         self,
         name: str,
         version: str,
-        context: EvaluationContext = EvaluationContext(),
+        context: EvaluationContext = None,
         hooks: typing.List[Hook] = None,
         provider: AbstractProvider = None,
     ):
         self.name = name
         self.version = version
-        self.context = context
+        self.context = context or EvaluationContext()
         self.hooks = hooks or []
         self.provider = provider
 

@@ -15,7 +15,7 @@ class Hook:
         :param hook_context: Information about the particular flag evaluation
         :param hints: An immutable mapping of data for users to
         communicate to the hooks.
-        :return: An optional EvaluationContext. If returned, it will
+        :return: An EvaluationContext. If returned, it will
         be merged with the EvaluationContext instances from other
         hooks, the client and API.
         """
@@ -31,21 +31,18 @@ class Hook:
         :param hook_context: Information about the particular flag evaluation
         :param details: Information about how the flag was resolved,
         including any resolved values.
-        :param hints: An immutable mapping of data for users to
-        communicate to the hooks.
+        :param hints: A mapping of data for users to communicate to the hooks.
         """
         pass
 
     @abstractmethod
     def error(self, hook_context: HookContext, exception: Exception, hints: dict):
         """
-        Run when evaluation encounters an error. This will always run.
-        Errors thrown will be swallowed.
+        Run when evaluation encounters an error. Errors thrown will be swallowed.
 
         :param hook_context: Information about the particular flag evaluation
-        :param exception:
-        :param hints: An immutable mapping of data for users to
-        communicate to the hooks.
+        :param exception: Ability to throw a specific exception if required
+        :param hints: A mapping of data for users to communicate to the hooks.
         """
         pass
 
@@ -56,11 +53,17 @@ class Hook:
         This will always run. Errors will be swallowed.
 
         :param hook_context: Information about the particular flag evaluation
-        :param hints: An immutable mapping of data for users to
-        communicate to the hooks.
+        :param hints: A mapping of data for users to communicate to the hooks.
         """
         pass
 
     @abstractmethod
     def supports_flag_value_type(self, flag_type: FlagType) -> bool:
+        """
+        Check to see if the hook supports the particular flag type.
+
+        :param flag_type: particular type of the flag
+        :return: a boolean containing whether the flag type is supported (True)
+        or not (False)
+        """
         return True
