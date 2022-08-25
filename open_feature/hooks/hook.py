@@ -15,9 +15,8 @@ class Hook:
         :param hook_context: Information about the particular flag evaluation
         :param hints: An immutable mapping of data for users to
         communicate to the hooks.
-        :return: An EvaluationContext. If returned, it will
-        be merged with the EvaluationContext instances from other
-        hooks, the client and API.
+        :return: An EvaluationContext. It will be merged with the
+        EvaluationContext instances from other hooks, the client and API.
         """
         pass
 
