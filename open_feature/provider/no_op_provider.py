@@ -17,7 +17,7 @@ class NoOpProvider(AbstractProvider):
         self,
         key: str,
         default_value: bool,
-        evaluation_context: EvaluationContext = EvaluationContext(),
+        evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
         return FlagEvaluationDetails(

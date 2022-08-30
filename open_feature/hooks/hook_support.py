@@ -17,15 +17,6 @@ def error_hooks(
     hooks: typing.List[Hook],
     hints: dict,
 ):
-    """
-
-    :param flag_type:
-    :param hook_context:
-    :param exception:
-    :param hooks:
-    :param hints:
-    :return:
-    """
     kwargs = {"ctx": hook_context, "exception": exception, "hints": hints}
     _execute_hooks(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.ERROR, **kwargs
@@ -38,14 +29,6 @@ def after_all_hooks(
     hooks: typing.List[Hook],
     hints: dict,
 ):
-    """
-
-    :param flag_type:
-    :param hook_context:
-    :param hooks:
-    :param hints:
-    :return:
-    """
     kwargs = {"ctx": hook_context, "hints": hints}
     _execute_hooks(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.FINALLY_AFTER, **kwargs
@@ -59,15 +42,6 @@ def after_hooks(
     hooks: typing.List[Hook],
     hints: dict,
 ):
-    """
-
-    :param flag_type:
-    :param hook_context:
-    :param details:
-    :param hooks:
-    :param hints:
-    :return:
-    """
     kwargs = {"ctx": hook_context, "details": details, "hints": hints}
     _execute_hooks_unchecked(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.AFTER, **kwargs
@@ -81,7 +55,7 @@ def before_hooks(
     hints: dict,
 ) -> EvaluationContext:
     kwargs = {"ctx": hook_context, "hints": hints}
-    executed_hooks = _execute_hooks(
+    executed_hooks = _execute_hooks_unchecked(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.BEFORE, **kwargs
     )
     filtered_hooks = list(filter(lambda hook: hook is not None, executed_hooks))
@@ -95,6 +69,16 @@ def before_hooks(
 def _execute_hooks(
     flag_type: FlagType, hooks: typing.List[Hook], hook_method: HookType, **kwargs
 ) -> list:
+    """
+    Run multiple hooks of any hook type. All of these hooks will be run through an
+    exception check.
+
+    :param flag_type: particular type of flag
+    :param hooks: a list of hooks
+    :param hook_method: the type of hook that is being run
+    :param kwargs: arguments that need to be provided to the hook method
+    :return: a list of results from the applied hook methods
+    """
     if hooks:
         filtered_hooks = list(
             filter(
@@ -102,7 +86,8 @@ def _execute_hooks(
             )
         )
         return [
-            _execute_checked(hook, hook_method, **kwargs) for hook in filtered_hooks
+            _execute_hook_checked(hook, hook_method, **kwargs)
+            for hook in filtered_hooks
         ]
     return []
 
@@ -110,6 +95,17 @@ def _execute_hooks(
 def _execute_hooks_unchecked(
     flag_type: FlagType, hooks, hook_method: HookType, **kwargs
 ) -> list:
+    """
+    Execute a single hook without checking whether an exception is thrown. This is
+    used in the before and after hooks since any exception will be caught in the
+    client.
+
+    :param flag_type: particular type of flag
+    :param hooks: a list of hooks
+    :param hook_method: the type of hook that is being run
+    :param kwargs: arguments that need to be provided to the hook method
+    :return: a list of results from the applied hook methods
+    """
     if hooks:
         filtered_hooks = list(
             filter(
@@ -121,8 +117,17 @@ def _execute_hooks_unchecked(
     return []
 
 
-def _execute_checked(hook: Hook, hook_method: HookType, **kwargs):
+def _execute_hook_checked(hook: Hook, hook_method: HookType, **kwargs):
+    """
+    Try and run a single hook and catch any exception thrown. This is used in the
+    after all and error hooks since any error thrown at this point needs to be caught.
+
+    :param hook: a list of hooks
+    :param hook_method: the type of hook that is being run
+    :param kwargs: arguments that need to be provided to the hook method
+    :return: the result of the hook method
+    """
     try:
-        getattr(hook, hook_method.value)(**kwargs)
-    except Exception:
+        return getattr(hook, hook_method.value)(**kwargs)
+    except Exception:  # noqa
         logging.error(f"Exception when running {hook_method.value} hooks")

@@ -40,7 +40,7 @@ class Hook:
         Run when evaluation encounters an error. Errors thrown will be swallowed.
 
         :param hook_context: Information about the particular flag evaluation
-        :param exception: Ability to throw a specific exception if required
+        :param exception: The exception that was thrown
         :param hints: A mapping of data for users to communicate to the hooks.
         """
         pass

@@ -3,7 +3,7 @@ import typing
 from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.exception.exceptions import GeneralError, OpenFeatureError
+from open_feature.exception.exceptions import GeneralError
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.flag_evaluation.reason import Reason
@@ -15,7 +15,7 @@ from open_feature.hooks.hook_support import (
     before_hooks,
     error_hooks,
 )
-from open_feature.open_feature_evaluation_context import get_evaluation_context
+from open_feature.open_feature_evaluation_context import api_evaluation_context
 from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider
 
@@ -192,6 +192,9 @@ class OpenFeatureClient:
         merged_hooks = []
 
         try:
+            # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
+            # Any resulting evaluation context from a before hook will overwrite
+            # duplicate fields defined globally, on the client, or in the invocation.
             invocation_context = before_hooks(
                 flag_type, hook_context, merged_hooks, None
             )
@@ -199,7 +202,7 @@ class OpenFeatureClient:
 
             # merge of: API.context, client.context, invocation.context
             merged_context = (
-                get_evaluation_context().merge(self.context).merge(invocation_context)
+                api_evaluation_context().merge(self.context).merge(invocation_context)
             )
 
             flag_evaluation = self.create_provider_evaluation(
@@ -213,13 +216,16 @@ class OpenFeatureClient:
             after_hooks(type, hook_context, flag_evaluation, merged_hooks, None)
 
             return flag_evaluation
-        except OpenFeatureError as ofe:
+
+        # Catch any type of exception here since the user can provide any exception
+        # in the error hooks
+        except Exception as e:  # noqa
             error_hooks(flag_type, hook_context, merged_hooks, None)
             return FlagEvaluationDetails(
                 key=key,
                 value=default_value,
                 reason=Reason.ERROR,
-                error_code=ofe.error_message,
+                error_code=e.error_message,
             )
 
         finally:
