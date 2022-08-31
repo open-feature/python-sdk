@@ -220,7 +220,7 @@ class OpenFeatureClient:
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
         except Exception as e:  # noqa
-            error_hooks(flag_type, hook_context, merged_hooks, None)
+            error_hooks(flag_type, hook_context, e, merged_hooks, None)
             return FlagEvaluationDetails(
                 key=key,
                 value=default_value,
