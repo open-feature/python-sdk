@@ -259,7 +259,7 @@ class OpenFeatureClient:
 
         if not self.provider:
             logging.info("No provider configured, using no-op provider.")
-            NoOpProvider()
+            self.provider = NoOpProvider()
 
         get_details_callable = {
             FlagType.BOOLEAN: self.provider.get_boolean_details,

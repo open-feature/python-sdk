@@ -31,7 +31,7 @@ class NoOpProvider(AbstractProvider):
         self,
         key: str,
         default_value: str,
-        evaluation_context: EvaluationContext = EvaluationContext(),
+        evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
         return FlagEvaluationDetails(
@@ -45,7 +45,7 @@ class NoOpProvider(AbstractProvider):
         self,
         key: str,
         default_value: Number,
-        evaluation_context: EvaluationContext = EvaluationContext(),
+        evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
         return FlagEvaluationDetails(
@@ -59,7 +59,7 @@ class NoOpProvider(AbstractProvider):
         self,
         key: str,
         default_value: dict,
-        evaluation_context: EvaluationContext = EvaluationContext(),
+        evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
         return FlagEvaluationDetails(
