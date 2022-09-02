@@ -1,6 +1,7 @@
 import typing
 from numbers import Number
 
+from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.provider.provider import AbstractProvider
@@ -16,7 +17,7 @@ class NoOpProvider(AbstractProvider):
         self,
         key: str,
         default_value: bool,
-        evaluation_context: typing.Any = None,
+        evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
         return FlagEvaluationDetails(
@@ -30,7 +31,7 @@ class NoOpProvider(AbstractProvider):
         self,
         key: str,
         default_value: str,
-        evaluation_context: typing.Any = None,
+        evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
         return FlagEvaluationDetails(
@@ -44,7 +45,7 @@ class NoOpProvider(AbstractProvider):
         self,
         key: str,
         default_value: Number,
-        evaluation_context: typing.Any = None,
+        evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
         return FlagEvaluationDetails(
@@ -58,7 +59,7 @@ class NoOpProvider(AbstractProvider):
         self,
         key: str,
         default_value: dict,
-        evaluation_context: typing.Any = None,
+        evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
         return FlagEvaluationDetails(

@@ -2,6 +2,8 @@ import typing
 from abc import abstractmethod
 from numbers import Number
 
+from open_feature.evaluation_context.evaluation_context import EvaluationContext
+
 
 class AbstractProvider:
     @abstractmethod
@@ -13,7 +15,7 @@ class AbstractProvider:
         self,
         key: str,
         default_value: bool,
-        evaluation_context: typing.Any = None,
+        evaluation_context: EvaluationContext = EvaluationContext(),
         flag_evaluation_options: typing.Any = None,
     ):
         pass
@@ -23,7 +25,7 @@ class AbstractProvider:
         self,
         key: str,
         default_value: str,
-        evaluation_context: typing.Any = None,
+        evaluation_context: EvaluationContext = EvaluationContext(),
         flag_evaluation_options: typing.Any = None,
     ):
         pass
@@ -33,7 +35,7 @@ class AbstractProvider:
         self,
         key: str,
         default_value: Number,
-        evaluation_context: typing.Any = None,
+        evaluation_context: EvaluationContext = EvaluationContext(),
         flag_evaluation_options: typing.Any = None,
     ):
         pass
@@ -43,7 +45,7 @@ class AbstractProvider:
         self,
         key: str,
         default_value: dict,
-        evaluation_context: typing.Any = None,
+        evaluation_context: EvaluationContext = EvaluationContext(),
         flag_evaluation_options: typing.Any = None,
     ):
         pass
