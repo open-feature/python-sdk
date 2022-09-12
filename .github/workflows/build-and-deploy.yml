@@ -3,13 +3,11 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Test
+name: Build and Deploy
 
 on:
   push:
     branches:
-      - '*'
-    branches-ignore:
       - 'main'
 
 jobs:
@@ -53,3 +51,8 @@ jobs:
 
       - name: Test with pytest
         run: pytest
+
+      - name: Publish a Python distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
