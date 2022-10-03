@@ -88,11 +88,9 @@ class FlagDProvider(AbstractProvider):
             "flagKey": key
         }
 
-        print(f"Conn details: {self.schema}://{self.endpoint}:{self.port}/{path}")
-
         try:
             url_endpoint = f"{self.schema}://{self.endpoint}:{self.port}/{path}"
-            print(url_endpoint)
+
             response = requests.post(
                 url = url_endpoint,
                 timeout=self.timeout,
