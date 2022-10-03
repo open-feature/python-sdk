@@ -26,10 +26,6 @@ from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.provider.provider import AbstractProvider
 
-FLAGD_API_PATH_STRING = "schema.v1.Service/ResolveString"
-FLAGD_API_PATH_NUMBER = "schema.v1.Service/ResolveFloat"
-FLAGD_API_PATH_OBJECT = "schema.v1.Service/ResolveObject"
-
 
 class FlagDProvider(AbstractProvider):
     """FlagD OpenFeature Provider"""
@@ -41,6 +37,9 @@ class FlagDProvider(AbstractProvider):
         self.port = 8013
         self.timeout = 2
         self.flagd_api_path_boolean = "schema.v1.Service/ResolveBoolean"
+        self.flagd_api_path_string = "schema.v1.Service/ResolveString"
+        self.flagd_api_path_number = "schema.v1.Service/ResolveFloat"
+        self.flagd_api_path_object = "schema.v1.Service/ResolveObject"
 
     def initialise(
         self,
@@ -158,7 +157,7 @@ class FlagDProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
-        flag = self.get_flag(key, default_value, FLAGD_API_PATH_STRING)
+        flag = self.get_flag(key, default_value, self.flagd_api_path_string)
         return flag
 
 
@@ -169,7 +168,7 @@ class FlagDProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
-        flag = self.get_flag(key, default_value, FLAGD_API_PATH_NUMBER)
+        flag = self.get_flag(key, default_value, self.flagd_api_path_number)
         return flag
 
     def get_object_details(
@@ -179,5 +178,5 @@ class FlagDProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
-        flag = self.get_flag(key, default_value, FLAGD_API_PATH_OBJECT)
+        flag = self.get_flag(key, default_value, self.flagd_api_path_object)
         return flag
