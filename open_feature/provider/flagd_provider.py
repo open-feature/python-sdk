@@ -157,8 +157,7 @@ class FlagDProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
-        flag = self.get_flag(key, default_value, self.flagd_api_path_string)
-        return flag
+        return self.get_flag(key, default_value, self.flagd_api_path_string)
 
 
     def get_number_details(
@@ -168,8 +167,7 @@ class FlagDProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
-        flag = self.get_flag(key, default_value, self.flagd_api_path_number)
-        return flag
+        return self.get_flag(key, default_value, self.flagd_api_path_number)
 
     def get_object_details(
         self,
@@ -178,5 +176,4 @@ class FlagDProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ):
-        flag = self.get_flag(key, default_value, self.flagd_api_path_object)
-        return flag
+        return self.get_flag(key, default_value, self.flagd_api_path_object)
