@@ -11,7 +11,7 @@ readme = "README.md"
 authors = [{ name = "Open Feature", email = "opensource@dynatrace.com" }]
 license = { file = "LICENSE" }
 classifiers = [
-    "License :: OSI Approved :: Apache",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
