@@ -210,7 +210,6 @@ class OpenFeatureClient:
                 key,
                 default_value,
                 merged_context,
-                flag_evaluation_options,
             )
 
             after_hooks(type, hook_context, flag_evaluation, merged_hooks, None)
@@ -237,7 +236,6 @@ class OpenFeatureClient:
         key: str,
         default_value: typing.Any,
         evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: typing.Any = None,
     ) -> FlagEvaluationDetails:
         """
         Encapsulated method to create a FlagEvaluationDetail from a specific provider.
@@ -246,7 +244,6 @@ class OpenFeatureClient:
         :param key: the string key of the selected flag
         :param default_value: backup value returned if no result found by the provider
         :param evaluation_context: Information for the purposes of flag evaluation
-        :param flag_evaluation_options: Additional flag evaluation information
         :return: a FlagEvaluationDetails object with the fully evaluated flag from a
         provider
         """
@@ -254,7 +251,6 @@ class OpenFeatureClient:
             key,
             default_value,
             evaluation_context,
-            flag_evaluation_options,
         )
 
         if not self.provider:
