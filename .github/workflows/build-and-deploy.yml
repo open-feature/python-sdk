@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        container: [ "python:3.8", "python:3.9", "python:3.10" ]
+        container: [ "python:3.10" ]
     container:
       image: ${{ matrix.container }}
 
@@ -52,8 +52,23 @@ jobs:
       - name: Test with pytest
         run: pytest
 
+      - name: Install pypa/build
+        run: >-
+          python -m
+          pip install
+          build
+          --user
+
+      - name: Build a binary wheel and a source tarball
+        run: >-
+          python -m
+          build
+          --sdist
+          --wheel
+          --outdir dist/
+          .
+
       - name: Publish a Python distribution to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
-          packages_dir: open-feature/
