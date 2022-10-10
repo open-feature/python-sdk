@@ -4,10 +4,10 @@ requires      = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "python_open_feature_sdk"
+name = "open_feature_sdk"
 version = "0.0.1"
 description = "Standardizing Feature Flagging for Everyone"
-readme = "README.md"
+readme = "readme.md"
 authors = [{ name = "Open Feature", email = "opensource@dynatrace.com" }]
 license = { file = "LICENSE" }
 classifiers = [
