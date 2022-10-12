@@ -9,6 +9,8 @@ on:
   push:
     branches:
       - 'main'
+    paths-ignore:
+      - 'python-coverage-comment-action.txt'
 
 jobs:
   build:
@@ -50,7 +52,26 @@ jobs:
         run: isort .
 
       - name: Test with pytest
-        run: pytest
+        run: coverage run -m pytest
+
+      - name: Coverage comment
+        id: coverage_comment
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Store Pull Request comment to be posted
+        uses: actions/upload-artifact@v3
+        if: steps.coverage_comment.outputs.COMMENT_FILE_WRITTEN == 'true'
+        with:
+          name: python-coverage-comment-action
+          path: python-coverage-comment-action.txt
+
+      - name: Post comment
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_PR_RUN_ID: ${{ github.event.workflow_run.id }}
 
       - name: Install pypa/build
         run: >-
