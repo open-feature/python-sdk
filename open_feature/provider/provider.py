@@ -1,4 +1,3 @@
-import typing
 from abc import abstractmethod
 from numbers import Number
 
@@ -16,7 +15,6 @@ class AbstractProvider:
         key: str,
         default_value: bool,
         evaluation_context: EvaluationContext = EvaluationContext(),
-        flag_evaluation_options: typing.Any = None,
     ):
         pass
 
@@ -26,7 +24,6 @@ class AbstractProvider:
         key: str,
         default_value: str,
         evaluation_context: EvaluationContext = EvaluationContext(),
-        flag_evaluation_options: typing.Any = None,
     ):
         pass
 
@@ -36,7 +33,6 @@ class AbstractProvider:
         key: str,
         default_value: Number,
         evaluation_context: EvaluationContext = EvaluationContext(),
-        flag_evaluation_options: typing.Any = None,
     ):
         pass
 
@@ -46,6 +42,5 @@ class AbstractProvider:
         key: str,
         default_value: dict,
         evaluation_context: EvaluationContext = EvaluationContext(),
-        flag_evaluation_options: typing.Any = None,
     ):
         pass
