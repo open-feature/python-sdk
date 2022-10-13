@@ -57,7 +57,7 @@ jobs:
         run: isort .
 
       - name: Test with pytest
-        run: coverage run -m pytest
+        run: coverage run --omit="*/test*" -m pytest
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@e0fbd592d323cb2991fb586fdd260734fcb41fcb
