@@ -8,7 +8,7 @@ name = "openfeature_sdk"
 version = "0.0.1"
 description = "Standardizing Feature Flagging for Everyone"
 readme = "readme.md"
-authors = [{ name = "Open Feature", email = "openfeature-core@groups.io" }]
+authors = [{ name = "OpenFeature", email = "openfeature-core@groups.io" }]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
