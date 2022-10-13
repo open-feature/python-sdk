@@ -4,11 +4,11 @@ requires      = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "python_open_feature_sdk"
+name = "openfeature_sdk"
 version = "0.0.1"
 description = "Standardizing Feature Flagging for Everyone"
-readme = "README.md"
-authors = [{ name = "Open Feature", email = "opensource@dynatrace.com" }]
+readme = "readme.md"
+authors = [{ name = "OpenFeature", email = "openfeature-core@groups.io" }]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: Apache Software License",

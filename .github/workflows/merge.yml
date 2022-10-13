@@ -3,19 +3,18 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Build and Deploy
+name: Merge
 
 on:
   push:
-    branches:
-      - 'main'
+    branches: [ master, main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        container: [ "python:3.10" ]
+        container: [ "python:3.8", "python:3.9", "python:3.10" ]
     container:
       image: ${{ matrix.container }}
 
@@ -37,6 +36,11 @@ jobs:
           [ ! -d ".venv" ] && virtualenv .venv
           . .venv/bin/activate
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: python
+
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
 
@@ -50,25 +54,15 @@ jobs:
         run: isort .
 
       - name: Test with pytest
-        run: pytest
+        run: coverage run --omit="*/test*" -m pytest
 
-      - name: Install pypa/build
-        run: >-
-          python -m
-          pip install
-          build
-          --user
-
-      - name: Build a binary wheel and a source tarball
-        run: >-
-          python -m
-          build
-          --sdist
-          --wheel
-          --outdir dist/
-          .
-
-      - name: Publish a Python distribution to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@e0fbd592d323cb2991fb586fdd260734fcb41fcb
         with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          flags: unittests # optional
+          name: coverage # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
