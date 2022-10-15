@@ -6,3 +6,5 @@ class FlagType(Enum):
     STRING = 2
     NUMBER = 3
     OBJECT = 4
+    FLOAT = 5
+    INTEGER = 6

@@ -128,6 +128,64 @@ class OpenFeatureClient:
             flag_evaluation_options,
         )
 
+    def get_integer_value(
+        self,
+        key: str,
+        default_value: int,
+        evaluation_context: EvaluationContext = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> Number:
+        return self.get_integer_details(
+            key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        ).value
+
+    def get_integer_details(
+        self,
+        key: str,
+        default_value: int,
+        evaluation_context: EvaluationContext = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> FlagEvaluationDetails:
+        return self.evaluate_flag_details(
+            FlagType.INTEGER,
+            key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+
+    def get_float_value(
+        self,
+        key: str,
+        default_value: int,
+        evaluation_context: EvaluationContext = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> Number:
+        return self.get_float_details(
+            key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        ).value
+
+    def get_float_details(
+        self,
+        key: str,
+        default_value: float,
+        evaluation_context: EvaluationContext = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> FlagEvaluationDetails:
+        return self.evaluate_flag_details(
+            FlagType.FLOAT,
+            key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+
     def get_object_value(
         self,
         key: str,
@@ -260,6 +318,8 @@ class OpenFeatureClient:
         get_details_callable = {
             FlagType.BOOLEAN: self.provider.get_boolean_details,
             FlagType.NUMBER: self.provider.get_number_details,
+            FlagType.INTEGER: self.provider.get_number_details,
+            FlagType.FLOAT: self.provider.get_number_details,
             FlagType.OBJECT: self.provider.get_object_details,
             FlagType.STRING: self.provider.get_string_details,
         }.get(flag_type)
@@ -267,4 +327,14 @@ class OpenFeatureClient:
         if not get_details_callable:
             raise GeneralError(error_message="Unknown flag type")
 
-        return get_details_callable(*args)
+        value = get_details_callable(*args)
+
+        converter = {
+            FlagType.FLOAT: float,
+            FlagType.INTEGER: int,
+        }.get(flag_type)
+
+        if converter:
+            value.value = converter(value.value)
+
+        return value
