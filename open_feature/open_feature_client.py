@@ -134,7 +134,7 @@ class OpenFeatureClient:
         default_value: int,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
-    ) -> Number:
+    ) -> int:
         return self.get_integer_details(
             key,
             default_value,
@@ -160,10 +160,10 @@ class OpenFeatureClient:
     def get_float_value(
         self,
         key: str,
-        default_value: int,
+        default_value: float,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
-    ) -> Number:
+    ) -> float:
         return self.get_float_details(
             key,
             default_value,
