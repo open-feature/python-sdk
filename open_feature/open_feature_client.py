@@ -25,6 +25,9 @@ from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider
 
 NUMERIC_TYPES = [FlagType.FLOAT, FlagType.INTEGER]
+GetDetailsCallable = typing.Callable[
+    [str, typing.Any, typing.Optional[EvaluationContext]], FlagEvaluationDetails
+]
 
 
 class OpenFeatureClient:
@@ -331,6 +334,8 @@ class OpenFeatureClient:
             FlagType.OBJECT: self.provider.resolve_object_details,
             FlagType.STRING: self.provider.resolve_string_details,
         }.get(flag_type)
+
+        get_details_callable = get_details_callables.get(flag_type)
 
         if not get_details_callable:
             raise GeneralError(error_message="Unknown flag type")

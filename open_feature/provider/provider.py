@@ -1,5 +1,7 @@
 import typing
 from abc import abstractmethod
+from numbers import Number
+from typing import Optional
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.hooks.hook import Hook
@@ -20,7 +22,7 @@ class AbstractProvider:
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: EvaluationContext = EvaluationContext(),
+        evaluation_context: Optional[EvaluationContext] = None,
     ):
         pass
 
@@ -29,7 +31,7 @@ class AbstractProvider:
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: EvaluationContext = EvaluationContext(),
+        evaluation_context: Optional[EvaluationContext] = None,
     ):
         pass
 
@@ -56,6 +58,6 @@ class AbstractProvider:
         self,
         flag_key: str,
         default_value: dict,
-        evaluation_context: EvaluationContext = EvaluationContext(),
+        evaluation_context: Optional[EvaluationContext] = None,
     ):
         pass

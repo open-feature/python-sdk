@@ -22,7 +22,7 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: EvaluationContext = None,
+        evaluation_context: Optional[EvaluationContext] = None,
     ):
         return FlagEvaluationDetails(
             flag_key=flag_key,
@@ -35,7 +35,7 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: EvaluationContext = None,
+        evaluation_context: Optional[EvaluationContext] = None,
     ):
         return FlagEvaluationDetails(
             flag_key=flag_key,
@@ -74,7 +74,7 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: dict,
-        evaluation_context: EvaluationContext = None,
+        evaluation_context: Optional[EvaluationContext] = None,
     ):
         return FlagEvaluationDetails(
             flag_key=flag_key,
