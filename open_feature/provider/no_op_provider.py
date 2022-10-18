@@ -15,48 +15,52 @@ class NoOpProvider(AbstractProvider):
 
     def get_boolean_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: bool,
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            flag_key=key,
+            flag_key=flag_key,
             value=default_value,
             reason=Reason.DEFAULT,
+            variant=PASSED_IN_DEFAULT,
         )
 
     def get_string_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: str,
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            flag_key=key,
+            flag_key=flag_key,
             value=default_value,
             reason=Reason.DEFAULT,
+            variant=PASSED_IN_DEFAULT,
         )
 
     def get_number_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: Number,
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            flag_key=key,
+            flag_key=flag_key,
             value=default_value,
             reason=Reason.DEFAULT,
+            variant=PASSED_IN_DEFAULT,
         )
 
     def get_object_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: dict,
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            flag_key=key,
+            flag_key=flag_key,
             value=default_value,
             reason=Reason.DEFAULT,
+            variant=PASSED_IN_DEFAULT,
         )

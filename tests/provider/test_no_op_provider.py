@@ -13,7 +13,7 @@ def setup():
 def test_should_get_boolean_flag_from_no_op(no_op_provider_client):
     # Given
     # When
-    flag = no_op_provider_client.get_boolean_details(key="Key", default_value=True)
+    flag = no_op_provider_client.get_boolean_details(flag_key="Key", default_value=True)
     # Then
     assert flag is not None
     assert flag.value
@@ -23,7 +23,7 @@ def test_should_get_boolean_flag_from_no_op(no_op_provider_client):
 def test_should_get_number_flag_from_no_op(no_op_provider_client):
     # Given
     # When
-    flag = no_op_provider_client.get_number_details(key="Key", default_value=100)
+    flag = no_op_provider_client.get_number_details(flag_key="Key", default_value=100)
     # Then
     assert flag is not None
     assert flag.value == 100
@@ -33,7 +33,9 @@ def test_should_get_number_flag_from_no_op(no_op_provider_client):
 def test_should_get_string_flag_from_no_op(no_op_provider_client):
     # Given
     # When
-    flag = no_op_provider_client.get_string_details(key="Key", default_value="String")
+    flag = no_op_provider_client.get_string_details(
+        flag_key="Key", default_value="String"
+    )
     # Then
     assert flag is not None
     assert flag.value == "String"
@@ -49,7 +51,7 @@ def test_should_get_object_flag_from_no_op(no_op_provider_client):
     }
     # When
     flag = no_op_provider_client.get_string_details(
-        key="Key", default_value=return_value
+        flag_key="Key", default_value=return_value
     )
     # Then
     assert flag is not None

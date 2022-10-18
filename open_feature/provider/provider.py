@@ -13,7 +13,7 @@ class AbstractProvider:
     @abstractmethod
     def get_boolean_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: bool,
         evaluation_context: EvaluationContext = EvaluationContext(),
     ):
@@ -22,7 +22,7 @@ class AbstractProvider:
     @abstractmethod
     def get_string_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: str,
         evaluation_context: EvaluationContext = EvaluationContext(),
     ):
@@ -31,7 +31,7 @@ class AbstractProvider:
     @abstractmethod
     def get_number_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: Number,
         evaluation_context: EvaluationContext = EvaluationContext(),
     ):
@@ -40,7 +40,7 @@ class AbstractProvider:
     @abstractmethod
     def get_object_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: dict,
         evaluation_context: EvaluationContext = EvaluationContext(),
     ):

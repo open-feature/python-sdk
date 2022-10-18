@@ -1,18 +1,15 @@
+import typing
+from dataclasses import dataclass
+
 from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.reason import Reason
 
 
+@dataclass
 class FlagEvaluationDetails:
-    def __init__(
-        self,
-        key: str,
-        value,
-        reason: Reason,
-        error_code: ErrorCode = None,
-        variant=None,
-    ):
-        self.key = key
-        self.value = value
-        self.reason = reason
-        self.error_code = error_code
-        self.variant = variant
+    flag_key: str
+    value: typing.Any
+    variant: str = None
+    reason: Reason = None
+    error_code: ErrorCode = None
+    error_message: str = None
