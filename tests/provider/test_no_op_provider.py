@@ -10,6 +10,16 @@ def setup():
     assert isinstance(provider, NoOpProvider)
 
 
+def test_should_return_no_op_provider_metadata(no_op_provider_client):
+    # Given
+    # When
+    metadata = NoOpProvider().get_metadata()
+    # Then
+    assert metadata is not None
+    assert metadata.name == "No-op Provider"
+    assert metadata.is_test_class
+
+
 def test_should_get_boolean_flag_from_no_op(no_op_provider_client):
     # Given
     # When

@@ -4,6 +4,7 @@ from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.provider.metadata import Metadata
+from open_feature.provider.no_op_metadata import NoOpMetadata
 from open_feature.provider.provider import AbstractProvider
 
 PASSED_IN_DEFAULT = "Passed in default"
@@ -11,7 +12,7 @@ PASSED_IN_DEFAULT = "Passed in default"
 
 class NoOpProvider(AbstractProvider):
     def get_metadata(self) -> Metadata:
-        return Metadata(name="No-op Provider")
+        return NoOpMetadata()
 
     def get_boolean_details(
         self,
