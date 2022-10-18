@@ -230,7 +230,7 @@ class OpenFeatureClient:
         # in the error hooks
         except Exception as e:  # noqa
             error_hooks(flag_type, hook_context, e, merged_hooks, None)
-            error_message = e.error_message if e.error_message else str(e)
+            error_message = getattr(e, "error_message", str(e))
             return FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
