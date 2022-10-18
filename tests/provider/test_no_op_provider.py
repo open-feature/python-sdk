@@ -17,7 +17,7 @@ def test_should_return_no_op_provider_metadata(no_op_provider_client):
     # Then
     assert metadata is not None
     assert metadata.name == "No-op Provider"
-    assert metadata.is_test_class
+    assert metadata.is_default_provider
 
 
 def test_should_get_boolean_flag_from_no_op(no_op_provider_client):
