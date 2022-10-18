@@ -4,6 +4,7 @@ from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.exception.exceptions import GeneralError
+from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.flag_evaluation.reason import Reason
@@ -40,14 +41,14 @@ class OpenFeatureClient:
 
     def get_boolean_value(
         self,
-        key: str,
+        flag_key: str,
         default_value: bool,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> bool:
         return self.evaluate_flag_details(
             FlagType.BOOLEAN,
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -55,14 +56,14 @@ class OpenFeatureClient:
 
     def get_boolean_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: bool,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.BOOLEAN,
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -70,14 +71,14 @@ class OpenFeatureClient:
 
     def get_string_value(
         self,
-        key: str,
+        flag_key: str,
         default_value: str,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> str:
         return self.evaluate_flag_details(
             FlagType.STRING,
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -85,14 +86,14 @@ class OpenFeatureClient:
 
     def get_string_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: str,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.STRING,
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -100,14 +101,14 @@ class OpenFeatureClient:
 
     def get_number_value(
         self,
-        key: str,
+        flag_key: str,
         default_value: Number,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> Number:
         return self.evaluate_flag_details(
             FlagType.NUMBER,
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -115,14 +116,14 @@ class OpenFeatureClient:
 
     def get_number_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: Number,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.NUMBER,
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -130,14 +131,14 @@ class OpenFeatureClient:
 
     def get_object_value(
         self,
-        key: str,
+        flag_key: str,
         default_value: dict,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> dict:
         return self.evaluate_flag_details(
             FlagType.OBJECT,
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -145,14 +146,14 @@ class OpenFeatureClient:
 
     def get_object_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: dict,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.OBJECT,
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -161,7 +162,7 @@ class OpenFeatureClient:
     def evaluate_flag_details(
         self,
         flag_type: FlagType,
-        key: str,
+        flag_key: str,
         default_value: typing.Any,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
@@ -182,7 +183,7 @@ class OpenFeatureClient:
             evaluation_context = EvaluationContext()
 
         hook_context = HookContext(
-            flag_key=key,
+            flag_key=flag_key,
             flag_type=flag_type,
             default_value=default_value,
             evaluation_context=evaluation_context,
@@ -207,7 +208,7 @@ class OpenFeatureClient:
 
             flag_evaluation = self.create_provider_evaluation(
                 flag_type,
-                key,
+                flag_key,
                 default_value,
                 merged_context,
             )
@@ -216,15 +217,26 @@ class OpenFeatureClient:
 
             return flag_evaluation
 
+        except OpenFeatureError as e:  # noqa
+            error_hooks(flag_type, hook_context, e, merged_hooks, None)
+            return FlagEvaluationDetails(
+                flag_key=flag_key,
+                value=default_value,
+                reason=Reason.ERROR,
+                error_code=e.error_code,
+                error_message=e.error_message,
+            )
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
         except Exception as e:  # noqa
             error_hooks(flag_type, hook_context, e, merged_hooks, None)
+            error_message = getattr(e, "error_message", str(e))
             return FlagEvaluationDetails(
-                key=key,
+                flag_key=flag_key,
                 value=default_value,
                 reason=Reason.ERROR,
-                error_code=e.error_message,
+                error_code=ErrorCode.GENERAL,
+                error_message=error_message,
             )
 
         finally:
@@ -233,7 +245,7 @@ class OpenFeatureClient:
     def create_provider_evaluation(
         self,
         flag_type: FlagType,
-        key: str,
+        flag_key: str,
         default_value: typing.Any,
         evaluation_context: EvaluationContext = None,
     ) -> FlagEvaluationDetails:
@@ -248,7 +260,7 @@ class OpenFeatureClient:
         provider
         """
         args = (
-            key,
+            flag_key,
             default_value,
             evaluation_context,
         )
