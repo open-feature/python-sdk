@@ -2,11 +2,12 @@ from abc import abstractmethod
 from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
+from open_feature.provider.metadata import Metadata
 
 
 class AbstractProvider:
     @abstractmethod
-    def get_name(self) -> str:
+    def get_metadata(self) -> Metadata:
         pass
 
     @abstractmethod
