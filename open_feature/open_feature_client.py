@@ -4,6 +4,7 @@ from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.exception.exceptions import GeneralError
+from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.flag_evaluation.reason import Reason
@@ -216,15 +217,26 @@ class OpenFeatureClient:
 
             return flag_evaluation
 
+        except OpenFeatureError as e:  # noqa
+            error_hooks(flag_type, hook_context, e, merged_hooks, None)
+            return FlagEvaluationDetails(
+                flag_key=key,
+                value=default_value,
+                reason=Reason.ERROR,
+                error_code=e.error_code,
+                error_message=e.error_message,
+            )
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
         except Exception as e:  # noqa
             error_hooks(flag_type, hook_context, e, merged_hooks, None)
+            error_message = e.error_message if e.error_message else str(e)
             return FlagEvaluationDetails(
-                key=key,
+                flag_key=key,
                 value=default_value,
                 reason=Reason.ERROR,
-                error_code=e.error_message,
+                error_code=ErrorCode.GENERAL,
+                error_message=error_message,
             )
 
         finally:
