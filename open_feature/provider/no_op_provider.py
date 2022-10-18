@@ -3,14 +3,15 @@ from numbers import Number
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.reason import Reason
+from open_feature.provider.metadata import Metadata
 from open_feature.provider.provider import AbstractProvider
 
 PASSED_IN_DEFAULT = "Passed in default"
 
 
 class NoOpProvider(AbstractProvider):
-    def get_name(self) -> str:
-        return "No-op Provider"
+    def get_metadata(self) -> Metadata:
+        return Metadata(name="No-op Provider")
 
     def get_boolean_details(
         self,
@@ -19,10 +20,9 @@ class NoOpProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            key=key,
+            flag_key=key,
             value=default_value,
             reason=Reason.DEFAULT,
-            variant=PASSED_IN_DEFAULT,
         )
 
     def get_string_details(
@@ -32,10 +32,9 @@ class NoOpProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            key=key,
+            flag_key=key,
             value=default_value,
             reason=Reason.DEFAULT,
-            variant=PASSED_IN_DEFAULT,
         )
 
     def get_number_details(
@@ -45,10 +44,9 @@ class NoOpProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            key=key,
+            flag_key=key,
             value=default_value,
             reason=Reason.DEFAULT,
-            variant=PASSED_IN_DEFAULT,
         )
 
     def get_object_details(
@@ -58,8 +56,7 @@ class NoOpProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            key=key,
+            flag_key=key,
             value=default_value,
             reason=Reason.DEFAULT,
-            variant=PASSED_IN_DEFAULT,
         )
