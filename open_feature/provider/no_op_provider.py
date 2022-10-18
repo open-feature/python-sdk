@@ -19,7 +19,7 @@ class NoOpProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            key=key,
+            flag_key=key,
             value=default_value,
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
@@ -32,7 +32,7 @@ class NoOpProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            key=key,
+            flag_key=key,
             value=default_value,
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
@@ -45,7 +45,7 @@ class NoOpProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            key=key,
+            flag_key=key,
             value=default_value,
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
@@ -58,7 +58,7 @@ class NoOpProvider(AbstractProvider):
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
-            key=key,
+            flag_key=key,
             value=default_value,
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
