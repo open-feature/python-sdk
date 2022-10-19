@@ -17,7 +17,7 @@ def error_hooks(
     hooks: typing.List[Hook],
     hints: dict,
 ):
-    kwargs = {"ctx": hook_context, "exception": exception, "hints": hints}
+    kwargs = {"hook_context": hook_context, "exception": exception, "hints": hints}
     _execute_hooks(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.ERROR, **kwargs
     )
@@ -29,7 +29,7 @@ def after_all_hooks(
     hooks: typing.List[Hook],
     hints: dict,
 ):
-    kwargs = {"ctx": hook_context, "hints": hints}
+    kwargs = {"hook_context": hook_context, "hints": hints}
     _execute_hooks(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.FINALLY_AFTER, **kwargs
     )
@@ -42,7 +42,7 @@ def after_hooks(
     hooks: typing.List[Hook],
     hints: dict,
 ):
-    kwargs = {"ctx": hook_context, "details": details, "hints": hints}
+    kwargs = {"hook_context": hook_context, "details": details, "hints": hints}
     _execute_hooks_unchecked(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.AFTER, **kwargs
     )
@@ -54,7 +54,7 @@ def before_hooks(
     hooks: typing.List[Hook],
     hints: dict,
 ) -> EvaluationContext:
-    kwargs = {"ctx": hook_context, "hints": hints}
+    kwargs = {"hook_context": hook_context, "hints": hints}
     executed_hooks = _execute_hooks_unchecked(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.BEFORE, **kwargs
     )
