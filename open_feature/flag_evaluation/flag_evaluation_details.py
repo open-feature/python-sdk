@@ -9,7 +9,7 @@ from open_feature.flag_evaluation.reason import Reason
 class FlagEvaluationDetails:
     flag_key: str
     value: typing.Any
-    variant: str = None
-    reason: Reason = None
-    error_code: ErrorCode = None
+    variant: typing.Optional[str] = None
+    reason: typing.Optional[Reason] = None
+    error_code: typing.Optional[ErrorCode] = None
     error_message: typing.Optional[str] = None
