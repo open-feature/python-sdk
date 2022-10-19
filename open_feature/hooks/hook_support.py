@@ -52,7 +52,7 @@ def before_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
     hooks: typing.List[Hook],
-    hints: typing.Optional[dict],
+    hints: typing.Optional[typing.Mapping] = None,
 ) -> EvaluationContext:
     kwargs = {"hook_context": hook_context, "hints": hints}
     executed_hooks = _execute_hooks_unchecked(
