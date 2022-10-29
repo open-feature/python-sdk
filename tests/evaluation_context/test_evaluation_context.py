@@ -66,7 +66,7 @@ def test_can_serialize_to_json_string():
     )
 
     # When
-    context_dict = context.to_json()
+    context_dict = str(context)
 
     # Then
     assert context_dict == '{"att1": "value1", "targetingKey": "targeting_key"}'

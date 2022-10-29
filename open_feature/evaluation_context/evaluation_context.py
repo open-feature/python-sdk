@@ -14,8 +14,14 @@ class EvaluationContext:
 
         return self
 
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return json.dumps(self.asdict(), ensure_ascii=False)
+
     def asdict(self):
         return {**self.attributes, 'targetingKey': self.targeting_key}
-    
+
     def to_json(self):
         return json.dumps(self.asdict())
