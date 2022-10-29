@@ -1,3 +1,4 @@
+import json
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 
 
@@ -45,3 +46,27 @@ def test_second_targeting_key_overwrites_first():
 
     # Then
     assert merged_context.targeting_key == second_context.targeting_key
+
+def test_can_cast_to_dict():
+    # Given
+    context = EvaluationContext(
+        targeting_key="targeting_key", attributes={"att1": "value1"}
+    )
+
+    # When
+    context_dict = context.asdict()
+
+    # Then
+    assert context_dict == {"targetingKey": "targeting_key", "att1": "value1"}
+
+def test_can_serialize_to_json_string():
+    # Given
+    context = EvaluationContext(
+        targeting_key="targeting_key", attributes={"att1": "value1"}
+    )
+
+    # When
+    context_dict = context.to_json()
+
+    # Then
+    assert context_dict == '{"att1": "value1", "targetingKey": "targeting_key"}'

@@ -1,3 +1,5 @@
+import json
+
 class EvaluationContext:
     def __init__(self, targeting_key: str = None, attributes: dict = None):
         self.targeting_key = targeting_key
@@ -11,3 +13,9 @@ class EvaluationContext:
         self.targeting_key = ctx2.targeting_key or self.targeting_key
 
         return self
+
+    def asdict(self):
+        return {**self.attributes, 'targetingKey': self.targeting_key}
+    
+    def to_json(self):
+        return json.dumps(self.asdict())
