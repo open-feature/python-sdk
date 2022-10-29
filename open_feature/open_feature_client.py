@@ -16,6 +16,7 @@ from open_feature.hooks.hook_support import (
     before_hooks,
     error_hooks,
 )
+from open_feature.immutable_dict.mapping_proxy_type import MappingProxyType
 from open_feature.open_feature_evaluation_context import api_evaluation_context
 from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider
@@ -182,6 +183,8 @@ class OpenFeatureClient:
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
 
+        evaluation_hooks, hook_hints = self.__extract_evaluation_options(flag_evaluation_options)
+
         hook_context = HookContext(
             flag_key=flag_key,
             flag_type=flag_type,
@@ -197,7 +200,7 @@ class OpenFeatureClient:
             # Any resulting evaluation context from a before hook will overwrite
             # duplicate fields defined globally, on the client, or in the invocation.
             invocation_context = before_hooks(
-                flag_type, hook_context, merged_hooks, None
+                flag_type, hook_context, merged_hooks, hook_hints
             )
             invocation_context.merge(ctx2=evaluation_context)
 
@@ -213,12 +216,12 @@ class OpenFeatureClient:
                 merged_context,
             )
 
-            after_hooks(type, hook_context, flag_evaluation, merged_hooks, None)
+            after_hooks(type, hook_context, flag_evaluation, merged_hooks, hook_hints)
 
             return flag_evaluation
 
         except OpenFeatureError as e:
-            error_hooks(flag_type, hook_context, e, merged_hooks, None)
+            error_hooks(flag_type, hook_context, e, merged_hooks, hook_hints)
             return FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
@@ -229,7 +232,7 @@ class OpenFeatureClient:
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
         except Exception as e:  # noqa
-            error_hooks(flag_type, hook_context, e, merged_hooks, None)
+            error_hooks(flag_type, hook_context, e, merged_hooks, hook_hints)
             error_message = getattr(e, "error_message", str(e))
             return FlagEvaluationDetails(
                 flag_key=flag_key,
@@ -240,7 +243,7 @@ class OpenFeatureClient:
             )
 
         finally:
-            after_all_hooks(flag_type, hook_context, merged_hooks, None)
+            after_all_hooks(flag_type, hook_context, merged_hooks, hook_hints)
 
     def _create_provider_evaluation(
         self,
@@ -280,3 +283,16 @@ class OpenFeatureClient:
             raise GeneralError(error_message="Unknown flag type")
 
         return get_details_callable(*args)
+
+    def __extract_evaluation_options(self, flag_evaluation_options: typing.Any) -> typing.Tuple(typing.List[Hook], MappingProxyType):
+        evaluation_hooks: typing.List[Hook] = []
+        hook_hints: dict = {}
+
+        if flag_evaluation_options is dict:
+            if 'hook_hints' in flag_evaluation_options and flag_evaluation_options['hook_hints'] is dict:
+                hook_hints = dict(flag_evaluation_options['hook_hints'])
+
+            if 'hooks' in flag_evaluation_options and flag_evaluation_options['hooks'] is list:
+                evaluation_hooks = flag_evaluation_options['hooks']
+
+        return (evaluation_hooks, MappingProxyType(hook_hints))
