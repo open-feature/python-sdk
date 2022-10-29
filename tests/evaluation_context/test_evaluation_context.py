@@ -59,7 +59,7 @@ def test_can_cast_to_dict():
     # Then
     assert context_dict == {"targetingKey": "targeting_key", "att1": "value1"}
 
-def test_can_serialize_to_json_string():
+def test_can_str_to_json():
     # Given
     context = EvaluationContext(
         targeting_key="targeting_key", attributes={"att1": "value1"}
@@ -67,6 +67,18 @@ def test_can_serialize_to_json_string():
 
     # When
     context_dict = str(context)
+
+    # Then
+    assert context_dict == '{"att1": "value1", "targetingKey": "targeting_key"}'
+
+def test_can_repr_to_json():
+    # Given
+    context = EvaluationContext(
+        targeting_key="targeting_key", attributes={"att1": "value1"}
+    )
+
+    # When
+    context_dict = repr(context)
 
     # Then
     assert context_dict == '{"att1": "value1", "targetingKey": "targeting_key"}'
