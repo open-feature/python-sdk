@@ -1,5 +1,6 @@
 # Open Feature SDK for Python
 [![PyPI version](https://badge.fury.io/py/openfeature-sdk.svg)](https://badge.fury.io/py/openfeature-sdk)
+![Python 3.8+](https://img.shields.io/badge/python->=3.8-blue.svg)
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![Specification](https://img.shields.io/static/v1?label=Specification&message=v0.3.0&color=red)](https://github.com/open-feature/spec/tree/v0.3.0)
 [![on-merge](https://github.com/open-feature/python-sdk/actions/workflows/merge.yml/badge.svg)](https://github.com/open-feature/python-sdk/actions/workflows/merge.yml)
