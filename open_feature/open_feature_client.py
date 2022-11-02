@@ -129,6 +129,64 @@ class OpenFeatureClient:
             flag_evaluation_options,
         )
 
+    def get_integer_value(
+        self,
+        key: str,
+        default_value: int,
+        evaluation_context: EvaluationContext = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> int:
+        return self.get_integer_details(
+            key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        ).value
+
+    def get_integer_details(
+        self,
+        key: str,
+        default_value: int,
+        evaluation_context: EvaluationContext = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> FlagEvaluationDetails:
+        return self.evaluate_flag_details(
+            FlagType.INTEGER,
+            key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+
+    def get_float_value(
+        self,
+        key: str,
+        default_value: float,
+        evaluation_context: EvaluationContext = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> float:
+        return self.get_float_details(
+            key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        ).value
+
+    def get_float_details(
+        self,
+        key: str,
+        default_value: float,
+        evaluation_context: EvaluationContext = None,
+        flag_evaluation_options: typing.Any = None,
+    ) -> FlagEvaluationDetails:
+        return self.evaluate_flag_details(
+            FlagType.FLOAT,
+            key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+
     def get_object_value(
         self,
         flag_key: str,
@@ -269,12 +327,22 @@ class OpenFeatureClient:
             logging.info("No provider configured, using no-op provider.")
             self.provider = NoOpProvider()
 
-        get_details_callable = {
+        value = get_details_callable = {
             FlagType.BOOLEAN: self.provider.get_boolean_details,
             FlagType.NUMBER: self.provider.get_number_details,
+            FlagType.INTEGER: self.provider.get_number_details,
+            FlagType.FLOAT: self.provider.get_number_details,
             FlagType.OBJECT: self.provider.get_object_details,
             FlagType.STRING: self.provider.get_string_details,
         }.get(flag_type)
+
+        converter = {
+            FlagType.FLOAT: float,
+            FlagType.INTEGER: int,
+        }.get(flag_type)
+
+        if converter:
+            value.value = converter(value.value)
 
         if not get_details_callable:
             raise GeneralError(error_message="Unknown flag type")
