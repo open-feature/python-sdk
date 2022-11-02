@@ -258,7 +258,18 @@ class OpenFeatureClient:
             client_metadata=None,
             provider_metadata=None,
         )
+        # Todo add api level hooks
+        # https://github.com/open-feature/spec/blob/main/specification/sections/04-hooks.md#requirement-442
+        # Hooks need to be handled in different orders at different stages
+        # in the flag evaluation
+        # before: API, Client, Invocation, Provider
         merged_hooks = (
+            self.hooks
+            + flag_evaluation_options.hooks
+            + self.provider.get_provider_hooks()
+        )
+        # after, error, finally: Provider, Invocation, Client, API
+        reversed_merged_hooks = (
             self.provider.get_provider_hooks()
             + flag_evaluation_options.hooks
             + self.hooks
@@ -285,12 +296,14 @@ class OpenFeatureClient:
                 merged_context,
             )
 
-            after_hooks(flag_type, hook_context, flag_evaluation, merged_hooks, None)
+            after_hooks(
+                flag_type, hook_context, flag_evaluation, reversed_merged_hooks, None
+            )
 
             return flag_evaluation
 
         except OpenFeatureError as e:
-            error_hooks(flag_type, hook_context, e, merged_hooks, None)
+            error_hooks(flag_type, hook_context, e, reversed_merged_hooks, None)
             return FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
@@ -301,7 +314,7 @@ class OpenFeatureClient:
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
         except Exception as e:  # noqa
-            error_hooks(flag_type, hook_context, e, merged_hooks, None)
+            error_hooks(flag_type, hook_context, e, reversed_merged_hooks, None)
             error_message = getattr(e, "error_message", str(e))
             return FlagEvaluationDetails(
                 flag_key=flag_key,
@@ -312,7 +325,7 @@ class OpenFeatureClient:
             )
 
         finally:
-            after_all_hooks(flag_type, hook_context, merged_hooks, None)
+            after_all_hooks(flag_type, hook_context, reversed_merged_hooks, None)
 
     def _create_provider_evaluation(
         self,
