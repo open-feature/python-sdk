@@ -3,8 +3,7 @@ import typing
 from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.exception.exceptions import GeneralError
-from open_feature.exception.exceptions import OpenFeatureError
+from open_feature.exception.exceptions import GeneralError, OpenFeatureError
 from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.flag_type import FlagType
@@ -191,7 +190,7 @@ class OpenFeatureClient:
             client_metadata=None,
             provider_metadata=None,
         )
-        merged_hooks = []
+        merged_hooks = self.hooks
 
         try:
             # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
@@ -207,7 +206,7 @@ class OpenFeatureClient:
                 api_evaluation_context().merge(self.context).merge(invocation_context)
             )
 
-            flag_evaluation = self.create_provider_evaluation(
+            flag_evaluation = self._create_provider_evaluation(
                 flag_type,
                 flag_key,
                 default_value,
@@ -218,7 +217,7 @@ class OpenFeatureClient:
 
             return flag_evaluation
 
-        except OpenFeatureError as e:  # noqa
+        except OpenFeatureError as e:
             error_hooks(flag_type, hook_context, e, merged_hooks, None)
             return FlagEvaluationDetails(
                 flag_key=flag_key,
@@ -243,7 +242,7 @@ class OpenFeatureClient:
         finally:
             after_all_hooks(flag_type, hook_context, merged_hooks, None)
 
-    def create_provider_evaluation(
+    def _create_provider_evaluation(
         self,
         flag_type: FlagType,
         flag_key: str,

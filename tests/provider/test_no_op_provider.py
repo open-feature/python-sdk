@@ -1,16 +1,9 @@
 from numbers import Number
 
-from open_feature import open_feature_api as api
 from open_feature.provider.no_op_provider import NoOpProvider
 
 
-def setup():
-    api.set_provider(NoOpProvider())
-    provider = api.get_provider()
-    assert isinstance(provider, NoOpProvider)
-
-
-def test_should_return_no_op_provider_metadata(no_op_provider_client):
+def test_should_return_no_op_provider_metadata():
     # Given
     # When
     metadata = NoOpProvider().get_metadata()
@@ -20,39 +13,37 @@ def test_should_return_no_op_provider_metadata(no_op_provider_client):
     assert metadata.is_default_provider
 
 
-def test_should_get_boolean_flag_from_no_op(no_op_provider_client):
+def test_should_get_boolean_flag_from_no_op():
     # Given
     # When
-    flag = no_op_provider_client.get_boolean_details(flag_key="Key", default_value=True)
+    flag = NoOpProvider().get_boolean_details(flag_key="Key", default_value=True)
     # Then
     assert flag is not None
     assert flag.value
     assert isinstance(flag.value, bool)
 
 
-def test_should_get_number_flag_from_no_op(no_op_provider_client):
+def test_should_get_number_flag_from_no_op():
     # Given
     # When
-    flag = no_op_provider_client.get_number_details(flag_key="Key", default_value=100)
+    flag = NoOpProvider().get_number_details(flag_key="Key", default_value=100)
     # Then
     assert flag is not None
     assert flag.value == 100
     assert isinstance(flag.value, Number)
 
 
-def test_should_get_string_flag_from_no_op(no_op_provider_client):
+def test_should_get_string_flag_from_no_op():
     # Given
     # When
-    flag = no_op_provider_client.get_string_details(
-        flag_key="Key", default_value="String"
-    )
+    flag = NoOpProvider().get_string_details(flag_key="Key", default_value="String")
     # Then
     assert flag is not None
     assert flag.value == "String"
     assert isinstance(flag.value, str)
 
 
-def test_should_get_object_flag_from_no_op(no_op_provider_client):
+def test_should_get_object_flag_from_no_op():
     # Given
     return_value = {
         "String": "string",
@@ -60,9 +51,7 @@ def test_should_get_object_flag_from_no_op(no_op_provider_client):
         "Boolean": True,
     }
     # When
-    flag = no_op_provider_client.get_string_details(
-        flag_key="Key", default_value=return_value
-    )
+    flag = NoOpProvider().get_object_details(flag_key="Key", default_value=return_value)
     # Then
     assert flag is not None
     assert flag.value == return_value
