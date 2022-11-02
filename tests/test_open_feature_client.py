@@ -15,6 +15,8 @@ from open_feature.hooks.hook import Hook
         (bool, True, "get_boolean_value"),
         (str, "String", "get_string_value"),
         (Number, 100, "get_number_value"),
+        (int, 100, "get_integer_value"),
+        (float, 10.23, "get_float_value"),
         (
             dict,
             {
@@ -46,6 +48,8 @@ def test_should_get_flag_value_based_on_method_type(
         (bool, True, "get_boolean_details"),
         (str, "String", "get_string_details"),
         (Number, 100, "get_number_details"),
+        (int, 100, "get_integer_details"),
+        (float, 10.23, "get_float_details"),
         (
             dict,
             {

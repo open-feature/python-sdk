@@ -138,13 +138,13 @@ class OpenFeatureClient:
 
     def get_integer_value(
         self,
-        key: str,
+        flag_key: str,
         default_value: int,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> int:
         return self.get_integer_details(
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -152,14 +152,14 @@ class OpenFeatureClient:
 
     def get_integer_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: int,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.INTEGER,
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -167,13 +167,13 @@ class OpenFeatureClient:
 
     def get_float_value(
         self,
-        key: str,
+        flag_key: str,
         default_value: float,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> float:
         return self.get_float_details(
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -181,14 +181,14 @@ class OpenFeatureClient:
 
     def get_float_details(
         self,
-        key: str,
+        flag_key: str,
         default_value: float,
         evaluation_context: EvaluationContext = None,
         flag_evaluation_options: typing.Any = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.FLOAT,
-            key,
+            flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
@@ -350,13 +350,13 @@ class OpenFeatureClient:
             FlagType.STRING: self.provider.get_string_details,
         }.get(flag_type)
 
+        if not get_details_callable:
+            raise GeneralError(error_message="Unknown flag type")
+
         value = get_details_callable(*args)
 
         if flag_type in NUMERIC_TYPES:
             value.value = self._convert_numeric_types(flag_type, value.value)
-
-        if not get_details_callable:
-            raise GeneralError(error_message="Unknown flag type")
 
         return value
 
