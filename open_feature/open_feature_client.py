@@ -4,6 +4,7 @@ from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.exception.exceptions import GeneralError
+from open_feature.exception.exceptions import OpenFeatureError
 from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.flag_type import FlagType
@@ -280,3 +281,6 @@ class OpenFeatureClient:
             raise GeneralError(error_message="Unknown flag type")
 
         return get_details_callable(*args)
+
+    def set_evaluation_context(self, evaluation_context: EvaluationContext):
+        self.context = evaluation_context
