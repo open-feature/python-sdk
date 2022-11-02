@@ -18,11 +18,20 @@ def setup():
     assert isinstance(provider, NoOpProvider)
 
 
-def test_should_use_no_op_provider_if_none_provided():
+@pytest.mark.parametrize(
+    "flag_type, default_value",
+    (
+        (FlagType.BOOLEAN, True),
+        (FlagType.STRING, True),
+        (FlagType.NUMBER, True),
+        (FlagType.OBJECT, True),
+    ),
+)
+def test_should_use_no_op_provider_if_none_provided(flag_type, default_value):
     # Given
     # When
     flag = OpenFeatureClient("No provider", "1.0")._create_provider_evaluation(
-        flag_type=FlagType.BOOLEAN, flag_key="Key", default_value=True
+        flag_type=flag_type, flag_key="Key", default_value=default_value
     )
     # Then
     assert flag is not None
