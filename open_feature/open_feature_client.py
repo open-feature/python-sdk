@@ -10,6 +10,7 @@ from open_feature.exception.exceptions import (
 )
 from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
+from open_feature.flag_evaluation.flag_evaluation_options import FlagEvaluationOptions
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.hooks.hook import Hook
@@ -227,7 +228,7 @@ class OpenFeatureClient:
         flag_key: str,
         default_value: typing.Any,
         evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: typing.Any = None,
+        flag_evaluation_options: FlagEvaluationOptions = None,
     ) -> FlagEvaluationDetails:
         """
         Evaluate the flag requested by the user from the clients provider.
@@ -244,6 +245,9 @@ class OpenFeatureClient:
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
 
+        if flag_evaluation_options is None:
+            flag_evaluation_options = FlagEvaluationOptions()
+
         hook_context = HookContext(
             flag_key=flag_key,
             flag_type=flag_type,
@@ -252,7 +256,11 @@ class OpenFeatureClient:
             client_metadata=None,
             provider_metadata=None,
         )
-        merged_hooks = []
+        merged_hooks = (
+            self.provider.get_provider_hooks()
+            + flag_evaluation_options.hooks
+            + self.hooks
+        )
 
         try:
             # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
