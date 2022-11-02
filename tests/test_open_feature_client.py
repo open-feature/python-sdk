@@ -51,9 +51,9 @@ def test_should_get_flag_value_based_on_method_type(
 @pytest.mark.parametrize(
     "flag_type, default_value, get_method",
     (
-        (bool, True, "get_boolean_detail"),
-        (str, "String", "get_string_detail"),
-        (Number, 100, "get_number_detail"),
+        (bool, True, "get_boolean_details"),
+        (str, "String", "get_string_details"),
+        (Number, 100, "get_number_details"),
         (
             dict,
             {
@@ -61,7 +61,7 @@ def test_should_get_flag_value_based_on_method_type(
                 "Number": 2,
                 "Boolean": True,
             },
-            "get_object_detail",
+            "get_object_details",
         ),
     ),
 )
