@@ -5,7 +5,6 @@ import pytest
 from open_feature import open_feature_api as api
 from open_feature.exception.exceptions import GeneralError
 from open_feature.flag_evaluation.error_code import ErrorCode
-from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.open_feature_client import OpenFeatureClient
 from open_feature.provider.no_op_provider import NoOpProvider
@@ -19,24 +18,65 @@ def setup():
 
 
 @pytest.mark.parametrize(
-    "flag_type, default_value",
+    "flag_type, default_value, get_method",
     (
-        (FlagType.BOOLEAN, True),
-        (FlagType.STRING, True),
-        (FlagType.NUMBER, True),
-        (FlagType.OBJECT, True),
+        (bool, True, "get_boolean_value"),
+        (str, "String", "get_string_value"),
+        (Number, 100, "get_number_value"),
+        (
+            dict,
+            {
+                "String": "string",
+                "Number": 2,
+                "Boolean": True,
+            },
+            "get_object_value",
+        ),
     ),
 )
-def test_should_use_no_op_provider_if_none_provided(flag_type, default_value):
+def test_should_get_flag_value_based_on_method_type(
+    flag_type, default_value, get_method, no_op_provider_client
+):
     # Given
     # When
-    flag = OpenFeatureClient("No provider", "1.0")._create_provider_evaluation(
-        flag_type=flag_type, flag_key="Key", default_value=default_value
+    flag = getattr(no_op_provider_client, get_method)(
+        flag_key="Key", default_value=default_value
     )
     # Then
     assert flag is not None
-    assert flag.value
-    assert isinstance(flag.value, bool)
+    assert flag == default_value
+    assert isinstance(flag, flag_type)
+
+
+@pytest.mark.parametrize(
+    "flag_type, default_value, get_method",
+    (
+        (bool, True, "get_boolean_detail"),
+        (str, "String", "get_string_detail"),
+        (Number, 100, "get_number_detail"),
+        (
+            dict,
+            {
+                "String": "string",
+                "Number": 2,
+                "Boolean": True,
+            },
+            "get_object_detail",
+        ),
+    ),
+)
+def test_should_get_flag_detail_based_on_method_type(
+    flag_type, default_value, get_method, no_op_provider_client
+):
+    # Given
+    # When
+    flag = getattr(no_op_provider_client, get_method)(
+        flag_key="Key", default_value=default_value
+    )
+    # Then
+    assert flag is not None
+    assert flag.value == default_value
+    assert isinstance(flag.value, flag_type)
 
 
 def test_should_raise_exception_when_invalid_flag_type_provided():
@@ -50,104 +90,6 @@ def test_should_raise_exception_when_invalid_flag_type_provided():
     assert ge.value
     assert ge.value.error_message == "Unknown flag type"
     assert ge.value.error_code == ErrorCode.GENERAL
-
-
-def test_should_get_boolean_flag(no_op_provider_client):
-    # Given
-    # When
-    flag = no_op_provider_client.get_boolean_details(flag_key="Key", default_value=True)
-    # Then
-    assert flag is not None
-    assert flag.value
-    assert isinstance(flag.value, bool)
-
-
-def test_should_get_boolean_flag_value(no_op_provider_client):
-    # Given
-    # When
-    flag = no_op_provider_client.get_boolean_value(flag_key="Key", default_value=True)
-    # Then
-    assert flag is not None
-    assert flag
-    assert isinstance(flag, bool)
-
-
-def test_should_get_number_flag(no_op_provider_client):
-    # Given
-    # When
-    flag = no_op_provider_client.get_number_details(flag_key="Key", default_value=100)
-    # Then
-    assert flag is not None
-    assert flag.value == 100
-    assert isinstance(flag.value, Number)
-
-
-def test_should_get_number_flag_value(no_op_provider_client):
-    # Given
-    # When
-    flag = no_op_provider_client.get_number_value(flag_key="Key", default_value=100)
-    # Then
-    assert flag is not None
-    assert flag == 100
-    assert isinstance(flag, Number)
-
-
-def test_should_get_string_flag(no_op_provider_client):
-    # Given
-    # When
-    flag = no_op_provider_client.get_string_details(
-        flag_key="Key", default_value="String"
-    )
-    # Then
-    assert flag is not None
-    assert flag.value == "String"
-    assert isinstance(flag.value, str)
-
-
-def test_should_get_string_flag_value(no_op_provider_client):
-    # Given
-    # When
-    flag = no_op_provider_client.get_string_value(
-        flag_key="Key", default_value="String"
-    )
-    # Then
-    assert flag is not None
-    assert flag == "String"
-    assert isinstance(flag, str)
-
-
-def test_should_get_object_flag(no_op_provider_client):
-    # Given
-    return_value = {
-        "String": "string",
-        "Number": 2,
-        "Boolean": True,
-    }
-    # When
-    flag = no_op_provider_client.get_object_details(
-        flag_key="Key", default_value=return_value
-    )
-    # Then
-    assert flag is not None
-    assert flag.value == return_value
-    assert isinstance(flag.value, dict)
-
-
-def test_should_get_object_flag_value(no_op_provider_client):
-    # Given
-    return_value = {
-        "String": "string",
-        "Number": 2,
-        "Boolean": True,
-    }
-    # When
-    flag = no_op_provider_client.get_object_value(
-        flag_key="Key", default_value=return_value
-    )
-    # Then
-    assert flag is not None
-    assert flag == return_value
-    assert isinstance(flag, dict)
 
 
 def test_should_handle_a_generic_exception_thrown_by_a_provider(no_op_provider_client):
