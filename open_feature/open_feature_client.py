@@ -3,7 +3,11 @@ import typing
 from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.exception.exceptions import GeneralError
+from open_feature.exception.exceptions import (
+    GeneralError,
+    OpenFeatureError,
+    TypeMismatchError,
+)
 from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.flag_type import FlagType
@@ -259,7 +263,7 @@ class OpenFeatureClient:
             )
             invocation_context.merge(ctx2=evaluation_context)
 
-            # merge of: API.context, client.context, invocation.context
+            # Requirement 3.2.2 merge: API.context->client.context->invocation.context
             merged_context = (
                 api_evaluation_context().merge(self.context).merge(invocation_context)
             )
@@ -271,7 +275,7 @@ class OpenFeatureClient:
                 merged_context,
             )
 
-            after_hooks(type, hook_context, flag_evaluation, merged_hooks, None)
+            after_hooks(flag_type, hook_context, flag_evaluation, merged_hooks, None)
 
             return flag_evaluation
 
@@ -327,7 +331,7 @@ class OpenFeatureClient:
             logging.info("No provider configured, using no-op provider.")
             self.provider = NoOpProvider()
 
-        value = get_details_callable = {
+        get_details_callable = {
             FlagType.BOOLEAN: self.provider.get_boolean_details,
             FlagType.NUMBER: self.provider.get_number_details,
             FlagType.INTEGER: self.provider.get_number_details,
@@ -336,15 +340,17 @@ class OpenFeatureClient:
             FlagType.STRING: self.provider.get_string_details,
         }.get(flag_type)
 
+        value = get_details_callable(*args)
+
         converter = {
             FlagType.FLOAT: float,
             FlagType.INTEGER: int,
         }.get(flag_type)
 
-        if converter:
-            value.value = converter(value.value)
+        if not isinstance(value.value, converter(value.value)):
+            raise TypeMismatchError()
 
         if not get_details_callable:
             raise GeneralError(error_message="Unknown flag type")
 
-        return get_details_callable(*args)
+        return value
