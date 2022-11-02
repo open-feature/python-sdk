@@ -3,19 +3,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from open_feature import open_feature_api as api
 from open_feature.exception.exceptions import GeneralError, OpenFeatureError
 from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.hooks.hook import Hook
 from open_feature.open_feature_client import OpenFeatureClient
-from open_feature.provider.no_op_provider import NoOpProvider
-
-
-def setup():
-    api.set_provider(NoOpProvider())
-    provider = api.get_provider()
-    assert isinstance(provider, NoOpProvider)
 
 
 @pytest.mark.parametrize(
