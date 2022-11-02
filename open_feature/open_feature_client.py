@@ -2,12 +2,12 @@ import logging
 import typing
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
+from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import (
     GeneralError,
     OpenFeatureError,
     TypeMismatchError,
 )
-from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.flag_evaluation_options import FlagEvaluationOptions
 from open_feature.flag_evaluation.flag_type import FlagType
