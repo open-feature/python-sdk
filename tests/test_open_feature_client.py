@@ -1,14 +1,15 @@
 from numbers import Number
+from unittest.mock import MagicMock
 
 import pytest
 
 from open_feature import open_feature_api as api
-from open_feature.exception.exceptions import GeneralError
+from open_feature.exception.exceptions import GeneralError, OpenFeatureError
 from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.reason import Reason
+from open_feature.hooks.hook import Hook
 from open_feature.open_feature_client import OpenFeatureClient
 from open_feature.provider.no_op_provider import NoOpProvider
-from tests.conftest import TestExceptionHook, TestOpenFeatureErrorHook
 
 
 def setup():
@@ -94,7 +95,9 @@ def test_should_raise_exception_when_invalid_flag_type_provided():
 
 def test_should_handle_a_generic_exception_thrown_by_a_provider(no_op_provider_client):
     # Given
-    no_op_provider_client.add_hooks([TestExceptionHook()])
+    exception_hook = MagicMock(spec=Hook)
+    exception_hook.after.side_effect = Exception("Generic exception raised")
+    no_op_provider_client.add_hooks([exception_hook])
     # When
     flag_details = no_op_provider_client.get_boolean_details(
         flag_key="Key", default_value=True
@@ -111,7 +114,12 @@ def test_should_handle_an_open_feature_exception_thrown_by_a_provider(
     no_op_provider_client,
 ):
     # Given
-    no_op_provider_client.add_hooks([TestOpenFeatureErrorHook()])
+    exception_hook = MagicMock(spec=Hook)
+    exception_hook.after.side_effect = OpenFeatureError(
+        "error_message", ErrorCode.GENERAL
+    )
+    no_op_provider_client.add_hooks([exception_hook])
+
     # When
     flag_details = no_op_provider_client.get_boolean_details(
         flag_key="Key", default_value=True
