@@ -1,8 +1,8 @@
 import pytest
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
+from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import GeneralError
-from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.open_feature_evaluation_context import (
     api_evaluation_context,
     set_api_evaluation_context,

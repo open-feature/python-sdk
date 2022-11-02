@@ -1,7 +1,7 @@
 import pytest
 
+from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import GeneralError
-from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.open_feature_api import get_client, get_provider, set_provider
 from open_feature.provider.no_op_provider import NoOpProvider
 

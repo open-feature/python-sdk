@@ -1,7 +1,7 @@
 import typing
 from dataclasses import dataclass
 
-from open_feature.flag_evaluation.error_code import ErrorCode
+from open_feature.exception.error_code import ErrorCode
 from open_feature.flag_evaluation.reason import Reason
 
 
@@ -12,4 +12,4 @@ class FlagEvaluationDetails:
     variant: str = None
     reason: Reason = None
     error_code: ErrorCode = None
-    error_message: str = None
+    error_message: typing.Optional[str] = None
