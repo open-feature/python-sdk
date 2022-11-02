@@ -278,7 +278,7 @@ class OpenFeatureClient:
                 api_evaluation_context().merge(self.context).merge(invocation_context)
             )
 
-            flag_evaluation = self.create_provider_evaluation(
+            flag_evaluation = self._create_provider_evaluation(
                 flag_type,
                 flag_key,
                 default_value,
@@ -289,7 +289,7 @@ class OpenFeatureClient:
 
             return flag_evaluation
 
-        except OpenFeatureError as e:  # noqa
+        except OpenFeatureError as e:
             error_hooks(flag_type, hook_context, e, merged_hooks, None)
             return FlagEvaluationDetails(
                 flag_key=flag_key,
@@ -314,7 +314,7 @@ class OpenFeatureClient:
         finally:
             after_all_hooks(flag_type, hook_context, merged_hooks, None)
 
-    def create_provider_evaluation(
+    def _create_provider_evaluation(
         self,
         flag_type: FlagType,
         flag_key: str,
