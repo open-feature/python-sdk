@@ -6,8 +6,11 @@ from open_feature.provider.no_op_provider import NoOpProvider
 
 @pytest.fixture(autouse=True)
 def clear_provider():
+    """
+    For tests that use set_provider(), we need to clear the provider to avoid issues
+    in other tests.
+    """
     yield
-    # Setting private provider back to None to ensure other tests aren't affected
     _provider = None  # noqa: F841
 
 
