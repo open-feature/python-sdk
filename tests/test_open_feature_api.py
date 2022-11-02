@@ -31,8 +31,6 @@ def test_should_return_open_feature_client_when_configured_correctly():
     assert client.name == "No-op Provider"
     assert client.version == "1.0"
     assert isinstance(client.provider, NoOpProvider)
-    # Setting private provider back to None to ensure other tests aren't affected
-    _provider = None  # noqa: F841
 
 
 def test_should_try_set_provider_and_fail_if_none_provided():
@@ -44,8 +42,6 @@ def test_should_try_set_provider_and_fail_if_none_provided():
     # Then
     assert ge.value.error_message == "No provider"
     assert ge.value.error_code == ErrorCode.GENERAL
-    # Setting private provider back to None to ensure other tests aren't affected
-    _provider = None  # noqa: F841
 
 
 def test_should_return_a_provider_if_setup_correctly():
@@ -58,5 +54,3 @@ def test_should_return_a_provider_if_setup_correctly():
     # Then
     assert provider
     assert isinstance(provider, NoOpProvider)
-    # Setting private provider back to None to ensure other tests aren't affected
-    _provider = None  # noqa: F841
