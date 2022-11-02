@@ -3,11 +3,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from open_feature.exception.exceptions import GeneralError, OpenFeatureError
+from open_feature.exception.exceptions import OpenFeatureError
 from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.hooks.hook import Hook
-from open_feature.open_feature_client import OpenFeatureClient
 
 
 @pytest.mark.parametrize(
@@ -72,17 +71,17 @@ def test_should_get_flag_detail_based_on_method_type(
     assert isinstance(flag.value, flag_type)
 
 
-def test_should_raise_exception_when_invalid_flag_type_provided():
+def test_should_raise_exception_when_invalid_flag_type_provided(no_op_provider_client):
     # Given
     # When
-    with pytest.raises(GeneralError) as ge:
-        OpenFeatureClient("No provider", "1.0")._create_provider_evaluation(
-            flag_type=None, flag_key="Key", default_value=True
-        )
+    flag = no_op_provider_client.evaluate_flag_details(
+        flag_type=None, flag_key="Key", default_value=True
+    )
     # Then
-    assert ge.value
-    assert ge.value.error_message == "Unknown flag type"
-    assert ge.value.error_code == ErrorCode.GENERAL
+    assert flag.value
+    assert flag.error_message == "Unknown flag type"
+    assert flag.error_code == ErrorCode.GENERAL
+    assert flag.reason == Reason.ERROR
 
 
 def test_should_handle_a_generic_exception_thrown_by_a_provider(no_op_provider_client):
