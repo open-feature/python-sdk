@@ -1,3 +1,4 @@
+import typing
 from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
@@ -15,7 +16,7 @@ class NoOpProvider(AbstractProvider):
     def get_metadata(self) -> Metadata:
         return NoOpMetadata()
 
-    def get_provider_hooks(self) -> list[Hook]:
+    def get_provider_hooks(self) -> typing.List[Hook]:
         return []
 
     def get_boolean_details(

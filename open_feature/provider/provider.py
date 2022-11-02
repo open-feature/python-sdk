@@ -1,3 +1,4 @@
+import typing
 from abc import abstractmethod
 from numbers import Number
 
@@ -12,7 +13,7 @@ class AbstractProvider:
         pass
 
     @abstractmethod
-    def get_provider_hooks(self) -> list[Hook]:
+    def get_provider_hooks(self) -> typing.List[Hook]:
         return []
 
     @abstractmethod
