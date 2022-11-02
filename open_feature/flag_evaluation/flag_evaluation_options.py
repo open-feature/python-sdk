@@ -1,13 +1,13 @@
-from dataclasses import dataclass, field
-from typing import List
+import typing
+from dataclasses import dataclass
 
 from open_feature.hooks.hook import Hook
 
 
 @dataclass
 class FlagEvaluationOptions:
-    hooks: List[Hook] = field(default_factory=list)
-    hook_hints: dict = field(default_factory=dict)
+    hooks: typing.List[Hook]
+    hook_hints: dict
 
     def __init__(self):
         self.hooks = []
