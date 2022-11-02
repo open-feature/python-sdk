@@ -248,6 +248,7 @@ class OpenFeatureClient:
             # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
             # Any resulting evaluation context from a before hook will overwrite
             # duplicate fields defined globally, on the client, or in the invocation.
+            # Requirement 3.2.2, 4.3.4: API.context->client.context->invocation.context
             invocation_context = before_hooks(
                 flag_type, hook_context, merged_hooks, None
             )
