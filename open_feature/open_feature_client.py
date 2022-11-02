@@ -25,6 +25,8 @@ from open_feature.open_feature_evaluation_context import api_evaluation_context
 from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider
 
+NUMERIC_TYPES = [FlagType.FLOAT, FlagType.INTEGER]
+
 
 class OpenFeatureClient:
     def __init__(
@@ -350,15 +352,22 @@ class OpenFeatureClient:
 
         value = get_details_callable(*args)
 
-        converter = {
-            FlagType.FLOAT: float,
-            FlagType.INTEGER: int,
-        }.get(flag_type)
-
-        if not isinstance(value.value, converter(value.value)):
-            raise TypeMismatchError()
+        if flag_type in NUMERIC_TYPES:
+            value.value = self._convert_numeric_types(flag_type, value.value)
 
         if not get_details_callable:
             raise GeneralError(error_message="Unknown flag type")
 
         return value
+
+    @staticmethod
+    def _convert_numeric_types(flag_type: FlagType, current_value: Number):
+        converter = {
+            FlagType.FLOAT: float,
+            FlagType.INTEGER: int,
+        }.get(flag_type)
+
+        try:
+            return converter(current_value)
+        except ValueError:
+            raise TypeMismatchError()
