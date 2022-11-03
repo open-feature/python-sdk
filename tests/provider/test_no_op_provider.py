@@ -23,13 +23,23 @@ def test_should_get_boolean_flag_from_no_op():
     assert isinstance(flag.value, bool)
 
 
-def test_should_get_number_flag_from_no_op():
+def test_should_get_integer_flag_from_no_op():
     # Given
     # When
-    flag = NoOpProvider().get_number_details(flag_key="Key", default_value=100)
+    flag = NoOpProvider().get_integer_details(flag_key="Key", default_value=100)
     # Then
     assert flag is not None
     assert flag.value == 100
+    assert isinstance(flag.value, Number)
+
+
+def test_should_get_float_flag_from_no_op():
+    # Given
+    # When
+    flag = NoOpProvider().get_float_details(flag_key="Key", default_value=10.23)
+    # Then
+    assert flag is not None
+    assert flag.value == 10.23
     assert isinstance(flag.value, Number)
 
 

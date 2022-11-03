@@ -1,6 +1,5 @@
 import logging
 import typing
-from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.exception.exceptions import (
@@ -100,36 +99,6 @@ class OpenFeatureClient:
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.STRING,
-            flag_key,
-            default_value,
-            evaluation_context,
-            flag_evaluation_options,
-        )
-
-    def get_number_value(
-        self,
-        flag_key: str,
-        default_value: Number,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: typing.Any = None,
-    ) -> Number:
-        return self.evaluate_flag_details(
-            FlagType.NUMBER,
-            flag_key,
-            default_value,
-            evaluation_context,
-            flag_evaluation_options,
-        ).value
-
-    def get_number_details(
-        self,
-        flag_key: str,
-        default_value: Number,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: typing.Any = None,
-    ) -> FlagEvaluationDetails:
-        return self.evaluate_flag_details(
-            FlagType.NUMBER,
             flag_key,
             default_value,
             evaluation_context,
@@ -356,9 +325,8 @@ class OpenFeatureClient:
 
         get_details_callable = {
             FlagType.BOOLEAN: self.provider.get_boolean_details,
-            FlagType.NUMBER: self.provider.get_number_details,
-            FlagType.INTEGER: self.provider.get_number_details,
-            FlagType.FLOAT: self.provider.get_number_details,
+            FlagType.INTEGER: self.provider.get_integer_details,
+            FlagType.FLOAT: self.provider.get_float_details,
             FlagType.OBJECT: self.provider.get_object_details,
             FlagType.STRING: self.provider.get_string_details,
         }.get(flag_type)
@@ -374,7 +342,7 @@ class OpenFeatureClient:
         return value
 
     @staticmethod
-    def _convert_numeric_types(flag_type: FlagType, current_value: Number):
+    def _convert_numeric_types(flag_type: FlagType, current_value):
         converter = {
             FlagType.FLOAT: float,
             FlagType.INTEGER: int,

@@ -19,7 +19,8 @@ While Boolean provides the simplest introduction, we offer a variety of flag typ
 # Depending on the flag type, use one of the methods below
 flag_key = "PROVIDER_FLAG"
 boolean_result = open_feature_client.get_boolean_value(key=flag_key,default_value=False)
-number_result = open_feature_client.get_number_value(key=flag_key,default_value=-1)
+integer_result = open_feature_client.get_integer_value(key=flag_key,default_value=-1)
+float_result = open_feature_client.get_float_value(key=flag_key,default_value=-1)
 string_result = open_feature_client.get_string_value(key=flag_key,default_value="")
 object_result = open_feature_client.get_object_value(key=flag_key,default_value={})
 ```

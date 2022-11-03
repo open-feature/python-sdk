@@ -45,9 +45,22 @@ class NoOpProvider(AbstractProvider):
             variant=PASSED_IN_DEFAULT,
         )
 
-    def get_number_details(
+    def get_integer_details(
         self,
-        flag_key: str,
+        flag_key: int,
+        default_value: Number,
+        evaluation_context: EvaluationContext = None,
+    ):
+        return FlagEvaluationDetails(
+            flag_key=flag_key,
+            value=default_value,
+            reason=Reason.DEFAULT,
+            variant=PASSED_IN_DEFAULT,
+        )
+
+    def get_float_details(
+        self,
+        flag_key: float,
         default_value: Number,
         evaluation_context: EvaluationContext = None,
     ):
