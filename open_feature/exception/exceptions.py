@@ -17,7 +17,6 @@ class OpenFeatureError(Exception):
         @param error_message: an optional string message representing why the
         error has been raised
         @param error_code: the ErrorCode string enum value for the type of error
-        @return: the generic OpenFeatureError exception
         """
         self.error_message = error_message
         self.error_code = error_code
@@ -35,7 +34,6 @@ class FlagNotFoundError(OpenFeatureError):
         this type of exception is ErrorCode.FLAG_NOT_FOUND.
         @param error_message: an optional string message representing
         why the error has been raised
-        @return: the generic FlagNotFoundError exception
         """
         super().__init__(error_message, ErrorCode.FLAG_NOT_FOUND)
 
@@ -52,7 +50,6 @@ class GeneralError(OpenFeatureError):
         is ErrorCode.GENERAL.
         @param error_message: an optional string message representing why the error
         has been raised
-        @return: the generic GeneralError exception
         """
         super().__init__(error_message, ErrorCode.GENERAL)
 
@@ -69,7 +66,6 @@ class ParseError(OpenFeatureError):
         is ErrorCode.PARSE_ERROR.
         @param error_message: an optional string message representing why the
         error has been raised
-        @return: the generic ParseError exception
         """
         super().__init__(error_message, ErrorCode.PARSE_ERROR)
 
@@ -86,7 +82,6 @@ class TypeMismatchError(OpenFeatureError):
         exception is ErrorCode.TYPE_MISMATCH.
         @param error_message: an optional string message representing why the
         error has been raised
-        @return: the generic TypeMismatchError exception
         """
         super().__init__(error_message, ErrorCode.TYPE_MISMATCH)
 
