@@ -336,19 +336,11 @@ class OpenFeatureClient:
 
         value = get_details_callable(*args)
 
-        if flag_type in NUMERIC_TYPES:
-            value.value = self._convert_numeric_types(flag_type, value.value)
+        self._check_flag_type(flag_type, value.value)
 
         return value
 
     @staticmethod
-    def _convert_numeric_types(flag_type: FlagType, current_value):
-        converter = {
-            FlagType.FLOAT: float,
-            FlagType.INTEGER: int,
-        }.get(flag_type)
-
-        try:
-            return converter(current_value)
-        except ValueError:
+    def _check_flag_type(flag_type: FlagType, current_value):
+        if not isinstance(current_value, flag_type.value):
             raise TypeMismatchError()
