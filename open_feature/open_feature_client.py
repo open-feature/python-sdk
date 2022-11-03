@@ -199,7 +199,7 @@ class OpenFeatureClient:
             invocation_context = before_hooks(
                 flag_type, hook_context, merged_hooks, None
             )
-            invocation_context.merge(ctx2=evaluation_context)
+            invocation_context = invocation_context.merge(ctx2=evaluation_context)
 
             # merge of: API.context, client.context, invocation.context
             merged_context = (
@@ -280,3 +280,6 @@ class OpenFeatureClient:
             raise GeneralError(error_message="Unknown flag type")
 
         return get_details_callable(*args)
+
+    def set_evaluation_context(self, evaluation_context: EvaluationContext):
+        self.context = evaluation_context
