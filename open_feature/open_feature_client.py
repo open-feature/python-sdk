@@ -205,7 +205,7 @@ class OpenFeatureClient:
         Evaluate the flag requested by the user from the clients provider.
 
         :param flag_type: the type of the flag being returned
-        :param key: the string key of the selected flag
+        :param flag_key: the string key of the selected flag
         :param default_value: backup value returned if no result found by the provider
         :param evaluation_context: Information for the purposes of flag evaluation
         :param flag_evaluation_options: Additional flag evaluation information
