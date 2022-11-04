@@ -336,11 +336,7 @@ class OpenFeatureClient:
 
         value = get_details_callable(*args)
 
-        self._check_flag_type(flag_type, value.value)
+        if not isinstance(value.value, flag_type.value):
+            raise TypeMismatchError()
 
         return value
-
-    @staticmethod
-    def _check_flag_type(flag_type: FlagType, current_value):
-        if not isinstance(current_value, flag_type.value):
-            raise TypeMismatchError()
