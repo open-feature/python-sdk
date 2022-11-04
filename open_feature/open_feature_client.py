@@ -280,6 +280,3 @@ class OpenFeatureClient:
             raise GeneralError(error_message="Unknown flag type")
 
         return get_details_callable(*args)
-
-    def set_evaluation_context(self, evaluation_context: EvaluationContext):
-        self.context = evaluation_context
