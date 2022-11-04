@@ -99,14 +99,13 @@ class TargetingKeyMissingError(OpenFeatureError):
         exception is ErrorCode.TARGETING_KEY_MISSING.
         @param error_message: a string message representing why the error has been
         raised
-        @return: the generic TargetingKeyMissingError exception
         """
         super().__init__(error_message, ErrorCode.TARGETING_KEY_MISSING)
 
 
 class InvalidContextError(OpenFeatureError):
     """
-    This exception should be raised when The evaluation context does not meet provider
+    This exception should be raised when the evaluation context does not meet provider
     requirements.
     """
 
@@ -116,6 +115,5 @@ class InvalidContextError(OpenFeatureError):
         exception is ErrorCode.INVALID_CONTEXT.
         @param error_message: a string message representing why the error has been
         raised
-        @return: the generic InvalidContextError exception
         """
         super().__init__(error_message, ErrorCode.INVALID_CONTEXT)
