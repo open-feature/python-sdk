@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.hooks.hook_context import HookContext
@@ -7,7 +9,7 @@ from open_feature.hooks.hook_support import (
     before_hooks,
     error_hooks,
 )
-from unittest.mock import ANY
+from open_feature.immutable_dict import MappingProxyType
 
 
 def test_error_hooks_run_error_method(mock_hook):
