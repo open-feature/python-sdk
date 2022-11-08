@@ -85,3 +85,35 @@ class TypeMismatchError(OpenFeatureError):
         @return: the generic TypeMismatchError exception
         """
         super().__init__(error_message, ErrorCode.TYPE_MISMATCH)
+
+
+class TargetingKeyMissingError(OpenFeatureError):
+    """
+    This exception should be raised when the provider requires a targeting key
+    but one was not provided in the evaluation context.
+    """
+
+    def __init__(self, error_message: str = None):
+        """
+        Constructor for the TargetingKeyMissingError. The error code for this type of
+        exception is ErrorCode.TARGETING_KEY_MISSING.
+        @param error_message: a string message representing why the error has been
+        raised
+        """
+        super().__init__(error_message, ErrorCode.TARGETING_KEY_MISSING)
+
+
+class InvalidContextError(OpenFeatureError):
+    """
+    This exception should be raised when the evaluation context does not meet provider
+    requirements.
+    """
+
+    def __init__(self, error_message: str = None):
+        """
+        Constructor for the InvalidContextError. The error code for this type of
+        exception is ErrorCode.INVALID_CONTEXT.
+        @param error_message: a string message representing why the error has been
+        raised
+        """
+        super().__init__(error_message, ErrorCode.INVALID_CONTEXT)
