@@ -183,7 +183,9 @@ class OpenFeatureClient:
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
 
-        evaluation_hooks, hook_hints = self.__extract_evaluation_options(flag_evaluation_options)
+        evaluation_hooks, hook_hints = self.__extract_evaluation_options(
+            flag_evaluation_options
+        )
 
         hook_context = HookContext(
             flag_key=flag_key,
@@ -284,15 +286,23 @@ class OpenFeatureClient:
 
         return get_details_callable(*args)
 
-    def __extract_evaluation_options(self, flag_evaluation_options: typing.Any) -> typing.Tuple(typing.List[Hook], MappingProxyType):
+    def __extract_evaluation_options(
+        self, flag_evaluation_options: typing.Any
+    ) -> typing.Tuple(typing.List[Hook], MappingProxyType):
         evaluation_hooks: typing.List[Hook] = []
         hook_hints: dict = {}
 
         if flag_evaluation_options is dict:
-            if 'hook_hints' in flag_evaluation_options and flag_evaluation_options['hook_hints'] is dict:
-                hook_hints = dict(flag_evaluation_options['hook_hints'])
+            if (
+                "hook_hints" in flag_evaluation_options
+                and flag_evaluation_options["hook_hints"] is dict
+            ):
+                hook_hints = dict(flag_evaluation_options["hook_hints"])
 
-            if 'hooks' in flag_evaluation_options and flag_evaluation_options['hooks'] is list:
-                evaluation_hooks = flag_evaluation_options['hooks']
+            if (
+                "hooks" in flag_evaluation_options
+                and flag_evaluation_options["hooks"] is list
+            ):
+                evaluation_hooks = flag_evaluation_options["hooks"]
 
         return (evaluation_hooks, MappingProxyType(hook_hints))

@@ -13,16 +13,17 @@ class MappingProxyType(dict):
     to:
     `from types import MappingProxyType`
     """
+
     def __hash__(self):
         return id(self)
 
     def _immutable(self, *args, **kws):
-        raise TypeError('immutable instance of dictionary')
+        raise TypeError("immutable instance of dictionary")
 
     __setitem__ = _immutable
     __delitem__ = _immutable
-    clear       = _immutable
-    update      = _immutable
-    setdefault  = _immutable
-    pop         = _immutable
-    popitem     = _immutable
+    clear = _immutable
+    update = _immutable
+    setdefault = _immutable
+    pop = _immutable
+    popitem = _immutable
