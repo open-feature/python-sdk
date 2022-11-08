@@ -1,4 +1,3 @@
-import json
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 
 
