@@ -47,6 +47,7 @@ def test_second_targeting_key_overwrites_first():
     # Then
     assert merged_context.targeting_key == second_context.targeting_key
 
+
 def test_can_cast_to_dict():
     # Given
     context = EvaluationContext(
@@ -59,6 +60,7 @@ def test_can_cast_to_dict():
     # Then
     assert context_dict == {"targetingKey": "targeting_key", "att1": "value1"}
 
+
 def test_can_str_to_json():
     # Given
     context = EvaluationContext(
@@ -70,6 +72,7 @@ def test_can_str_to_json():
 
     # Then
     assert context_dict == '{"att1": "value1", "targetingKey": "targeting_key"}'
+
 
 def test_can_repr_to_json():
     # Given

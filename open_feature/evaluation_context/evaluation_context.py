@@ -1,5 +1,6 @@
 import json
 
+
 class EvaluationContext:
     """
     EvaluationContext contains metadata pertaining to the evaluation context
@@ -10,6 +11,7 @@ class EvaluationContext:
     representation of JSON, or you can use the `asdict()` method to generate
     a dictionary of the same structure.
     """
+
     def __init__(self, targeting_key: str = None, attributes: dict = None):
         self.targeting_key = targeting_key
         self.attributes = attributes or {}
@@ -30,5 +32,4 @@ class EvaluationContext:
         return json.dumps(self.asdict(), ensure_ascii=False)
 
     def asdict(self):
-        return {**self.attributes, 'targetingKey': self.targeting_key}
-
+        return {**self.attributes, "targetingKey": self.targeting_key}
