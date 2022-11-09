@@ -324,11 +324,11 @@ class OpenFeatureClient:
             self.provider = NoOpProvider()
 
         get_details_callable = {
-            FlagType.BOOLEAN: self.provider.get_boolean_details,
-            FlagType.INTEGER: self.provider.get_integer_details,
-            FlagType.FLOAT: self.provider.get_float_details,
-            FlagType.OBJECT: self.provider.get_object_details,
-            FlagType.STRING: self.provider.get_string_details,
+            FlagType.BOOLEAN: self.provider.resolve_boolean_details,
+            FlagType.INTEGER: self.provider.resolve_integer_details,
+            FlagType.FLOAT: self.provider.resolve_float_details,
+            FlagType.OBJECT: self.provider.resolve_object_details,
+            FlagType.STRING: self.provider.resolve_string_details,
         }.get(flag_type)
 
         if not get_details_callable:

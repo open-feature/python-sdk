@@ -16,7 +16,7 @@ class AbstractProvider:
         return []
 
     @abstractmethod
-    def get_boolean_details(
+    def resolve_boolean_details(
         self,
         flag_key: str,
         default_value: bool,
@@ -25,7 +25,7 @@ class AbstractProvider:
         pass
 
     @abstractmethod
-    def get_string_details(
+    def resolve_string_details(
         self,
         flag_key: str,
         default_value: str,
@@ -34,7 +34,7 @@ class AbstractProvider:
         pass
 
     @abstractmethod
-    def get_integer_details(
+    def resolve_integer_details(
         self,
         flag_key: str,
         default_value: int,
@@ -43,7 +43,7 @@ class AbstractProvider:
         pass
 
     @abstractmethod
-    def get_float_details(
+    def resolve_float_details(
         self,
         flag_key: str,
         default_value: float,
@@ -52,7 +52,7 @@ class AbstractProvider:
         pass
 
     @abstractmethod
-    def get_object_details(
+    def resolve_object_details(
         self,
         flag_key: str,
         default_value: dict,

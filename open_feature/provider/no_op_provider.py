@@ -18,7 +18,7 @@ class NoOpProvider(AbstractProvider):
     def get_provider_hooks(self) -> typing.List[Hook]:
         return []
 
-    def get_boolean_details(
+    def resolve_boolean_details(
         self,
         flag_key: str,
         default_value: bool,
@@ -31,7 +31,7 @@ class NoOpProvider(AbstractProvider):
             variant=PASSED_IN_DEFAULT,
         )
 
-    def get_string_details(
+    def resolve_string_details(
         self,
         flag_key: str,
         default_value: str,
@@ -44,7 +44,7 @@ class NoOpProvider(AbstractProvider):
             variant=PASSED_IN_DEFAULT,
         )
 
-    def get_integer_details(
+    def resolve_integer_details(
         self,
         flag_key: str,
         default_value: int,
@@ -57,7 +57,7 @@ class NoOpProvider(AbstractProvider):
             variant=PASSED_IN_DEFAULT,
         )
 
-    def get_float_details(
+    def resolve_float_details(
         self,
         flag_key: str,
         default_value: float,
@@ -70,7 +70,7 @@ class NoOpProvider(AbstractProvider):
             variant=PASSED_IN_DEFAULT,
         )
 
-    def get_object_details(
+    def resolve_object_details(
         self,
         flag_key: str,
         default_value: dict,
