@@ -1,5 +1,4 @@
 import typing
-from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
@@ -47,8 +46,8 @@ class NoOpProvider(AbstractProvider):
 
     def get_integer_details(
         self,
-        flag_key: int,
-        default_value: Number,
+        flag_key: str,
+        default_value: int,
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
@@ -60,8 +59,8 @@ class NoOpProvider(AbstractProvider):
 
     def get_float_details(
         self,
-        flag_key: float,
-        default_value: Number,
+        flag_key: str,
+        default_value: float,
         evaluation_context: EvaluationContext = None,
     ):
         return FlagEvaluationDetails(
