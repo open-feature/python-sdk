@@ -1,7 +1,8 @@
+import typing
 from abc import abstractmethod
-from numbers import Number
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
+from open_feature.hooks.hook import Hook
 from open_feature.provider.metadata import Metadata
 
 
@@ -11,7 +12,11 @@ class AbstractProvider:
         pass
 
     @abstractmethod
-    def get_boolean_details(
+    def get_provider_hooks(self) -> typing.List[Hook]:
+        return []
+
+    @abstractmethod
+    def resolve_boolean_details(
         self,
         flag_key: str,
         default_value: bool,
@@ -20,7 +25,7 @@ class AbstractProvider:
         pass
 
     @abstractmethod
-    def get_string_details(
+    def resolve_string_details(
         self,
         flag_key: str,
         default_value: str,
@@ -29,16 +34,25 @@ class AbstractProvider:
         pass
 
     @abstractmethod
-    def get_number_details(
+    def resolve_integer_details(
         self,
         flag_key: str,
-        default_value: Number,
+        default_value: int,
         evaluation_context: EvaluationContext = EvaluationContext(),
     ):
         pass
 
     @abstractmethod
-    def get_object_details(
+    def resolve_float_details(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: EvaluationContext = EvaluationContext(),
+    ):
+        pass
+
+    @abstractmethod
+    def resolve_object_details(
         self,
         flag_key: str,
         default_value: dict,
