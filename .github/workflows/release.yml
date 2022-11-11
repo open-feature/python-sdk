@@ -14,7 +14,10 @@ permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
-  build:
+  release:
+    permissions:
+      contents: write  # for google-github-actions/release-please-action to create release commit
+      pull-requests: write  # for google-github-actions/release-please-action to create release PR
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,27 +26,41 @@ jobs:
       image: ${{ matrix.container }}
 
     steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          command: manifest
+          token: ${{secrets.GITHUB_TOKEN}}
+          default-branch: main
+          release-type: python
+
       - uses: actions/checkout@v3
+        if: ${{ steps.release.outputs.releases_created }}
 
       - name: Cache virtualenvironment
         uses: actions/cache@v3
+        if: ${{ steps.release.outputs.releases_created }}
         with:
           path: ~/.venv
           key: ${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
 
       - name: Upgrade pip
+        if: ${{ steps.release.outputs.releases_created }}
         run: pip install --upgrade pip
 
       - name: Create and activate Virtualenv
+        if: ${{ steps.release.outputs.releases_created }}
         run: |
           pip install virtualenv
           [ ! -d ".venv" ] && virtualenv .venv
           . .venv/bin/activate
 
       - name: Install dependencies
+        if: ${{ steps.release.outputs.releases_created }}
         run: pip install -r requirements.txt
 
       - name: Install pypa/build
+        if: ${{ steps.release.outputs.releases_created }}
         run: >-
           python -m
           pip install
@@ -51,6 +68,7 @@ jobs:
           --user
 
       - name: Build a binary wheel and a source tarball
+        if: ${{ steps.release.outputs.releases_created }}
         run: >-
           python -m
           build
@@ -60,6 +78,7 @@ jobs:
           .
 
       - name: Publish a Python distribution to PyPI
+        if: ${{ steps.release.outputs.releases_created }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
