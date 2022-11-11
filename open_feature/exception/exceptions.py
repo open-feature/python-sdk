@@ -1,4 +1,6 @@
-from open_feature.flag_evaluation.error_code import ErrorCode
+import typing
+
+from open_feature.exception.error_code import ErrorCode
 
 
 class OpenFeatureError(Exception):
@@ -7,13 +9,14 @@ class OpenFeatureError(Exception):
     the more specific exceptions extending this one should be used.
     """
 
-    def __init__(self, error_message: str = None, error_code: ErrorCode = None):
+    def __init__(
+        self, error_message: typing.Optional[str] = None, error_code: ErrorCode = None
+    ):
         """
         Constructor for the generic OpenFeatureError.
-        @param error_message: a string message representing why the error has been
-        raised
+        @param error_message: an optional string message representing why the
+        error has been raised
         @param error_code: the ErrorCode string enum value for the type of error
-        @return: the generic OpenFeatureError exception
         """
         self.error_message = error_message
         self.error_code = error_code
@@ -25,13 +28,12 @@ class FlagNotFoundError(OpenFeatureError):
     key provided by the user.
     """
 
-    def __init__(self, error_message: str = None):
+    def __init__(self, error_message: typing.Optional[str] = None):
         """
         Constructor for the FlagNotFoundError.  The error code for
         this type of exception is ErrorCode.FLAG_NOT_FOUND.
-        @param error_message: a string message representing why the error has been
-        raised
-        @return: the generic FlagNotFoundError exception
+        @param error_message: an optional string message representing
+        why the error has been raised
         """
         super().__init__(error_message, ErrorCode.FLAG_NOT_FOUND)
 
@@ -42,13 +44,12 @@ class GeneralError(OpenFeatureError):
     feature python sdk.
     """
 
-    def __init__(self, error_message: str = None):
+    def __init__(self, error_message: typing.Optional[str] = None):
         """
         Constructor for the GeneralError.  The error code for this type of exception
         is ErrorCode.GENERAL.
-        @param error_message: a string message representing why the error has been
-        raised
-        @return: the generic GeneralError exception
+        @param error_message: an optional string message representing why the error
+        has been raised
         """
         super().__init__(error_message, ErrorCode.GENERAL)
 
@@ -59,13 +60,12 @@ class ParseError(OpenFeatureError):
     be parsed into a FlagEvaluationDetails object.
     """
 
-    def __init__(self, error_message: str = None):
+    def __init__(self, error_message: typing.Optional[str] = None):
         """
         Constructor for the ParseError. The error code for this type of exception
         is ErrorCode.PARSE_ERROR.
-        @param error_message: a string message representing why the error has been
-        raised
-        @return: the generic ParseError exception
+        @param error_message: an optional string message representing why the
+        error has been raised
         """
         super().__init__(error_message, ErrorCode.PARSE_ERROR)
 
@@ -76,13 +76,12 @@ class TypeMismatchError(OpenFeatureError):
     not match the type requested by the user.
     """
 
-    def __init__(self, error_message: str = None):
+    def __init__(self, error_message: typing.Optional[str] = None):
         """
         Constructor for the TypeMismatchError. The error code for this type of
         exception is ErrorCode.TYPE_MISMATCH.
-        @param error_message: a string message representing why the error has been
-        raised
-        @return: the generic TypeMismatchError exception
+        @param error_message: an optional string message representing why the
+        error has been raised
         """
         super().__init__(error_message, ErrorCode.TYPE_MISMATCH)
 
