@@ -1,5 +1,12 @@
+import typing
+
+
 class EvaluationContext:
-    def __init__(self, targeting_key: str = None, attributes: dict = None):
+    def __init__(
+        self,
+        targeting_key: typing.Optional[str] = None,
+        attributes: typing.Optional[dict] = None,
+    ):
         self.targeting_key = targeting_key
         self.attributes = attributes or {}
 

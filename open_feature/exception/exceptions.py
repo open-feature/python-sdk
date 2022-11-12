@@ -10,7 +10,7 @@ class OpenFeatureError(Exception):
     """
 
     def __init__(
-        self, error_message: typing.Optional[str] = None, error_code: ErrorCode = None
+        self, error_code: ErrorCode, error_message: typing.Optional[str] = None
     ):
         """
         Constructor for the generic OpenFeatureError.
@@ -35,7 +35,7 @@ class FlagNotFoundError(OpenFeatureError):
         @param error_message: an optional string message representing
         why the error has been raised
         """
-        super().__init__(error_message, ErrorCode.FLAG_NOT_FOUND)
+        super().__init__(ErrorCode.FLAG_NOT_FOUND, error_message)
 
 
 class GeneralError(OpenFeatureError):
@@ -51,7 +51,7 @@ class GeneralError(OpenFeatureError):
         @param error_message: an optional string message representing why the error
         has been raised
         """
-        super().__init__(error_message, ErrorCode.GENERAL)
+        super().__init__(ErrorCode.GENERAL, error_message)
 
 
 class ParseError(OpenFeatureError):
@@ -67,7 +67,7 @@ class ParseError(OpenFeatureError):
         @param error_message: an optional string message representing why the
         error has been raised
         """
-        super().__init__(error_message, ErrorCode.PARSE_ERROR)
+        super().__init__(ErrorCode.PARSE_ERROR, error_message)
 
 
 class TypeMismatchError(OpenFeatureError):
@@ -83,7 +83,7 @@ class TypeMismatchError(OpenFeatureError):
         @param error_message: an optional string message representing why the
         error has been raised
         """
-        super().__init__(error_message, ErrorCode.TYPE_MISMATCH)
+        super().__init__(ErrorCode.TYPE_MISMATCH, error_message)
 
 
 class TargetingKeyMissingError(OpenFeatureError):
@@ -92,14 +92,14 @@ class TargetingKeyMissingError(OpenFeatureError):
     but one was not provided in the evaluation context.
     """
 
-    def __init__(self, error_message: str = None):
+    def __init__(self, error_message: typing.Optional[str] = None):
         """
         Constructor for the TargetingKeyMissingError. The error code for this type of
         exception is ErrorCode.TARGETING_KEY_MISSING.
         @param error_message: a string message representing why the error has been
         raised
         """
-        super().__init__(error_message, ErrorCode.TARGETING_KEY_MISSING)
+        super().__init__(ErrorCode.TARGETING_KEY_MISSING, error_message)
 
 
 class InvalidContextError(OpenFeatureError):
@@ -108,11 +108,11 @@ class InvalidContextError(OpenFeatureError):
     requirements.
     """
 
-    def __init__(self, error_message: str = None):
+    def __init__(self, error_message: typing.Optional[str]):
         """
         Constructor for the InvalidContextError. The error code for this type of
         exception is ErrorCode.INVALID_CONTEXT.
         @param error_message: a string message representing why the error has been
         raised
         """
-        super().__init__(error_message, ErrorCode.INVALID_CONTEXT)
+        super().__init__(ErrorCode.INVALID_CONTEXT, error_message)

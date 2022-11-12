@@ -22,8 +22,8 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: Optional[EvaluationContext] = None,
-    ):
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagEvaluationDetails[bool]:
         return FlagEvaluationDetails(
             flag_key=flag_key,
             value=default_value,
@@ -35,8 +35,8 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: Optional[EvaluationContext] = None,
-    ):
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagEvaluationDetails[str]:
         return FlagEvaluationDetails(
             flag_key=flag_key,
             value=default_value,
@@ -48,8 +48,8 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: EvaluationContext = None,
-    ):
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagEvaluationDetails[int]:
         return FlagEvaluationDetails(
             flag_key=flag_key,
             value=default_value,
@@ -61,8 +61,8 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: EvaluationContext = None,
-    ):
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagEvaluationDetails[float]:
         return FlagEvaluationDetails(
             flag_key=flag_key,
             value=default_value,
@@ -74,8 +74,8 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: dict,
-        evaluation_context: Optional[EvaluationContext] = None,
-    ):
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagEvaluationDetails[dict]:
         return FlagEvaluationDetails(
             flag_key=flag_key,
             value=default_value,
