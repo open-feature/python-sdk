@@ -19,8 +19,6 @@ jobs:
       contents: write  # for google-github-actions/release-please-action to create release commit
       pull-requests: write  # for google-github-actions/release-please-action to create release PR
     runs-on: ubuntu-latest
-    container:
-      image: ${{ matrix.container }}
 
     steps:
       - uses: google-github-actions/release-please-action@v3
