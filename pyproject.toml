@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openfeature_sdk"
-version = "0.0.3"
+version = "0.0.4"
 description = "Standardizing Feature Flagging for Everyone"
 readme = "readme.md"
 authors = [{ name = "OpenFeature", email = "openfeature-core@groups.io" }]
