@@ -34,11 +34,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: ${{ needs.release-please.outputs.release_created }}
-    strategy:
-      matrix:
-        container: [ "python:3.10" ]
     container:
-      image: ${{ matrix.container }}
+      image: "python:3.10"
 
     steps:
       - uses: actions/checkout@v3
