@@ -27,9 +27,9 @@ jobs:
           command: manifest
           token: ${{secrets.GITHUB_TOKEN}}
           default-branch: main
-          outputs:
-            release_created: ${{ steps.release.outputs.release_created }}
-            release_tag_name: ${{ steps.release.outputs.tag_name }}
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      release_tag_name: ${{ steps.release.outputs.tag_name }}
 
   release:
     runs-on: ubuntu-latest
