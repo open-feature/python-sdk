@@ -33,6 +33,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
+    needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
     container:
       image: "python:3.10"
