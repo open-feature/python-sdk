@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/open-feature/python-sdk/compare/v0.0.2...v0.0.3) (2022-11-15)
+
+
+### Features
+
+* Run a single container for sdk release ([#50](https://github.com/open-feature/python-sdk/issues/50)) ([87c62cf](https://github.com/open-feature/python-sdk/commit/87c62cfae7ce2bd47ed79adb7bb9b58d3b0072fd))
+
 ## [0.0.2](https://github.com/open-feature/python-sdk/compare/v0.0.1...v0.0.2) (2022-11-15)
 
 
