@@ -14,8 +14,26 @@ permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
-  build:
+  release-please:
+    permissions:
+      contents: write  # for google-github-actions/release-please-action to create release commit
+      pull-requests: write  # for google-github-actions/release-please-action to create release PR
     runs-on: ubuntu-latest
+
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          command: manifest
+          token: ${{secrets.GITHUB_TOKEN}}
+          default-branch: main
+          outputs:
+            release_created: ${{ steps.release.outputs.release_created }}
+            release_tag_name: ${{ steps.release.outputs.tag_name }}
+
+  release:
+    runs-on: ubuntu-latest
+    if: ${{ needs.release-please.outputs.release_created }}
     strategy:
       matrix:
         container: [ "python:3.10" ]
