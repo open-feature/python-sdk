@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/open-feature/python-sdk/compare/v0.0.3...v0.0.4) (2022-11-15)
+
+
+### Features
+
+* Add needs to release job ([#52](https://github.com/open-feature/python-sdk/issues/52)) ([fb7655a](https://github.com/open-feature/python-sdk/commit/fb7655aa3aae0fb021e0aae57c0a7d182a8218cf))
+
 ## [0.0.3](https://github.com/open-feature/python-sdk/compare/v0.0.2...v0.0.3) (2022-11-15)
 
 
