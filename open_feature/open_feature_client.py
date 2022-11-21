@@ -286,7 +286,8 @@ class OpenFeatureClient:
             )
 
             after_hooks(
-                flag_type, hook_context, flag_evaluation, reversed_merged_hooks, hook_hints
+                flag_type, hook_context, flag_evaluation, reversed_merged_hooks, hook_hints,
+            )
 
             return flag_evaluation
 
