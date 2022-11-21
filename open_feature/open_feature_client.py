@@ -24,17 +24,34 @@ from open_feature.open_feature_evaluation_context import api_evaluation_context
 from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider
 
-NUMERIC_TYPES = [FlagType.FLOAT, FlagType.INTEGER]
+
+GetDetailCallable = typing.Union[
+    typing.Callable[
+        [str, bool, typing.Optional[EvaluationContext]], FlagEvaluationDetails[bool]
+    ],
+    typing.Callable[
+        [str, int, typing.Optional[EvaluationContext]], FlagEvaluationDetails[int]
+    ],
+    typing.Callable[
+        [str, float, typing.Optional[EvaluationContext]], FlagEvaluationDetails[float]
+    ],
+    typing.Callable[
+        [str, str, typing.Optional[EvaluationContext]], FlagEvaluationDetails[str]
+    ],
+    typing.Callable[
+        [str, dict, typing.Optional[EvaluationContext]], FlagEvaluationDetails[dict]
+    ],
+]
 
 
 class OpenFeatureClient:
     def __init__(
         self,
-        name: str,
-        version: str,
-        context: EvaluationContext = None,
-        hooks: typing.List[Hook] = None,
-        provider: AbstractProvider = None,
+        name: typing.Optional[str],
+        version: typing.Optional[str],
+        provider: AbstractProvider,
+        context: typing.Optional[EvaluationContext] = None,
+        hooks: typing.Optional[typing.List[Hook]] = None,
     ):
         self.name = name
         self.version = version
@@ -49,8 +66,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> bool:
         return self.evaluate_flag_details(
             FlagType.BOOLEAN,
@@ -64,8 +81,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.BOOLEAN,
@@ -79,8 +96,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> str:
         return self.evaluate_flag_details(
             FlagType.STRING,
@@ -94,8 +111,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.STRING,
@@ -109,8 +126,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> int:
         return self.get_integer_details(
             flag_key,
@@ -123,8 +140,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.INTEGER,
@@ -138,8 +155,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> float:
         return self.get_float_details(
             flag_key,
@@ -152,8 +169,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.FLOAT,
@@ -167,8 +184,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: dict,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> dict:
         return self.evaluate_flag_details(
             FlagType.OBJECT,
@@ -182,8 +199,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: dict,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails:
         return self.evaluate_flag_details(
             FlagType.OBJECT,
@@ -198,8 +215,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: typing.Any,
-        evaluation_context: EvaluationContext = None,
-        flag_evaluation_options: FlagEvaluationOptions = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails:
         """
         Evaluate the flag requested by the user from the clients provider.
@@ -302,7 +319,7 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: typing.Any,
-        evaluation_context: EvaluationContext = None,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagEvaluationDetails:
         """
         Encapsulated method to create a FlagEvaluationDetail from a specific provider.
@@ -324,14 +341,15 @@ class OpenFeatureClient:
             logging.info("No provider configured, using no-op provider.")
             self.provider = NoOpProvider()
 
-        get_details_callable = {
+        get_details_callables: typing.Mapping[FlagType, GetDetailCallable] = {
             FlagType.BOOLEAN: self.provider.resolve_boolean_details,
             FlagType.INTEGER: self.provider.resolve_integer_details,
             FlagType.FLOAT: self.provider.resolve_float_details,
             FlagType.OBJECT: self.provider.resolve_object_details,
             FlagType.STRING: self.provider.resolve_string_details,
-        }.get(flag_type)
+        }
 
+        get_details_callable = get_details_callables.get(flag_type)
         if not get_details_callable:
             raise GeneralError(error_message="Unknown flag type")
 

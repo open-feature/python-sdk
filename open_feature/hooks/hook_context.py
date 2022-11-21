@@ -11,5 +11,5 @@ class HookContext:
     flag_type: FlagType
     default_value: typing.Any
     evaluation_context: EvaluationContext
-    client_metadata: dict = None
-    provider_metadata: dict = None
+    client_metadata: typing.Optional[dict] = None
+    provider_metadata: typing.Optional[dict] = None

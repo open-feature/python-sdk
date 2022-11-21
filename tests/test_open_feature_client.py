@@ -108,7 +108,7 @@ def test_should_handle_an_open_feature_exception_thrown_by_a_provider(
     # Given
     exception_hook = MagicMock(spec=Hook)
     exception_hook.after.side_effect = OpenFeatureError(
-        "error_message", ErrorCode.GENERAL
+        ErrorCode.GENERAL, "error_message"
     )
     no_op_provider_client.add_hooks([exception_hook])
 
