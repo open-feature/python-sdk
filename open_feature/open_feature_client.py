@@ -365,7 +365,7 @@ class OpenFeatureClient:
         
     def __extract_evaluation_options(
         self, flag_evaluation_options: typing.Any
-    ) -> typing.Tuple(typing.List[Hook], MappingProxyType):
+    ) -> typing.Tuple[typing.List[Hook], MappingProxyType]:
         evaluation_hooks: typing.List[Hook] = []
         hook_hints: dict = {}
 
