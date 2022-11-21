@@ -13,37 +13,47 @@ def test_should_return_no_op_provider_metadata():
     assert metadata.is_default_provider
 
 
-def test_should_get_boolean_flag_from_no_op():
+def test_should_resolve_boolean_flag_from_no_op():
     # Given
     # When
-    flag = NoOpProvider().get_boolean_details(flag_key="Key", default_value=True)
+    flag = NoOpProvider().resolve_boolean_details(flag_key="Key", default_value=True)
     # Then
     assert flag is not None
     assert flag.value
     assert isinstance(flag.value, bool)
 
 
-def test_should_get_number_flag_from_no_op():
+def test_should_resolve_integer_flag_from_no_op():
     # Given
     # When
-    flag = NoOpProvider().get_number_details(flag_key="Key", default_value=100)
+    flag = NoOpProvider().resolve_integer_details(flag_key="Key", default_value=100)
     # Then
     assert flag is not None
     assert flag.value == 100
     assert isinstance(flag.value, Number)
 
 
-def test_should_get_string_flag_from_no_op():
+def test_should_resolve_float_flag_from_no_op():
     # Given
     # When
-    flag = NoOpProvider().get_string_details(flag_key="Key", default_value="String")
+    flag = NoOpProvider().resolve_float_details(flag_key="Key", default_value=10.23)
+    # Then
+    assert flag is not None
+    assert flag.value == 10.23
+    assert isinstance(flag.value, Number)
+
+
+def test_should_resolve_string_flag_from_no_op():
+    # Given
+    # When
+    flag = NoOpProvider().resolve_string_details(flag_key="Key", default_value="String")
     # Then
     assert flag is not None
     assert flag.value == "String"
     assert isinstance(flag.value, str)
 
 
-def test_should_get_object_flag_from_no_op():
+def test_should_resolve_object_flag_from_no_op():
     # Given
     return_value = {
         "String": "string",
@@ -51,7 +61,9 @@ def test_should_get_object_flag_from_no_op():
         "Boolean": True,
     }
     # When
-    flag = NoOpProvider().get_object_details(flag_key="Key", default_value=return_value)
+    flag = NoOpProvider().resolve_object_details(
+        flag_key="Key", default_value=return_value
+    )
     # Then
     assert flag is not None
     assert flag.value == return_value

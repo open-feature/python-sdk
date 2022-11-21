@@ -1,10 +1,9 @@
-from numbers import Number
 from unittest.mock import MagicMock
 
 import pytest
 
+from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import OpenFeatureError
-from open_feature.flag_evaluation.error_code import ErrorCode
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.hooks.hook import Hook
 
@@ -14,7 +13,8 @@ from open_feature.hooks.hook import Hook
     (
         (bool, True, "get_boolean_value"),
         (str, "String", "get_string_value"),
-        (Number, 100, "get_number_value"),
+        (int, 100, "get_integer_value"),
+        (float, 10.23, "get_float_value"),
         (
             dict,
             {
@@ -45,7 +45,8 @@ def test_should_get_flag_value_based_on_method_type(
     (
         (bool, True, "get_boolean_details"),
         (str, "String", "get_string_details"),
-        (Number, 100, "get_number_details"),
+        (int, 100, "get_integer_details"),
+        (float, 10.23, "get_float_details"),
         (
             dict,
             {
@@ -107,7 +108,7 @@ def test_should_handle_an_open_feature_exception_thrown_by_a_provider(
     # Given
     exception_hook = MagicMock(spec=Hook)
     exception_hook.after.side_effect = OpenFeatureError(
-        "error_message", ErrorCode.GENERAL
+        ErrorCode.GENERAL, "error_message"
     )
     no_op_provider_client.add_hooks([exception_hook])
 
