@@ -1,5 +1,11 @@
 VENV = . .venv/bin/activate
 
+.PHONY: all
+all: lint test
+
+.PHONY: init
+init: .venv
+
 .venv: requirements-dev.txt
 	test -d .venv || python -m virtualenv .venv
 	$(VENV); pip install -Ur requirements-dev.txt
@@ -18,6 +24,3 @@ lint: .venv
 clean:
 	@rm -rf .venv
 	@find -iname "*.pyc" -delete
-
-.PHONY: all
-all: lint test
