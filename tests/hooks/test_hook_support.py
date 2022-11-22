@@ -9,7 +9,7 @@ from open_feature.hooks.hook_support import (
     before_hooks,
     error_hooks,
 )
-from open_feature.immutable_dict import MappingProxyType
+from open_feature.immutable_dict.mapping_proxy_type import MappingProxyType
 
 
 def test_error_hooks_run_error_method(mock_hook):
@@ -21,7 +21,9 @@ def test_error_hooks_run_error_method(mock_hook):
     # Then
     mock_hook.supports_flag_value_type.assert_called_once()
     mock_hook.error.assert_called_once()
-    mock_hook.error.assert_called_with(hook_context, ANY, hook_hints)
+    mock_hook.error.assert_called_with(
+        hook_context=hook_context, exception=ANY, hints=hook_hints
+    )
 
 
 def test_before_hooks_run_before_method(mock_hook):
@@ -33,7 +35,7 @@ def test_before_hooks_run_before_method(mock_hook):
     # Then
     mock_hook.supports_flag_value_type.assert_called_once()
     mock_hook.before.assert_called_once()
-    mock_hook.error.assert_called_with(hook_context, hook_hints)
+    mock_hook.before.assert_called_with(hook_context=hook_context, hints=hook_hints)
 
 
 def test_after_hooks_run_after_method(mock_hook):
@@ -50,8 +52,8 @@ def test_after_hooks_run_after_method(mock_hook):
     # Then
     mock_hook.supports_flag_value_type.assert_called_once()
     mock_hook.after.assert_called_once()
-    mock_hook.error.assert_called_with(
-        hook_context, flag_evaluation_details, hook_hints
+    mock_hook.after.assert_called_with(
+        hook_context=hook_context, details=flag_evaluation_details, hints=hook_hints
     )
 
 
@@ -64,4 +66,6 @@ def test_finally_after_hooks_run_finally_after_method(mock_hook):
     # Then
     mock_hook.supports_flag_value_type.assert_called_once()
     mock_hook.finally_after.assert_called_once()
-    mock_hook.error.assert_called_with(hook_context, hook_hints)
+    mock_hook.finally_after.assert_called_with(
+        hook_context=hook_context, hints=hook_hints
+    )

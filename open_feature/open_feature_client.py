@@ -25,7 +25,6 @@ from open_feature.open_feature_evaluation_context import api_evaluation_context
 from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider
 
-
 GetDetailCallable = typing.Union[
     typing.Callable[
         [str, bool, typing.Optional[EvaluationContext]], FlagEvaluationDetails[bool]
@@ -252,15 +251,11 @@ class OpenFeatureClient:
         # in the flag evaluation
         # before: API, Client, Invocation, Provider
         merged_hooks = (
-            self.hooks
-            + flag_evaluation_options.hooks
-            + self.provider.get_provider_hooks()
+            self.hooks + evaluation_hooks + self.provider.get_provider_hooks()
         )
         # after, error, finally: Provider, Invocation, Client, API
         reversed_merged_hooks = (
-            self.provider.get_provider_hooks()
-            + flag_evaluation_options.hooks
-            + self.hooks
+            self.provider.get_provider_hooks() + evaluation_hooks + self.hooks
         )
 
         try:
@@ -286,7 +281,11 @@ class OpenFeatureClient:
             )
 
             after_hooks(
-                flag_type, hook_context, flag_evaluation, reversed_merged_hooks, hook_hints,
+                flag_type,
+                hook_context,
+                flag_evaluation,
+                reversed_merged_hooks,
+                hook_hints,
             )
 
             return flag_evaluation
@@ -363,7 +362,7 @@ class OpenFeatureClient:
             raise TypeMismatchError()
 
         return value
-        
+
     def __extract_evaluation_options(
         self, flag_evaluation_options: typing.Any
     ) -> typing.Tuple[typing.List[Hook], MappingProxyType]:
