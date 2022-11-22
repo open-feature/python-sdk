@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.5](https://github.com/open-feature/python-sdk/compare/v0.0.4...v0.0.5) (2022-11-22)
+
+
+### Bug Fixes
+
+* Fix type checking ([#25](https://github.com/open-feature/python-sdk/issues/25)) ([50f5a48](https://github.com/open-feature/python-sdk/commit/50f5a484a012167aeebac4d99a47a336d146e243))
+
+
+### Documentation
+
+* Update pip install instructions ([#57](https://github.com/open-feature/python-sdk/issues/57)) ([dc6ed6f](https://github.com/open-feature/python-sdk/commit/dc6ed6f6d744d694ad08c5330c8c3d16189d9de3))
+
 ## [0.0.4](https://github.com/open-feature/python-sdk/compare/v0.0.3...v0.0.4) (2022-11-15)
 
 
