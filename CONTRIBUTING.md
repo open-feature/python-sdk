@@ -76,7 +76,7 @@ Open a pull request against the main js-sdk repository.
 - Make sure all required CI checks are clear.
 - Submit small, focused PRs addressing a single concern/issue.
 - Make sure the PR title reflects the contribution.
-- Write a summary that helps understand the change.
+- Write a summary that explains the change.
 - Include usage examples in the summary, where applicable.
 
 ### How to Get PRs Merged
