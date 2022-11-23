@@ -52,7 +52,7 @@ Add your fork as an origin
 git remote add fork https://github.com/YOUR_GITHUB_USERNAME/python-sdk.git
 ```
 
-Makes sure your development environment is all setup by building and testing
+Ensure your development environment is all set up by building and testing
 
 ```bash
 make
