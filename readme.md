@@ -42,13 +42,13 @@ Each provider class may have further setup required i.e. secret keys, environmen
 Pip install
 
 ```bash
-pip install openfeature-sdk==0.0.5
+pip install openfeature-sdk==0.0.6
 ```
 
 requirements.txt
 
 ```bash
-openfeature-sdk==0.0.5
+openfeature-sdk==0.0.6
 ```
 
 ```python
