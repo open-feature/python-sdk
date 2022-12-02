@@ -233,9 +233,11 @@ class OpenFeatureClient:
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
 
-        evaluation_hooks, hook_hints = self.__extract_evaluation_options(
-            flag_evaluation_options
-        )
+        if flag_evaluation_options is None:
+            flag_evaluation_options = FlagEvaluationOptions()
+
+        evaluation_hooks = flag_evaluation_options.hooks
+        hook_hints = flag_evaluation_options.hook_hints
 
         hook_context = HookContext(
             flag_key=flag_key,
@@ -254,9 +256,8 @@ class OpenFeatureClient:
             self.hooks + evaluation_hooks + self.provider.get_provider_hooks()
         )
         # after, error, finally: Provider, Invocation, Client, API
-        reversed_merged_hooks = (
-            self.provider.get_provider_hooks() + evaluation_hooks + self.hooks
-        )
+        reversed_merged_hooks = merged_hooks[:]
+        reversed_merged_hooks.sort()
 
         try:
             # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
@@ -290,22 +291,22 @@ class OpenFeatureClient:
 
             return flag_evaluation
 
-        except OpenFeatureError as e:
-            error_hooks(flag_type, hook_context, e, reversed_merged_hooks, hook_hints)
+        except OpenFeatureError as err:
+            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
             return FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
                 reason=Reason.ERROR,
-                error_code=e.error_code,
-                error_message=e.error_message,
+                error_code=err.error_code,
+                error_message=err.error_message,
             )
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
-        except Exception as e:  # noqa
-            error_hooks(flag_type, hook_context, e, reversed_merged_hooks, hook_hints)
+        except Exception as err:  # noqa
+            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
-            error_message = getattr(e, "error_message", str(e))
+            error_message = getattr(err, "error_message", str(err))
             return FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
@@ -363,23 +364,3 @@ class OpenFeatureClient:
 
         return value
 
-    def __extract_evaluation_options(
-        self, flag_evaluation_options: typing.Any
-    ) -> typing.Tuple[typing.List[Hook], MappingProxyType]:
-        evaluation_hooks: typing.List[Hook] = []
-        hook_hints: dict = {}
-
-        if flag_evaluation_options is dict:
-            if (
-                "hook_hints" in flag_evaluation_options
-                and flag_evaluation_options["hook_hints"] is dict
-            ):
-                hook_hints = dict(flag_evaluation_options["hook_hints"])
-
-            if (
-                "hooks" in flag_evaluation_options
-                and flag_evaluation_options["hooks"] is list
-            ):
-                evaluation_hooks = flag_evaluation_options["hooks"]
-
-        return (evaluation_hooks, MappingProxyType(hook_hints))
