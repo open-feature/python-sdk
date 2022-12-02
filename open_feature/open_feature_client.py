@@ -20,7 +20,6 @@ from open_feature.hooks.hook_support import (
     before_hooks,
     error_hooks,
 )
-from open_feature.immutable_dict.mapping_proxy_type import MappingProxyType
 from open_feature.open_feature_evaluation_context import api_evaluation_context
 from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider
@@ -363,4 +362,3 @@ class OpenFeatureClient:
             raise TypeMismatchError()
 
         return value
-
