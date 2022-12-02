@@ -67,7 +67,7 @@ git commit
 git push fork feat/NAME_OF_FEATURE
 ```
 
-Open a pull request against the main js-sdk repository.
+Open a pull request against the main python-sdk repository.
 
 ### How to Receive Comments
 
