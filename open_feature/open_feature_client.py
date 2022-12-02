@@ -24,7 +24,6 @@ from open_feature.open_feature_evaluation_context import api_evaluation_context
 from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider
 
-
 GetDetailCallable = typing.Union[
     typing.Callable[
         [str, bool, typing.Optional[EvaluationContext]], FlagEvaluationDetails[bool]
@@ -236,6 +235,9 @@ class OpenFeatureClient:
         if flag_evaluation_options is None:
             flag_evaluation_options = FlagEvaluationOptions()
 
+        evaluation_hooks = flag_evaluation_options.hooks
+        hook_hints = flag_evaluation_options.hook_hints
+
         hook_context = HookContext(
             flag_key=flag_key,
             flag_type=flag_type,
@@ -250,16 +252,11 @@ class OpenFeatureClient:
         # in the flag evaluation
         # before: API, Client, Invocation, Provider
         merged_hooks = (
-            self.hooks
-            + flag_evaluation_options.hooks
-            + self.provider.get_provider_hooks()
+            self.hooks + evaluation_hooks + self.provider.get_provider_hooks()
         )
         # after, error, finally: Provider, Invocation, Client, API
-        reversed_merged_hooks = (
-            self.provider.get_provider_hooks()
-            + flag_evaluation_options.hooks
-            + self.hooks
-        )
+        reversed_merged_hooks = merged_hooks[:]
+        reversed_merged_hooks.sort()
 
         try:
             # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
@@ -267,7 +264,7 @@ class OpenFeatureClient:
             # duplicate fields defined globally, on the client, or in the invocation.
             # Requirement 3.2.2, 4.3.4: API.context->client.context->invocation.context
             invocation_context = before_hooks(
-                flag_type, hook_context, merged_hooks, None
+                flag_type, hook_context, merged_hooks, hook_hints
             )
             invocation_context = invocation_context.merge(ctx2=evaluation_context)
 
@@ -284,25 +281,31 @@ class OpenFeatureClient:
             )
 
             after_hooks(
-                flag_type, hook_context, flag_evaluation, reversed_merged_hooks, None
+                flag_type,
+                hook_context,
+                flag_evaluation,
+                reversed_merged_hooks,
+                hook_hints,
             )
 
             return flag_evaluation
 
-        except OpenFeatureError as e:
-            error_hooks(flag_type, hook_context, e, reversed_merged_hooks, None)
+        except OpenFeatureError as err:
+            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
+
             return FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
                 reason=Reason.ERROR,
-                error_code=e.error_code,
-                error_message=e.error_message,
+                error_code=err.error_code,
+                error_message=err.error_message,
             )
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
-        except Exception as e:  # noqa
-            error_hooks(flag_type, hook_context, e, reversed_merged_hooks, None)
-            error_message = getattr(e, "error_message", str(e))
+        except Exception as err:  # noqa
+            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
+
+            error_message = getattr(err, "error_message", str(err))
             return FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
@@ -312,7 +315,7 @@ class OpenFeatureClient:
             )
 
         finally:
-            after_all_hooks(flag_type, hook_context, reversed_merged_hooks, None)
+            after_all_hooks(flag_type, hook_context, reversed_merged_hooks, hook_hints)
 
     def _create_provider_evaluation(
         self,

@@ -83,3 +83,7 @@ Thanks so much to our contributors.
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).
+
+### Development
+
+If you would like to contribute to the project, please see our [contributing](./CONTRIBUTING.md) documentation!
