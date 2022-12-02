@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/open-feature/python-sdk/compare/v0.0.5...v0.0.6) (2022-12-02)
+
+
+### Features
+
+* process flag evaluation options in client ([#31](https://github.com/open-feature/python-sdk/issues/31)) ([6f6186e](https://github.com/open-feature/python-sdk/commit/6f6186ed910be12579c10e6e5d693867093cf4b2))
+
 ## [0.0.5](https://github.com/open-feature/python-sdk/compare/v0.0.4...v0.0.5) (2022-11-22)
 
 
