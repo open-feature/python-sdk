@@ -56,7 +56,7 @@ class AbstractProvider:
     def resolve_object_details(
         self,
         flag_key: str,
-        default_value: dict,
+        default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[dict]:
+    ) -> FlagEvaluationDetails[typing.Union[dict, list]]:
         pass
