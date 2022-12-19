@@ -358,7 +358,11 @@ class OpenFeatureClient:
 
         value = get_details_callable(*args)
 
-        if not isinstance(value.value, flag_type.value):
+        # we need to check the get_args to be compatible with union types.
+        is_right_instance = isinstance(
+            value.value, typing.get_args(flag_type.value)
+        ) or isinstance(value.value, flag_type.value)
+        if not is_right_instance:
             raise TypeMismatchError()
 
         return value

@@ -24,6 +24,11 @@ from open_feature.hooks.hook import Hook
             },
             "get_object_value",
         ),
+        (
+            list,
+            ["string1", "string2"],
+            "get_object_value",
+        ),
     ),
 )
 def test_should_get_flag_value_based_on_method_type(
