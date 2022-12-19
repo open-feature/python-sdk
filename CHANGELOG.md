@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/open-feature/python-sdk/compare/v0.0.6...v0.0.7) (2022-12-19)
+
+
+### Bug Fixes
+
+* Get Object should return both list and dict ([#64](https://github.com/open-feature/python-sdk/issues/64)) ([85db1e0](https://github.com/open-feature/python-sdk/commit/85db1e0a748bc131bbdb9f8996284b13480b3a33))
+
 ## [0.0.6](https://github.com/open-feature/python-sdk/compare/v0.0.5...v0.0.6) (2022-12-02)
 
 
