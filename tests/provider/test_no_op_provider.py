@@ -56,7 +56,9 @@ def test_should_resolve_string_flag_from_no_op():
 def test_should_resolve_list_flag_from_no_op():
     # Given
     # When
-    flag = NoOpProvider().resolve_object_details(flag_key="Key", default_value=["item1", "item2"])
+    flag = NoOpProvider().resolve_object_details(
+        flag_key="Key", default_value=["item1", "item2"]
+    )
     # Then
     assert flag is not None
     assert flag.value == ["item1", "item2"]
