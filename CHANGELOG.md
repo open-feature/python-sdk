@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/open-feature/python-sdk/compare/v0.0.7...v0.0.8) (2022-12-28)
+
+
+### Features
+
+* defaults to NoOpProvider ([#66](https://github.com/open-feature/python-sdk/issues/66)) ([9276d35](https://github.com/open-feature/python-sdk/commit/9276d3579881049f8412e329f0ceec7df56e914b))
+
 ## [0.0.7](https://github.com/open-feature/python-sdk/compare/v0.0.6...v0.0.7) (2022-12-19)
 
 
