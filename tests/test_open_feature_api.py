@@ -6,18 +6,16 @@ from open_feature.open_feature_api import get_client, get_provider, set_provider
 from open_feature.provider.no_op_provider import NoOpProvider
 
 
-def test_should_raise_exception_with_nop_client():
+def test_should_not_raise_exception_with_noop_client():
     # Given
+    # No provider has been set
     # When
-    with pytest.raises(GeneralError) as ge:
-        get_client()
+    client = get_client(name="Default Provider", version="1.0")
+
     # Then
-    assert ge.value
-    assert (
-        ge.value.error_message
-        == "Provider not set. Call set_provider before using get_client"
-    )
-    assert ge.value.error_code == ErrorCode.GENERAL
+    assert client.name == "Default Provider"
+    assert client.version == "1.0"
+    assert isinstance(client.provider, NoOpProvider)
 
 
 def test_should_return_open_feature_client_when_configured_correctly():
