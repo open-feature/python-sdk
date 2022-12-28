@@ -63,6 +63,7 @@ In order to use the sdk there is some minor configuration. Follow the script bel
 
 ```python
 from open_feature import open_feature_api
+from open_feature.provider.no_op_provider import NoOpProvider
 
 open_feature_api.set_provider(NoOpProvider())
 open_feature_client = open_feature_api.get_client()
