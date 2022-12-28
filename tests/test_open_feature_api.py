@@ -6,7 +6,7 @@ from open_feature.open_feature_api import get_client, get_provider, set_provider
 from open_feature.provider.no_op_provider import NoOpProvider
 
 
-def test_should_not_raise_exception_with_nop_client():
+def test_should_not_raise_exception_with_noop_client():
     # Given
     # No provider has been set
     # When
