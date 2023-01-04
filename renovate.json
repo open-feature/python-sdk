@@ -3,7 +3,25 @@
   "extends": [
     "config:base"
   ],
+  "semanticCommits": "enabled",
   "pip_requirements": {
     "fileMatch": ["requirements.txt", "requirements-dev.txt"]
-  }
+  },
+  "packageRules": [
+    {
+      "description": "Automerge non-major updates",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "automerge": true
+    }
+  ]
 }
