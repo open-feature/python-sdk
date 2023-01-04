@@ -256,7 +256,7 @@ class OpenFeatureClient:
         )
         # after, error, finally: Provider, Invocation, Client, API
         reversed_merged_hooks = merged_hooks[:]
-        reversed_merged_hooks.sort()
+        reversed_merged_hooks.reverse()
 
         try:
             # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
