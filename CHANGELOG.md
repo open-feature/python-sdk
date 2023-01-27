@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.9](https://github.com/open-feature/python-sdk/compare/v0.0.8...v0.0.9) (2023-01-19)
+
+
+### Bug Fixes
+
+* reverse the merged before hooks ([#71](https://github.com/open-feature/python-sdk/issues/71)) ([3a33551](https://github.com/open-feature/python-sdk/commit/3a33551fdbd01c876920177ab2035d0e24e17572))
+
+
+### Documentation
+
+* add NoOpProvider import to config sample ([#68](https://github.com/open-feature/python-sdk/issues/68)) ([643d9fa](https://github.com/open-feature/python-sdk/commit/643d9fa34f94f6ca1f9a5d4251097a3f98dae43e))
+
 ## [0.0.8](https://github.com/open-feature/python-sdk/compare/v0.0.7...v0.0.8) (2022-12-28)
 
 
