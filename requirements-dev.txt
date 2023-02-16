@@ -46,7 +46,7 @@ packaging==21.3
     # via pytest
 pathspec==0.9.0
     # via black
-pep517==0.12.0
+pep517==0.13.0
     # via pip-tools
 pip-tools==6.6.0
     # via -r requirements-dev.in
