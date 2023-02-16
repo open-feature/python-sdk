@@ -40,7 +40,7 @@ mccabe==0.6.1
     #   pylint
 mypy-extensions==0.4.3
     # via black
-nodeenv==1.6.0
+nodeenv==1.7.0
     # via pre-commit
 packaging==21.3
     # via pytest
