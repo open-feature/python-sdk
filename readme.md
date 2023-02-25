@@ -32,8 +32,10 @@ Each provider class may have further setup required i.e. secret keys, environmen
 ## Requirements
 
 - Python 3.8+
-
+- pip
+- [pip tools](https://pypi.org/project/pip-tools/)
 ## Installation
+
 
 ### Add it to your build
 

@@ -1,0 +1,9 @@
+pylint
+pytest
+pytest-mock
+black
+pip-tools
+pre-commit
+flake8
+pytest-mock
+coverage
