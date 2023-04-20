@@ -1,7 +1,6 @@
 import typing
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
 from open_feature.hooks.hook import Hook
