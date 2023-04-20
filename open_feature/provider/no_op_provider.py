@@ -3,6 +3,7 @@ import typing
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.reason import Reason
+from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
 from open_feature.hooks.hook import Hook
 from open_feature.provider.metadata import Metadata
 from open_feature.provider.no_op_metadata import NoOpMetadata
@@ -23,9 +24,8 @@ class NoOpProvider(AbstractProvider):
         flag_key: str,
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[bool]:
-        return FlagEvaluationDetails(
-            flag_key=flag_key,
+    ) -> FlagResolutionDetails[bool]:
+        return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
@@ -36,9 +36,8 @@ class NoOpProvider(AbstractProvider):
         flag_key: str,
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[str]:
-        return FlagEvaluationDetails(
-            flag_key=flag_key,
+    ) -> FlagResolutionDetails[str]:
+        return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
@@ -49,9 +48,8 @@ class NoOpProvider(AbstractProvider):
         flag_key: str,
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[int]:
-        return FlagEvaluationDetails(
-            flag_key=flag_key,
+    ) -> FlagResolutionDetails[int]:
+        return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
@@ -62,9 +60,8 @@ class NoOpProvider(AbstractProvider):
         flag_key: str,
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[float]:
-        return FlagEvaluationDetails(
-            flag_key=flag_key,
+    ) -> FlagResolutionDetails[float]:
+        return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
@@ -75,9 +72,8 @@ class NoOpProvider(AbstractProvider):
         flag_key: str,
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[typing.Union[dict, list]]:
-        return FlagEvaluationDetails(
-            flag_key=flag_key,
+    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+        return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
