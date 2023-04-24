@@ -2,7 +2,7 @@ import typing
 from abc import abstractmethod
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
+from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
 from open_feature.hooks.hook import Hook
 from open_feature.provider.metadata import Metadata
 
@@ -22,7 +22,7 @@ class AbstractProvider:
         flag_key: str,
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[bool]:
+    ) -> FlagResolutionDetails[bool]:
         pass
 
     @abstractmethod
@@ -31,7 +31,7 @@ class AbstractProvider:
         flag_key: str,
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[str]:
+    ) -> FlagResolutionDetails[str]:
         pass
 
     @abstractmethod
@@ -40,7 +40,7 @@ class AbstractProvider:
         flag_key: str,
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[int]:
+    ) -> FlagResolutionDetails[int]:
         pass
 
     @abstractmethod
@@ -49,7 +49,7 @@ class AbstractProvider:
         flag_key: str,
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[float]:
+    ) -> FlagResolutionDetails[float]:
         pass
 
     @abstractmethod
@@ -58,5 +58,5 @@ class AbstractProvider:
         flag_key: str,
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[typing.Union[dict, list]]:
+    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
         pass
