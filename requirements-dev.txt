@@ -57,7 +57,7 @@ platformdirs==2.6.2
     #   virtualenv
 pluggy==1.0.0
     # via pytest
-pre-commit==2.19.0
+pre-commit==2.21.0
     # via -r requirements-dev.in
 py==1.11.0
     # via pytest
