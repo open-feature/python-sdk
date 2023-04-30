@@ -50,7 +50,7 @@ pep517==0.13.0
     # via pip-tools
 pip-tools==6.6.0
     # via -r requirements-dev.in
-platformdirs==2.5.2
+platformdirs==2.6.2
     # via
     #   black
     #   pylint
