@@ -96,7 +96,7 @@ virtualenv==20.14.1
     # via pre-commit
 wheel==0.40.0
     # via pip-tools
-wrapt==1.14.1
+wrapt==1.15.0
     # via astroid
 
 # The following packages are considered to be unsafe in a requirements file:
