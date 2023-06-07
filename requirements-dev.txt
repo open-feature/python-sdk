@@ -87,7 +87,7 @@ tomli==2.0.1
     #   pep517
     #   pylint
     #   pytest
-typing-extensions==4.6.0
+typing-extensions==4.6.3
     # via
     #   astroid
     #   black
