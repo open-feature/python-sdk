@@ -15,3 +15,11 @@ class FlagEvaluationDetails(typing.Generic[T]):
     reason: typing.Optional[Reason] = None
     error_code: typing.Optional[ErrorCode] = None
     error_message: typing.Optional[str] = None
+
+    @property
+    def reason(self) -> str:
+        return self._reason.value
+
+    @reason.setter
+    def reason(self, reason: Reason):
+        self._reason = reason

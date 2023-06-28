@@ -87,7 +87,7 @@ def test_should_raise_exception_when_invalid_flag_type_provided(no_op_provider_c
     assert flag.value
     assert flag.error_message == "Unknown flag type"
     assert flag.error_code == ErrorCode.GENERAL
-    assert flag.reason == Reason.ERROR
+    assert flag.reason == Reason.ERROR.value
 
 
 def test_should_handle_a_generic_exception_thrown_by_a_provider(no_op_provider_client):
@@ -103,7 +103,7 @@ def test_should_handle_a_generic_exception_thrown_by_a_provider(no_op_provider_c
     assert flag_details is not None
     assert flag_details.value
     assert isinstance(flag_details.value, bool)
-    assert flag_details.reason == Reason.ERROR
+    assert flag_details.reason == Reason.ERROR.value
     assert flag_details.error_message == "Generic exception raised"
 
 
@@ -125,5 +125,5 @@ def test_should_handle_an_open_feature_exception_thrown_by_a_provider(
     assert flag_details is not None
     assert flag_details.value
     assert isinstance(flag_details.value, bool)
-    assert flag_details.reason == Reason.ERROR
+    assert flag_details.reason == Reason.ERROR.value
     assert flag_details.error_message == "error_message"
