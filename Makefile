@@ -12,7 +12,11 @@ init: .venv
 
 .PHONY: test
 test: .venv
+ifdef TEST
+	$(VENV); pytest $(TEST)
+else
 	$(VENV); pytest
+endif
 
 .PHONY: lint
 lint: .venv
