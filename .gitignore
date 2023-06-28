@@ -51,3 +51,4 @@ docs/_build/
 
 # Virtual env directories
 .venv
+tests/features/*.feature

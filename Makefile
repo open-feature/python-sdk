@@ -28,3 +28,10 @@ lint: .venv
 clean:
 	@rm -rf .venv
 	@find -iname "*.pyc" -delete
+
+.PHONY: e2e
+e2e: .venv
+	# NOTE: only the evaluation feature is run for now
+	cp test-harness/features/evaluation.feature tests/features/
+	behave tests/features/
+	rm tests/features/*.feature
