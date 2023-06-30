@@ -1,4 +1,13 @@
-# OpenFeature SDK for Python
+<!-- markdownlint-disable MD033 -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/open-feature/community/0e23508c163a6a1ac8c0ced3e4bd78faafe627c7/assets/logo/horizontal/white/openfeature-horizontal-white.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/open-feature/community/0e23508c163a6a1ac8c0ced3e4bd78faafe627c7/assets/logo/horizontal/black/openfeature-horizontal-black.svg">
+    <img align="center" alt="OpenFeature Logo">
+  </picture>
+</p>
+
+<h2 align="center">OpenFeature Python SDK</h2>
 
 [![PyPI version](https://badge.fury.io/py/openfeature-sdk.svg)](https://badge.fury.io/py/openfeature-sdk)
 ![Python 3.8+](https://img.shields.io/badge/python->=3.8-blue.svg)
@@ -20,9 +29,11 @@ This library is intended to be used in server-side contexts and has not been eva
 - Python 3.8+
 
 ## 📦 Installation:
+
 ### Add it to your build
 
 <!---x-release-please-start-version-->
+
 Pip install
 
 ```bash
@@ -41,14 +52,12 @@ pip install requirements.txt
 
 <!---x-release-please-end-->
 
-
-
 ## 🌟 Features:
+
 - support for various backend [providers](https://openfeature.dev/docs/reference/concepts/provider)
 - easy integration and extension via [hooks](https://openfeature.dev/docs/reference/concepts/hooks)
 - bool, string, numeric, and object flag types
 - [context-aware](https://openfeature.dev/docs/reference/concepts/evaluation-context) evaluation
-
 
 ## 🚀 Usage:
 
@@ -87,7 +96,6 @@ open_feature_api.set_provider(NoOpProvider())
 
 Each provider class may have further setup required i.e. secret keys, environment variables etc
 
-<!-- TODO: example of named client binding -->
 ### Context-aware evaluation:
 
 Sometimes the value of a flag must take into account some dynamic criteria about the application or user, such as the user location, IP, email address, or the location of the server.
@@ -116,11 +124,10 @@ client = get_client(name="No-op Provider", version="0.5.2")
 client.get_string_value("email", None, request_context)
 
 ```
+
 ### Events
 
-Events allow you to react to state changes in the provider or underlying flag management system, such as flag definition changes, provider readiness, or error conditions.
-
-<!-- TODO: code example of a PROVIDER_CONFIGURATION_CHANGED event -->
+TBD (See Issue [#131](https://github.com/open-feature/python-sdk/issues/131))
 
 ### Providers:
 
@@ -129,24 +136,29 @@ To develop a provider, you need to create a new project and include the OpenFeat
 <!-- TODO: code example implementing a provider -->
 
 <!-- TODO: update with the technology in question -->
+
 See [here](https://openfeature.dev/ecosystem) for a catalog of available providers.
 
 ### Hooks:
-TBD
+
+TBD (See Issue [#72](https://github.com/open-feature/python-sdk/issues/72))
 
 <!-- A hook is a mechanism that allows for adding arbitrary behavior at well-defined points of the flag evaluation life-cycle. Use cases include validating the resolved flag value, modifying or adding data to the evaluation context, logging, telemetry, and tracking. -->
 
 <!-- TODO: code example of a hook -->
 
 <!-- TODO: update with the technology in question -->
+
 See [here](https://openfeature.dev/ecosystem) for a catalog of available hooks.
 
 ### Logging:
+
 TBD
 
 <!-- TODO: talk about logging config -->
 
 ## ⭐️ Support the project
+
 - Give this repo a ⭐️!
 - Follow us on social media:
   - Twitter: [@openfeature](https://twitter.com/openfeature)
