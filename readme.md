@@ -133,29 +133,17 @@ TBD (See Issue [#131](https://github.com/open-feature/python-sdk/issues/131))
 
 To develop a provider, you need to create a new project and include the OpenFeature SDK as a dependency. This can be a new repository or included in [the existing contrib repository](https://github.com/open-feature/python-sdk-contrib) available under the OpenFeature organization. Finally, you’ll then need to write the provider itself. This can be accomplished by implementing the `Provider` interface exported by the OpenFeature SDK.
 
-<!-- TODO: code example implementing a provider -->
-
-<!-- TODO: update with the technology in question -->
-
 See [here](https://openfeature.dev/ecosystem) for a catalog of available providers.
 
 ### Hooks:
 
 TBD (See Issue [#72](https://github.com/open-feature/python-sdk/issues/72))
 
-<!-- A hook is a mechanism that allows for adding arbitrary behavior at well-defined points of the flag evaluation life-cycle. Use cases include validating the resolved flag value, modifying or adding data to the evaluation context, logging, telemetry, and tracking. -->
-
-<!-- TODO: code example of a hook -->
-
-<!-- TODO: update with the technology in question -->
-
 See [here](https://openfeature.dev/ecosystem) for a catalog of available hooks.
 
 ### Logging:
 
 TBD
-
-<!-- TODO: talk about logging config -->
 
 ## ⭐️ Support the project
 
@@ -184,3 +172,11 @@ Made with [contrib.rocks](https://contrib.rocks).
 We hold regular meetings which you can see [here](https://github.com/open-feature/community/#meetings-and-events).
 
 We are also present on the `#openfeature` channel in the [CNCF slack](https://slack.cncf.io/).
+
+## 📜 License
+
+[Apache License 2.0](LICENSE)
+
+<!-- TODO: add FOSSA widget -->
+
+[openfeature-website]: https://openfeature.dev
