@@ -61,6 +61,11 @@ def test_should_get_flag_value_based_on_method_type(
             },
             "get_object_details",
         ),
+        (
+            list,
+            ["string1", "string2"],
+            "get_object_details",
+        ),
     ),
 )
 def test_should_get_flag_detail_based_on_method_type(
