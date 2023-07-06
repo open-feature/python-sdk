@@ -184,7 +184,7 @@ class OpenFeatureClient:
     def get_object_value(
         self,
         flag_key: str,
-        default_value: dict,
+        default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> dict:
@@ -199,7 +199,7 @@ class OpenFeatureClient:
     def get_object_details(
         self,
         flag_key: str,
-        default_value: dict,
+        default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails:
