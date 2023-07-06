@@ -12,6 +12,7 @@ from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationD
 from open_feature.flag_evaluation.flag_evaluation_options import FlagEvaluationOptions
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.flag_evaluation.reason import Reason
+from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
 from open_feature.hooks.hook import Hook
 from open_feature.hooks.hook_context import HookContext
 from open_feature.hooks.hook_support import (
@@ -26,19 +27,20 @@ from open_feature.provider.provider import AbstractProvider
 
 GetDetailCallable = typing.Union[
     typing.Callable[
-        [str, bool, typing.Optional[EvaluationContext]], FlagEvaluationDetails[bool]
+        [str, bool, typing.Optional[EvaluationContext]], FlagResolutionDetails[bool]
     ],
     typing.Callable[
-        [str, int, typing.Optional[EvaluationContext]], FlagEvaluationDetails[int]
+        [str, int, typing.Optional[EvaluationContext]], FlagResolutionDetails[int]
     ],
     typing.Callable[
-        [str, float, typing.Optional[EvaluationContext]], FlagEvaluationDetails[float]
+        [str, float, typing.Optional[EvaluationContext]], FlagResolutionDetails[float]
     ],
     typing.Callable[
-        [str, str, typing.Optional[EvaluationContext]], FlagEvaluationDetails[str]
+        [str, str, typing.Optional[EvaluationContext]], FlagResolutionDetails[str]
     ],
     typing.Callable[
-        [str, dict, typing.Optional[EvaluationContext]], FlagEvaluationDetails[dict]
+        [str, typing.Union[dict, list], typing.Optional[EvaluationContext]],
+        FlagResolutionDetails[typing.Union[dict, list]],
     ],
 ]
 
@@ -356,13 +358,20 @@ class OpenFeatureClient:
         if not get_details_callable:
             raise GeneralError(error_message="Unknown flag type")
 
-        value = get_details_callable(*args)
+        resolution = get_details_callable(*args)
 
         # we need to check the get_args to be compatible with union types.
         is_right_instance = isinstance(
-            value.value, typing.get_args(flag_type.value)
-        ) or isinstance(value.value, flag_type.value)
+            resolution.value, typing.get_args(flag_type.value)
+        ) or isinstance(resolution.value, flag_type.value)
         if not is_right_instance:
             raise TypeMismatchError()
 
-        return value
+        return FlagEvaluationDetails(
+            flag_key=flag_key,
+            value=resolution.value,
+            variant=resolution.variant,
+            reason=resolution.reason,
+            error_code=resolution.error_code,
+            error_message=resolution.error_message,
+        )
