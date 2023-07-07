@@ -1,7 +1,7 @@
-from enum import Enum
+from open_feature._backports.strenum import StrEnum
 
 
-class Reason(Enum):
+class Reason(StrEnum):
     CACHED = "CACHED"
     DEFAULT = "DEFAULT"
     DISABLED = "DISABLED"
