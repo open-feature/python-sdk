@@ -361,11 +361,7 @@ class OpenFeatureClient:
         resolution = get_details_callable(*args)
 
         # we need to check the get_args to be compatible with union types.
-        is_right_instance = isinstance(
-            resolution.value, typing.get_args(flag_type.value)
-        ) or isinstance(resolution.value, flag_type.value)
-        if not is_right_instance:
-            raise TypeMismatchError()
+        _typecheck_flag_value(resolution.value, flag_type)
 
         return FlagEvaluationDetails(
             flag_key=flag_key,
@@ -375,3 +371,18 @@ class OpenFeatureClient:
             error_code=resolution.error_code,
             error_message=resolution.error_message,
         )
+
+
+def _typecheck_flag_value(value, flag_type):
+    type_map = {
+        FlagType.BOOLEAN: bool,
+        FlagType.STRING: str,
+        FlagType.OBJECT: typing.Union[dict, list],
+        FlagType.FLOAT: float,
+        FlagType.INTEGER: int,
+    }
+    _type = type_map.get(flag_type)
+    if not _type:
+        raise GeneralError(error_message="Unknown flag type")
+    if not isinstance(value, _type):
+        raise TypeMismatchError(f"Expected type {_type} but got {type(value)}")
