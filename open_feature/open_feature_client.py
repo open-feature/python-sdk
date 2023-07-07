@@ -80,8 +80,7 @@ class OpenFeatureClient:
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> bool:
-        return self.evaluate_flag_details(
-            FlagType.BOOLEAN,
+        return self.get_boolean_details(
             flag_key,
             default_value,
             evaluation_context,
@@ -110,8 +109,7 @@ class OpenFeatureClient:
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> str:
-        return self.evaluate_flag_details(
-            FlagType.STRING,
+        return self.get_string_details(
             flag_key,
             default_value,
             evaluation_context,
@@ -198,8 +196,7 @@ class OpenFeatureClient:
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> dict:
-        return self.evaluate_flag_details(
-            FlagType.OBJECT,
+        return self.get_object_details(
             flag_key,
             default_value,
             evaluation_context,
