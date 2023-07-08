@@ -137,7 +137,24 @@ See [here](https://openfeature.dev/ecosystem) for a catalog of available provide
 
 ### Hooks:
 
-TBD (See Issue [#72](https://github.com/open-feature/python-sdk/issues/72))
+A hook is a mechanism that allows for adding arbitrary behavior at well-defined points of the flag evaluation life-cycle. Use cases include validating the resolved flag value, modifying or adding data to the evaluation context, logging, telemetry, and tracking.
+
+```python
+from open_feature.hooks.hook import Hook
+
+class MyHook(Hook):
+    def after(self, hook_context: HookContext, details: FlagEvaluationDetails, hints: dict):
+        print("This runs after the flag has been evaluated")
+
+
+# set global hooks at the API-level
+from open_feature.hooks import add_api_hooks
+add_api_hooks([MyHook()])
+
+# or configure them in the client
+client = OpenFeatureClient()
+client.add_hooks([MyHook()])
+```
 
 See [here](https://openfeature.dev/ecosystem) for a catalog of available hooks.
 

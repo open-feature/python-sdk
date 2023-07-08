@@ -5,6 +5,7 @@ import pytest
 from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import OpenFeatureError
 from open_feature.flag_evaluation.reason import Reason
+from open_feature.hooks import clear_api_hooks, add_api_hooks
 from open_feature.hooks.hook import Hook
 from open_feature.open_feature_client import OpenFeatureClient
 from open_feature.provider.no_op_provider import NoOpProvider
@@ -144,3 +145,17 @@ def test_should_return_client_metadata_with_name():
     # Then
     assert metadata is not None
     assert metadata.name == "my-client"
+
+
+def test_should_call_api_level_hooks(no_op_provider_client):
+    # Given
+    clear_api_hooks()
+    api_hook = MagicMock(spec=Hook)
+    add_api_hooks([api_hook])
+
+    # When
+    no_op_provider_client.get_boolean_details(flag_key="Key", default_value=True)
+
+    # Then
+    api_hook.before.assert_called_once()
+    api_hook.after.assert_called_once()
