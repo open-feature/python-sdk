@@ -14,6 +14,7 @@ from open_feature.flag_evaluation.flag_evaluation_options import FlagEvaluationO
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
+from open_feature.hooks import api_hooks
 from open_feature.hooks.hook import Hook
 from open_feature.hooks.hook_context import HookContext
 from open_feature.hooks.hook_support import (
@@ -257,13 +258,14 @@ class OpenFeatureClient:
             client_metadata=None,
             provider_metadata=None,
         )
-        # Todo add api level hooks
-        # https://github.com/open-feature/spec/blob/main/specification/sections/04-hooks.md#requirement-442
         # Hooks need to be handled in different orders at different stages
         # in the flag evaluation
         # before: API, Client, Invocation, Provider
         merged_hooks = (
-            self.hooks + evaluation_hooks + self.provider.get_provider_hooks()
+            api_hooks()
+            + self.hooks
+            + evaluation_hooks
+            + self.provider.get_provider_hooks()
         )
         # after, error, finally: Provider, Invocation, Client, API
         reversed_merged_hooks = merged_hooks[:]
