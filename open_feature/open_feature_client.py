@@ -1,5 +1,6 @@
 import logging
 import typing
+from dataclasses import dataclass
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.exception.error_code import ErrorCode
@@ -45,6 +46,11 @@ GetDetailCallable = typing.Union[
 ]
 
 
+@dataclass
+class ClientMetadata:
+    name: str
+
+
 class OpenFeatureClient:
     def __init__(
         self,
@@ -59,6 +65,9 @@ class OpenFeatureClient:
         self.context = context or EvaluationContext()
         self.hooks = hooks or []
         self.provider = provider
+
+    def get_metadata(self):
+        return ClientMetadata(name=self.name)
 
     def add_hooks(self, hooks: typing.List[Hook]):
         self.hooks = self.hooks + hooks

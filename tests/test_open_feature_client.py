@@ -6,6 +6,8 @@ from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import OpenFeatureError
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.hooks.hook import Hook
+from open_feature.open_feature_client import OpenFeatureClient
+from open_feature.provider.no_op_provider import NoOpProvider
 
 
 @pytest.mark.parametrize(
@@ -132,3 +134,13 @@ def test_should_handle_an_open_feature_exception_thrown_by_a_provider(
     assert isinstance(flag_details.value, bool)
     assert flag_details.reason == Reason.ERROR.value
     assert flag_details.error_message == "error_message"
+
+
+def test_should_return_client_metadata_with_name():
+    # Given
+    client = OpenFeatureClient("my-client", None, NoOpProvider())
+    # When
+    metadata = client.get_metadata()
+    # Then
+    assert metadata is not None
+    assert metadata.name == "my-client"
