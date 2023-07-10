@@ -2,7 +2,13 @@ import pytest
 
 from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import GeneralError
-from open_feature.open_feature_api import get_client, get_provider, set_provider
+from open_feature.open_feature_api import (
+    get_client,
+    get_provider,
+    set_provider,
+    get_provider_metadata,
+)
+from open_feature.provider.metadata import Metadata
 from open_feature.provider.no_op_provider import NoOpProvider
 
 
@@ -52,3 +58,15 @@ def test_should_return_a_provider_if_setup_correctly():
     # Then
     assert provider
     assert isinstance(provider, NoOpProvider)
+
+
+def test_should_retrieve_metadata_for_configured_provider():
+    # Given
+    set_provider(NoOpProvider())
+
+    # When
+    metadata = get_provider_metadata()
+
+    # Then
+    assert isinstance(metadata, Metadata)
+    assert metadata.name == "No-op Provider"
