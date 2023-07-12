@@ -28,7 +28,7 @@ def test_evaulation_details_reason_should_be_a_string():
     assert variant == flag_details.variant
     assert error_code == flag_details.error_code
     assert error_message == flag_details.error_message
-    assert reason.value == flag_details.reason
+    assert reason == flag_details.reason
 
 
 def test_evaulation_details_reason_should_be_a_string_when_set():
@@ -52,4 +52,4 @@ def test_evaulation_details_reason_should_be_a_string_when_set():
     flag_details.reason = Reason.STATIC
 
     # Then
-    assert Reason.STATIC.value == flag_details.reason
+    assert Reason.STATIC == flag_details.reason
