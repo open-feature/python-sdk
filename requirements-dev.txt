@@ -55,7 +55,7 @@ platformdirs==2.6.2
     #   black
     #   pylint
     #   virtualenv
-pluggy==1.0.0
+pluggy==1.2.0
     # via pytest
 pre-commit==2.21.0
     # via -r requirements-dev.in
