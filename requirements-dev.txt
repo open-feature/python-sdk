@@ -73,7 +73,7 @@ pytest==7.4.0
     # via
     #   -r requirements-dev.in
     #   pytest-mock
-pytest-mock==3.10.0
+pytest-mock==3.11.1
     # via -r requirements-dev.in
 pyyaml==6.0
     # via pre-commit
