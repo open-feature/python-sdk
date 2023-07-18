@@ -1,5 +1,6 @@
 from numbers import Number
 
+from open_feature.exception.error_code import ErrorCode
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
 from open_feature.provider.in_memory_provider import InMemoryProvider, InMemoryFlag
@@ -24,8 +25,9 @@ def test_should_handle_unknown_flags_correctly():
     assert flag is not None
     assert flag.value is True
     assert isinstance(flag.value, bool)
-    assert flag.reason == Reason.DEFAULT
-    assert flag.variant == "Passed in default"
+    assert flag.reason == Reason.ERROR
+    assert flag.error_code == ErrorCode.FLAG_NOT_FOUND
+    assert flag.error_message == "Flag 'Key' not found"
 
 
 def test_calls_context_evaluator_if_present():

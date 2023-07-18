@@ -116,7 +116,8 @@ class InMemoryProvider(AbstractProvider):
         if flag is None:
             return FlagResolutionDetails(
                 value=default_value,
-                reason=Reason.DEFAULT,
-                variant=PASSED_IN_DEFAULT,
+                reason=Reason.ERROR,
+                error_code=ErrorCode.FLAG_NOT_FOUND,
+                error_message=f"Flag '{flag_key}' not found",
             )
         return flag.resolve(evaluation_context)
