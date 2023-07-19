@@ -20,7 +20,7 @@ class InMemoryMetadata(Metadata):
 T = typing.TypeVar("T", covariant=True)
 
 
-@dataclass
+@dataclass(frozen=True)
 class InMemoryFlag(typing.Generic[T]):
     flag_key: str
     default_variant: str
@@ -58,7 +58,7 @@ class InMemoryProvider(AbstractProvider):
     _flags: FlagStorage
 
     def __init__(self, flags: FlagStorage):
-        self._flags = flags
+        self._flags = flags.copy()
 
     def get_metadata(self) -> Metadata:
         return InMemoryMetadata()
