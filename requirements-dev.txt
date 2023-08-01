@@ -38,7 +38,7 @@ mccabe==0.6.1
     # via
     #   flake8
     #   pylint
-mypy-extensions==0.4.3
+mypy-extensions==1.0.0
     # via black
 nodeenv==1.8.0
     # via pre-commit
