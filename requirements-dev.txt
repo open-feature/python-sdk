@@ -42,7 +42,7 @@ mypy-extensions==0.4.3
     # via black
 nodeenv==1.8.0
     # via pre-commit
-packaging==21.3
+packaging==23.1
     # via pytest
 pathspec==0.9.0
     # via black
