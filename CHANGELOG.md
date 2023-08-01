@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.1.0](https://github.com/open-feature/python-sdk/compare/v0.0.9...v0.1.0) (2023-07-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* EvaluationDetails.reason should be a string, Reason enum should export default reasons per spec ([#126](https://github.com/open-feature/python-sdk/issues/126))
+
+### Features
+
+* EvaluationDetails.reason should be a string, Reason enum should export default reasons per spec ([#126](https://github.com/open-feature/python-sdk/issues/126)) ([c2d225e](https://github.com/open-feature/python-sdk/commit/c2d225e34cefe284288e7fc5a574c1136e0962aa))
+* implement api-level hooks ([#139](https://github.com/open-feature/python-sdk/issues/139)) ([7fe511f](https://github.com/open-feature/python-sdk/commit/7fe511ffe023b164f7ad6bd9f41d60b289747268))
+* implement client get_metadata for requirement 1.2.2 ([#141](https://github.com/open-feature/python-sdk/issues/141)) ([571f5eb](https://github.com/open-feature/python-sdk/commit/571f5eb3bfe147407e473b36ae8a6c5ad056ebf2))
+* implement get_provider_metadata for requirement 1.1.5 ([#140](https://github.com/open-feature/python-sdk/issues/140)) ([695da28](https://github.com/open-feature/python-sdk/commit/695da28c1ed4f65e19bed0fa4a379257d7dc6776))
+* implement InMemoryProvider ([#157](https://github.com/open-feature/python-sdk/issues/157)) ([5e7bf1f](https://github.com/open-feature/python-sdk/commit/5e7bf1f8ad6aa6a34f5be322ade92b672ad9b6b6))
+
+
+### Bug Fixes
+
+* object client methods can receive dict or list as default_value ([#134](https://github.com/open-feature/python-sdk/issues/134)) ([291581f](https://github.com/open-feature/python-sdk/commit/291581fbceb5abbe267d63c9c7e94d4cd34cef21))
+* return correct type object in OpenFeatureClient._create_provider_evaluation ([#136](https://github.com/open-feature/python-sdk/issues/136)) ([052e149](https://github.com/open-feature/python-sdk/commit/052e149ec530c71efed6d8c478d09b9772505153))
+* use str values in FlagType enum for easier typing ([#137](https://github.com/open-feature/python-sdk/issues/137)) ([292a0df](https://github.com/open-feature/python-sdk/commit/292a0dfc0ba6e0d2baa6cd0cb87351b8b02ef13a))
+
+
+### Documentation
+
+* simplified the under development warning ([0926a68](https://github.com/open-feature/python-sdk/commit/0926a68de69dfe5dba0f7af49daaa07e3383aed5))
+
 ## [0.0.9](https://github.com/open-feature/python-sdk/compare/v0.0.8...v0.0.9) (2023-01-19)
 
 
