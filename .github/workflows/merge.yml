@@ -20,6 +20,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       - name: Cache virtualenvironment
         uses: actions/cache@v3
@@ -63,6 +65,11 @@ jobs:
           name: coverage # optional
           fail_ci_if_error: true # optional (default = false)
           verbose: true # optional (default = false)
+
+      - name: Run E2E tests with behave
+        run: |
+          cp test-harness/features/evaluation.feature tests/features/
+          behave tests/features/
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2

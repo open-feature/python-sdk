@@ -6,6 +6,8 @@
 #
 astroid==2.15.6
     # via pylint
+behave==1.2.6
+    # via -r requirements-dev.in
 black==23.7.0
     # via -r requirements-dev.in
 build==0.10.0
@@ -47,6 +49,12 @@ packaging==23.1
     #   black
     #   build
     #   pytest
+parse==1.19.1
+    # via
+    #   behave
+    #   parse-type
+parse-type==0.6.2
+    # via behave
 pathspec==0.11.1
     # via black
 pip-tools==7.1.0
@@ -76,6 +84,10 @@ pytest-mock==3.11.1
     # via -r requirements-dev.in
 pyyaml==6.0.1
     # via pre-commit
+six==1.16.0
+    # via
+    #   behave
+    #   parse-type
 tomlkit==0.12.1
     # via pylint
 virtualenv==20.24.2
