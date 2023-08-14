@@ -18,6 +18,9 @@ else
 	$(VENV); pytest
 endif
 
+test-harness:
+	git submodule update --init
+
 .PHONY: lint
 lint: .venv
 	$(VENV); black .
@@ -30,8 +33,8 @@ clean:
 	@find -iname "*.pyc" -delete
 
 .PHONY: e2e
-e2e: .venv
+e2e: .venv test-harness
 	# NOTE: only the evaluation feature is run for now
 	cp test-harness/features/evaluation.feature tests/features/
-	behave tests/features/
+	$(VENV); behave tests/features/
 	rm tests/features/*.feature
