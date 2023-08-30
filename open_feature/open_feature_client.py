@@ -385,7 +385,7 @@ def _typecheck_flag_value(value, flag_type):
     type_map = {
         FlagType.BOOLEAN: bool,
         FlagType.STRING: str,
-        FlagType.OBJECT: typing.Union[dict, list],
+        FlagType.OBJECT: (dict, list),
         FlagType.FLOAT: float,
         FlagType.INTEGER: int,
     }

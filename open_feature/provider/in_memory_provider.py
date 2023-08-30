@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import typing
 
+from open_feature._backports.strenum import StrEnum
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.exception.error_code import ErrorCode
 from open_feature.flag_evaluation.reason import Reason
@@ -22,12 +23,14 @@ T = typing.TypeVar("T", covariant=True)
 
 @dataclass(frozen=True)
 class InMemoryFlag(typing.Generic[T]):
+    class State(StrEnum):
+        ENABLED = "ENABLED"
+        DISABLED = "DISABLED"
+
     flag_key: str
     default_variant: str
     variants: typing.Dict[str, T]
-    reason: typing.Optional[Reason] = Reason.STATIC
-    error_code: typing.Optional[ErrorCode] = None
-    error_message: typing.Optional[str] = None
+    state: State = State.ENABLED
     context_evaluator: typing.Optional[
         typing.Callable[["InMemoryFlag", EvaluationContext], FlagResolutionDetails[T]]
     ] = None
@@ -42,10 +45,8 @@ class InMemoryFlag(typing.Generic[T]):
 
         return FlagResolutionDetails(
             value=self.variants[self.default_variant],
-            reason=self.reason,
+            reason=Reason.STATIC,
             variant=self.default_variant,
-            error_code=self.error_code,
-            error_message=self.error_message,
         )
 
 
