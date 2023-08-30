@@ -14,7 +14,7 @@ build==0.10.0
     # via pip-tools
 cfgv==3.3.1
     # via pre-commit
-click==8.1.6
+click==8.1.7
     # via
     #   black
     #   pip-tools
