@@ -4,7 +4,7 @@ import pytest
 
 from open_feature.open_feature_api import add_hooks, clear_hooks
 from open_feature.exception import ErrorCode, OpenFeatureError
-from open_feature.flag_evaluation.reason import Reason
+from open_feature.flag_evaluation import Reason
 from open_feature.hooks import Hook
 from open_feature.open_feature_client import OpenFeatureClient
 from open_feature.provider.no_op_provider import NoOpProvider

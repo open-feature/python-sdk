@@ -1,11 +1,11 @@
+from __future__ import annotations
 import typing
 from abc import abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 
 from open_feature.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
-from open_feature.flag_evaluation.flag_type import FlagType
+from open_feature.flag_evaluation import FlagEvaluationDetails, FlagType
 
 
 class HookType(Enum):

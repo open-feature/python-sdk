@@ -3,8 +3,7 @@ import typing
 from functools import reduce
 
 from open_feature.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
-from open_feature.flag_evaluation.flag_type import FlagType
+from open_feature.flag_evaluation import FlagEvaluationDetails, FlagType
 from open_feature.hooks import Hook, HookContext, HookType
 
 

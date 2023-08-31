@@ -10,11 +10,13 @@ from open_feature.exception import (
     OpenFeatureError,
     TypeMismatchError,
 )
-from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
-from open_feature.flag_evaluation.flag_evaluation_options import FlagEvaluationOptions
-from open_feature.flag_evaluation.flag_type import FlagType
-from open_feature.flag_evaluation.reason import Reason
-from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
+from open_feature.flag_evaluation import (
+    FlagEvaluationDetails,
+    FlagEvaluationOptions,
+    FlagType,
+    Reason,
+    FlagResolutionDetails,
+)
 from open_feature.hooks import Hook, HookContext
 from open_feature.hooks.hook_support import (
     after_all_hooks,
