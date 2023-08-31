@@ -12,7 +12,7 @@ black==23.7.0
     # via -r requirements-dev.in
 build==0.10.0
     # via pip-tools
-cfgv==3.3.1
+cfgv==3.4.0
     # via pre-commit
 click==8.1.7
     # via
