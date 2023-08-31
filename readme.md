@@ -103,8 +103,10 @@ In OpenFeature, we refer to this as [`targeting`](https://openfeature.dev/specif
 If the flag system you're using supports targeting, you can provide the input data using the `EvaluationContext`.
 
 ```python
-from open_feature.open_feature_api import get_client, get_provider, set_provider
-from open_feature.open_feature_evaluation_context import (
+from open_feature.open_feature_api import (
+    get_client,
+    get_provider,
+    set_provider
     api_evaluation_context,
     set_api_evaluation_context,
 )
