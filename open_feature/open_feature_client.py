@@ -2,6 +2,7 @@ import logging
 import typing
 from dataclasses import dataclass
 
+from open_feature import open_feature_api as api
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import (
@@ -23,7 +24,6 @@ from open_feature.hooks.hook_support import (
     before_hooks,
     error_hooks,
 )
-from open_feature.open_feature_evaluation_context import api_evaluation_context
 from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider
 
@@ -280,7 +280,9 @@ class OpenFeatureClient:
 
             # Requirement 3.2.2 merge: API.context->client.context->invocation.context
             merged_context = (
-                api_evaluation_context().merge(self.context).merge(invocation_context)
+                api.get_evaluation_context()
+                .merge(self.context)
+                .merge(invocation_context)
             )
 
             flag_evaluation = self._create_provider_evaluation(
