@@ -24,7 +24,7 @@ dill==0.3.7
     # via pylint
 distlib==0.3.7
     # via virtualenv
-filelock==3.12.2
+filelock==3.12.3
     # via virtualenv
 flake8==6.0.0
     # via -r requirements-dev.in
