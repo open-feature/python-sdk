@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from open_feature.evaluation_context.evaluation_context import EvaluationContext
+from open_feature.evaluation_context import EvaluationContext
 from open_feature.hooks.hook import Hook
 from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import GeneralError
