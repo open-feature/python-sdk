@@ -150,7 +150,7 @@ class MyHook(Hook):
 
 
 # set global hooks at the API-level
-from open_feature.hooks import add_api_hooks
+from open_feature.open_feature_api import add_api_hooks
 add_api_hooks([MyHook()])
 
 # or configure them in the client

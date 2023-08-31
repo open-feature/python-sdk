@@ -2,6 +2,7 @@ import typing
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
 from open_feature.exception.exceptions import GeneralError
+from open_feature.hooks.hook import Hook
 from open_feature.open_feature_client import OpenFeatureClient
 from open_feature.provider.metadata import Metadata
 from open_feature.provider.no_op_provider import NoOpProvider
@@ -10,6 +11,8 @@ from open_feature.provider.provider import AbstractProvider
 _provider: AbstractProvider = NoOpProvider()
 
 _evaluation_context = EvaluationContext()
+
+_hooks: typing.List[Hook] = []
 
 
 def get_client(
@@ -45,3 +48,18 @@ def set_evaluation_context(evaluation_context: EvaluationContext):
     if evaluation_context is None:
         raise GeneralError(error_message="No api level evaluation context")
     _evaluation_context = evaluation_context
+
+
+def add_api_hooks(hooks: typing.List[Hook]):
+    global _hooks
+    _hooks = _hooks + hooks
+
+
+def clear_api_hooks():
+    global _hooks
+    _hooks = []
+
+
+def api_hooks() -> typing.List[Hook]:
+    global _hooks
+    return _hooks

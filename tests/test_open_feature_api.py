@@ -1,6 +1,9 @@
+from unittest.mock import MagicMock
+
 import pytest
 
 from open_feature.evaluation_context.evaluation_context import EvaluationContext
+from open_feature.hooks.hook import Hook
 from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import GeneralError
 from open_feature.open_feature_api import (
@@ -10,6 +13,9 @@ from open_feature.open_feature_api import (
     get_provider_metadata,
     get_evaluation_context,
     set_evaluation_context,
+    api_hooks,
+    add_api_hooks,
+    clear_api_hooks,
 )
 from open_feature.provider.metadata import Metadata
 from open_feature.provider.no_op_provider import NoOpProvider
@@ -97,3 +103,17 @@ def test_should_successfully_set_evaluation_context_for_api():
     assert global_evaluation_context
     assert global_evaluation_context.targeting_key == evaluation_context.targeting_key
     assert global_evaluation_context.attributes == evaluation_context.attributes
+
+
+def test_should_add_hooks_to_api_hooks():
+    # Given
+    hook_1 = MagicMock(spec=Hook)
+    hook_2 = MagicMock(spec=Hook)
+    clear_api_hooks()
+
+    # When
+    add_api_hooks([hook_1])
+    add_api_hooks([hook_2])
+
+    # Then
+    assert api_hooks() == [hook_1, hook_2]
