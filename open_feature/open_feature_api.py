@@ -50,16 +50,16 @@ def set_evaluation_context(evaluation_context: EvaluationContext):
     _evaluation_context = evaluation_context
 
 
-def add_api_hooks(hooks: typing.List[Hook]):
+def add_hooks(hooks: typing.List[Hook]):
     global _hooks
     _hooks = _hooks + hooks
 
 
-def clear_api_hooks():
+def clear_hooks():
     global _hooks
     _hooks = []
 
 
-def api_hooks() -> typing.List[Hook]:
+def get_hooks() -> typing.List[Hook]:
     global _hooks
     return _hooks

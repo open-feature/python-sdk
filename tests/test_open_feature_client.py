@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from open_feature.open_feature_api import clear_api_hooks, add_api_hooks
+from open_feature.open_feature_api import add_hooks, clear_hooks
 from open_feature.exception.error_code import ErrorCode
 from open_feature.exception.exceptions import OpenFeatureError
 from open_feature.flag_evaluation.reason import Reason
@@ -149,9 +149,9 @@ def test_should_return_client_metadata_with_name():
 
 def test_should_call_api_level_hooks(no_op_provider_client):
     # Given
-    clear_api_hooks()
+    clear_hooks()
     api_hook = MagicMock(spec=Hook)
-    add_api_hooks([api_hook])
+    add_hooks([api_hook])
 
     # When
     no_op_provider_client.get_boolean_details(flag_key="Key", default_value=True)

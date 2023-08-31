@@ -258,7 +258,7 @@ class OpenFeatureClient:
         # in the flag evaluation
         # before: API, Client, Invocation, Provider
         merged_hooks = (
-            api.api_hooks()
+            api.get_hooks()
             + self.hooks
             + evaluation_hooks
             + self.provider.get_provider_hooks()
