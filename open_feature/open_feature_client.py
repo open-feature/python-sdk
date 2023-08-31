@@ -15,8 +15,7 @@ from open_feature.flag_evaluation.flag_evaluation_options import FlagEvaluationO
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
-from open_feature.hooks.hook import Hook
-from open_feature.hooks.hook_context import HookContext
+from open_feature.hooks import Hook, HookContext
 from open_feature.hooks.hook_support import (
     after_all_hooks,
     after_hooks,

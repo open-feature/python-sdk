@@ -1,7 +1,7 @@
 import typing
 from dataclasses import dataclass, field
 
-from open_feature.hooks.hook import Hook
+from open_feature.hooks import Hook
 
 
 @dataclass

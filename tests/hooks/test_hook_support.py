@@ -2,7 +2,7 @@ from unittest.mock import ANY
 
 from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
 from open_feature.flag_evaluation.flag_type import FlagType
-from open_feature.hooks.hook_context import HookContext
+from open_feature.hooks import HookContext
 from open_feature.hooks.hook_support import (
     after_all_hooks,
     after_hooks,

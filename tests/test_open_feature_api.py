@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from open_feature.evaluation_context import EvaluationContext
-from open_feature.hooks.hook import Hook
+from open_feature.hooks import Hook
 from open_feature.exception import ErrorCode, GeneralError
 from open_feature.open_feature_api import (
     get_client,
