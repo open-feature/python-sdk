@@ -90,7 +90,7 @@ six==1.16.0
     #   parse-type
 tomlkit==0.12.1
     # via pylint
-virtualenv==20.24.2
+virtualenv==20.24.4
     # via pre-commit
 wheel==0.41.0
     # via pip-tools
