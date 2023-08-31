@@ -35,12 +35,12 @@ def get_provider_metadata() -> typing.Optional[Metadata]:
     return _provider.get_metadata()
 
 
-def api_evaluation_context() -> EvaluationContext:
+def get_evaluation_context() -> EvaluationContext:
     global _evaluation_context
     return _evaluation_context
 
 
-def set_api_evaluation_context(evaluation_context: EvaluationContext):
+def set_evaluation_context(evaluation_context: EvaluationContext):
     global _evaluation_context
     if evaluation_context is None:
         raise GeneralError(error_message="No api level evaluation context")

@@ -280,7 +280,9 @@ class OpenFeatureClient:
 
             # Requirement 3.2.2 merge: API.context->client.context->invocation.context
             merged_context = (
-                api.api_evaluation_context().merge(self.context).merge(invocation_context)
+                api.get_evaluation_context()
+                .merge(self.context)
+                .merge(invocation_context)
             )
 
             flag_evaluation = self._create_provider_evaluation(

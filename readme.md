@@ -107,8 +107,8 @@ from open_feature.open_feature_api import (
     get_client,
     get_provider,
     set_provider
-    api_evaluation_context,
-    set_api_evaluation_context,
+    get_evaluation_context,
+    set_evaluation_context,
 )
 
 global_context = EvaluationContext(
@@ -119,7 +119,7 @@ request_context = EvaluationContext(
 )
 
 ## set global context
-set_api_evaluation_context(first_context)
+set_evaluation_context(first_context)
 
 # merge second context
 client = get_client(name="No-op Provider", version="0.5.2")

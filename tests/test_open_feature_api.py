@@ -8,8 +8,8 @@ from open_feature.open_feature_api import (
     get_provider,
     set_provider,
     get_provider_metadata,
-    api_evaluation_context,
-    set_api_evaluation_context
+    get_evaluation_context,
+    set_evaluation_context,
 )
 from open_feature.provider.metadata import Metadata
 from open_feature.provider.no_op_provider import NoOpProvider
@@ -75,11 +75,10 @@ def test_should_retrieve_metadata_for_configured_provider():
     assert metadata.name == "No-op Provider"
 
 
-
 def test_should_raise_an_exception_if_no_evaluation_context_set():
     # Given
     with pytest.raises(GeneralError) as ge:
-        set_api_evaluation_context(evaluation_context=None)
+        set_evaluation_context(evaluation_context=None)
     # Then
     assert ge.value
     assert ge.value.error_message == "No api level evaluation context"
@@ -91,8 +90,8 @@ def test_should_successfully_set_evaluation_context_for_api():
     evaluation_context = EvaluationContext("targeting_key", {"attr1": "val1"})
 
     # When
-    set_api_evaluation_context(evaluation_context)
-    global_evaluation_context = api_evaluation_context()
+    set_evaluation_context(evaluation_context)
+    global_evaluation_context = get_evaluation_context()
 
     # Then
     assert global_evaluation_context
