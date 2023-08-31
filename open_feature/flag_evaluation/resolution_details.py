@@ -1,7 +1,7 @@
 import typing
 from dataclasses import dataclass
 
-from open_feature.exception.error_code import ErrorCode
+from open_feature.exception import ErrorCode
 from open_feature.flag_evaluation.reason import Reason
 
 T = typing.TypeVar("T", covariant=True)

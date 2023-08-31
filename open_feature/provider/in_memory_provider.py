@@ -3,7 +3,7 @@ import typing
 
 from open_feature._backports.strenum import StrEnum
 from open_feature.evaluation_context import EvaluationContext
-from open_feature.exception.error_code import ErrorCode
+from open_feature.exception import ErrorCode
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
 from open_feature.hooks.hook import Hook

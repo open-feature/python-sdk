@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 from open_feature import open_feature_api as api
 from open_feature.evaluation_context import EvaluationContext
-from open_feature.exception.error_code import ErrorCode
-from open_feature.exception.exceptions import (
+from open_feature.exception import (
+    ErrorCode,
     GeneralError,
     OpenFeatureError,
     TypeMismatchError,
