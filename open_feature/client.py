@@ -17,8 +17,8 @@ from open_feature.flag_evaluation import (
     Reason,
     FlagResolutionDetails,
 )
-from open_feature.hooks import Hook, HookContext
-from open_feature.hooks.hook_support import (
+from open_feature.hook import Hook, HookContext
+from open_feature.hook.hook_support import (
     after_all_hooks,
     after_hooks,
     before_hooks,

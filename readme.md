@@ -142,7 +142,7 @@ See [here](https://openfeature.dev/ecosystem) for a catalog of available provide
 A hook is a mechanism that allows for adding arbitrary behavior at well-defined points of the flag evaluation life-cycle. Use cases include validating the resolved flag value, modifying or adding data to the evaluation context, logging, telemetry, and tracking.
 
 ```python
-from open_feature.hooks import Hook
+from open_feature.hook import Hook
 
 class MyHook(Hook):
     def after(self, hook_context: HookContext, details: FlagEvaluationDetails, hints: dict):

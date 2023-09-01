@@ -6,7 +6,7 @@ from open_feature.api import add_hooks, clear_hooks
 from open_feature.client import OpenFeatureClient
 from open_feature.exception import ErrorCode, OpenFeatureError
 from open_feature.flag_evaluation import Reason
-from open_feature.hooks import Hook
+from open_feature.hook import Hook
 from open_feature.provider.no_op_provider import NoOpProvider
 
 

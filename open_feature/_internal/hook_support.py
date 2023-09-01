@@ -4,7 +4,7 @@ from functools import reduce
 
 from open_feature.evaluation_context import EvaluationContext
 from open_feature.flag_evaluation import FlagEvaluationDetails, FlagType
-from open_feature.hooks import Hook, HookContext, HookType
+from open_feature.hook import Hook, HookContext, HookType
 
 
 def error_hooks(

@@ -5,7 +5,7 @@ from open_feature._backports.strenum import StrEnum
 from open_feature.evaluation_context import EvaluationContext
 from open_feature.exception import ErrorCode
 from open_feature.flag_evaluation import FlagResolutionDetails, Reason
-from open_feature.hooks import Hook
+from open_feature.hook import Hook
 from open_feature.provider.metadata import Metadata
 from open_feature.provider.provider import AbstractProvider
 

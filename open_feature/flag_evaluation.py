@@ -6,7 +6,7 @@ from open_feature._backports.strenum import StrEnum
 from open_feature.exception import ErrorCode
 
 if typing.TYPE_CHECKING:  # resolves a circular dependency in type annotations
-    from open_feature.hooks import Hook
+    from open_feature.hook import Hook
 
 
 class FlagType(StrEnum):
