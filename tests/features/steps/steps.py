@@ -2,11 +2,11 @@
 
 from behave import given, then, when
 
+from open_feature.api import get_client, set_provider
+from open_feature.client import OpenFeatureClient
 from open_feature.evaluation_context import EvaluationContext
 from open_feature.exception import ErrorCode
 from open_feature.flag_evaluation import FlagEvaluationDetails, Reason
-from open_feature.open_feature_api import get_client, set_provider
-from open_feature.open_feature_client import OpenFeatureClient
 from open_feature.provider.in_memory_provider import InMemoryProvider
 from tests.features.data import IN_MEMORY_FLAGS
 
