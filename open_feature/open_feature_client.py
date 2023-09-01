@@ -15,7 +15,6 @@ from open_feature.flag_evaluation.flag_evaluation_options import FlagEvaluationO
 from open_feature.flag_evaluation.flag_type import FlagType
 from open_feature.flag_evaluation.reason import Reason
 from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
-from open_feature.hooks import api_hooks
 from open_feature.hooks.hook import Hook
 from open_feature.hooks.hook_context import HookContext
 from open_feature.hooks.hook_support import (
@@ -259,7 +258,7 @@ class OpenFeatureClient:
         # in the flag evaluation
         # before: API, Client, Invocation, Provider
         merged_hooks = (
-            api_hooks()
+            api.get_hooks()
             + self.hooks
             + evaluation_hooks
             + self.provider.get_provider_hooks()

@@ -150,8 +150,8 @@ class MyHook(Hook):
 
 
 # set global hooks at the API-level
-from open_feature.hooks import add_api_hooks
-add_api_hooks([MyHook()])
+from open_feature.open_feature_api import add_hooks
+add_hooks([MyHook()])
 
 # or configure them in the client
 client = OpenFeatureClient()
