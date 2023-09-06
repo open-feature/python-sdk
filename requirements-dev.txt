@@ -18,7 +18,7 @@ click==8.1.7
     # via
     #   black
     #   pip-tools
-coverage==7.3.0
+coverage==7.3.1
     # via -r requirements-dev.in
 dill==0.3.7
     # via pylint
