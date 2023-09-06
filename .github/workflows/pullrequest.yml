@@ -22,7 +22,7 @@ jobs:
       image: ${{ matrix.container }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -62,7 +62,7 @@ jobs:
         run: coverage run --omit="*/test*" -m pytest
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@04adcebd9b38cae0bb0fd4a05e3497ce0bce41a0
+        uses: codecov/codecov-action@78116274182c2729736ac465c39be601ea6d015e
         with:
           flags: unittests # optional
           name: coverage # optional
