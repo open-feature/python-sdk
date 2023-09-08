@@ -10,7 +10,7 @@ behave==1.2.6
     # via -r requirements-dev.in
 black==23.7.0
     # via -r requirements-dev.in
-build==0.10.0
+build==1.0.3
     # via pip-tools
 cfgv==3.4.0
     # via pre-commit
