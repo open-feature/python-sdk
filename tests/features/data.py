@@ -1,6 +1,5 @@
-from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation.reason import Reason
-from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
+from open_feature.evaluation_context import EvaluationContext
+from open_feature.flag_evaluation import FlagResolutionDetails, Reason
 from open_feature.provider.in_memory_provider import InMemoryFlag
 
 

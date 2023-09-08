@@ -1,9 +1,28 @@
+from __future__ import annotations
+import typing
 from abc import abstractmethod
+from dataclasses import dataclass
+from enum import Enum
 
-from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
-from open_feature.flag_evaluation.flag_type import FlagType
-from open_feature.hooks.hook_context import HookContext
+from open_feature.evaluation_context import EvaluationContext
+from open_feature.flag_evaluation import FlagEvaluationDetails, FlagType
+
+
+class HookType(Enum):
+    BEFORE = "before"
+    AFTER = "after"
+    FINALLY_AFTER = "finally_after"
+    ERROR = "error"
+
+
+@dataclass
+class HookContext:
+    flag_key: str
+    flag_type: FlagType
+    default_value: typing.Any
+    evaluation_context: EvaluationContext
+    client_metadata: typing.Optional[dict] = None
+    provider_metadata: typing.Optional[dict] = None
 
 
 class Hook:

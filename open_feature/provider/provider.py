@@ -1,9 +1,9 @@
 import typing
 from abc import abstractmethod
 
-from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
-from open_feature.hooks.hook import Hook
+from open_feature.evaluation_context import EvaluationContext
+from open_feature.flag_evaluation import FlagResolutionDetails
+from open_feature.hook import Hook
 from open_feature.provider.metadata import Metadata
 
 

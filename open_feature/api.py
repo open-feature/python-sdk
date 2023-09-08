@@ -1,9 +1,9 @@
 import typing
 
-from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.exception.exceptions import GeneralError
-from open_feature.hooks.hook import Hook
-from open_feature.open_feature_client import OpenFeatureClient
+from open_feature.client import OpenFeatureClient
+from open_feature.evaluation_context import EvaluationContext
+from open_feature.exception import GeneralError
+from open_feature.hook import Hook
 from open_feature.provider.metadata import Metadata
 from open_feature.provider.no_op_provider import NoOpProvider
 from open_feature.provider.provider import AbstractProvider

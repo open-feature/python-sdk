@@ -2,12 +2,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from open_feature.open_feature_api import add_hooks, clear_hooks
-from open_feature.exception.error_code import ErrorCode
-from open_feature.exception.exceptions import OpenFeatureError
-from open_feature.flag_evaluation.reason import Reason
-from open_feature.hooks.hook import Hook
-from open_feature.open_feature_client import OpenFeatureClient
+from open_feature.api import add_hooks, clear_hooks
+from open_feature.client import OpenFeatureClient
+from open_feature.exception import ErrorCode, OpenFeatureError
+from open_feature.flag_evaluation import Reason
+from open_feature.hook import Hook
 from open_feature.provider.no_op_provider import NoOpProvider
 
 

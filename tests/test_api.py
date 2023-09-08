@@ -2,11 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.hooks.hook import Hook
-from open_feature.exception.error_code import ErrorCode
-from open_feature.exception.exceptions import GeneralError
-from open_feature.open_feature_api import (
+from open_feature.api import (
     get_client,
     get_provider,
     set_provider,
@@ -17,6 +13,9 @@ from open_feature.open_feature_api import (
     add_hooks,
     clear_hooks,
 )
+from open_feature.evaluation_context import EvaluationContext
+from open_feature.exception import ErrorCode, GeneralError
+from open_feature.hook import Hook
 from open_feature.provider.metadata import Metadata
 from open_feature.provider.no_op_provider import NoOpProvider
 

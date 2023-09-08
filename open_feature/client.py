@@ -2,22 +2,23 @@ import logging
 import typing
 from dataclasses import dataclass
 
-from open_feature import open_feature_api as api
-from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.exception.error_code import ErrorCode
-from open_feature.exception.exceptions import (
+from open_feature import api
+from open_feature.evaluation_context import EvaluationContext
+from open_feature.exception import (
+    ErrorCode,
     GeneralError,
     OpenFeatureError,
     TypeMismatchError,
 )
-from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
-from open_feature.flag_evaluation.flag_evaluation_options import FlagEvaluationOptions
-from open_feature.flag_evaluation.flag_type import FlagType
-from open_feature.flag_evaluation.reason import Reason
-from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
-from open_feature.hooks.hook import Hook
-from open_feature.hooks.hook_context import HookContext
-from open_feature.hooks.hook_support import (
+from open_feature.flag_evaluation import (
+    FlagEvaluationDetails,
+    FlagEvaluationOptions,
+    FlagType,
+    Reason,
+    FlagResolutionDetails,
+)
+from open_feature.hook import Hook, HookContext
+from open_feature.hook.hook_support import (
     after_all_hooks,
     after_hooks,
     before_hooks,

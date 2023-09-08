@@ -1,6 +1,5 @@
-from open_feature.exception.error_code import ErrorCode
-from open_feature.flag_evaluation.flag_evaluation_details import FlagEvaluationDetails
-from open_feature.flag_evaluation.reason import Reason
+from open_feature.exception import ErrorCode
+from open_feature.flag_evaluation import FlagEvaluationDetails, Reason
 
 
 def test_evaulation_details_reason_should_be_a_string():

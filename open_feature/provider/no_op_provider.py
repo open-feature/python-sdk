@@ -1,9 +1,8 @@
 import typing
 
-from open_feature.evaluation_context.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation.reason import Reason
-from open_feature.flag_evaluation.resolution_details import FlagResolutionDetails
-from open_feature.hooks.hook import Hook
+from open_feature.evaluation_context import EvaluationContext
+from open_feature.flag_evaluation import FlagResolutionDetails, Reason
+from open_feature.hook import Hook
 from open_feature.provider.metadata import Metadata
 from open_feature.provider.no_op_metadata import NoOpMetadata
 from open_feature.provider.provider import AbstractProvider
