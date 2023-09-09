@@ -8,7 +8,7 @@ astroid==2.15.6
     # via pylint
 behave==1.2.6
     # via -r requirements-dev.in
-black==23.7.0
+black==23.9.0
     # via -r requirements-dev.in
 build==1.0.3
     # via pip-tools
@@ -55,7 +55,7 @@ parse==1.19.1
     #   parse-type
 parse-type==0.6.2
     # via behave
-pathspec==0.11.1
+pathspec==0.11.2
     # via black
 pip-tools==7.3.0
     # via -r requirements-dev.in
@@ -92,7 +92,7 @@ tomlkit==0.12.1
     # via pylint
 virtualenv==20.24.5
     # via pre-commit
-wheel==0.41.0
+wheel==0.41.2
     # via pip-tools
 wrapt==1.15.0
     # via astroid
