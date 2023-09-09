@@ -26,7 +26,7 @@ distlib==0.3.7
     # via virtualenv
 filelock==3.12.3
     # via virtualenv
-flake8==6.0.0
+flake8==6.1.0
     # via -r requirements-dev.in
 identify==2.5.27
     # via pre-commit
