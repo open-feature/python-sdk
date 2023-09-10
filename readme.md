@@ -37,13 +37,13 @@ This library is intended to be used in server-side contexts and has not been eva
 Pip install
 
 ```bash
-pip install openfeature-sdk==0.1.0
+pip install openfeature-sdk==0.2.0
 ```
 
 requirements.txt
 
 ```bash
-openfeature-sdk==0.1.0
+openfeature-sdk==0.2.0
 ```
 
 ```python
