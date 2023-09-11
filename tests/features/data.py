@@ -1,6 +1,6 @@
-from open_feature.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation import FlagResolutionDetails, Reason
-from open_feature.provider.in_memory_provider import InMemoryFlag
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.flag_evaluation import FlagResolutionDetails, Reason
+from openfeature.provider.in_memory_provider import InMemoryFlag
 
 
 def context_func(flag: InMemoryFlag, evaluation_context: EvaluationContext):

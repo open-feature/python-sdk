@@ -2,11 +2,11 @@ from __future__ import annotations
 import typing
 from dataclasses import dataclass, field
 
-from open_feature._backports.strenum import StrEnum
-from open_feature.exception import ErrorCode
+from openfeature._backports.strenum import StrEnum
+from openfeature.exception import ErrorCode
 
 if typing.TYPE_CHECKING:  # resolves a circular dependency in type annotations
-    from open_feature.hook import Hook
+    from openfeature.hook import Hook
 
 
 class FlagType(StrEnum):

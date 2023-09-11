@@ -2,12 +2,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from open_feature.api import add_hooks, clear_hooks
-from open_feature.client import OpenFeatureClient
-from open_feature.exception import ErrorCode, OpenFeatureError
-from open_feature.flag_evaluation import Reason
-from open_feature.hook import Hook
-from open_feature.provider.no_op_provider import NoOpProvider
+from openfeature.api import add_hooks, clear_hooks
+from openfeature.client import OpenFeatureClient
+from openfeature.exception import ErrorCode, OpenFeatureError
+from openfeature.flag_evaluation import Reason
+from openfeature.hook import Hook
+from openfeature.provider.no_op_provider import NoOpProvider
 
 
 @pytest.mark.parametrize(

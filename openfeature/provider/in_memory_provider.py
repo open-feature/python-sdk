@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 import typing
 
-from open_feature._backports.strenum import StrEnum
-from open_feature.evaluation_context import EvaluationContext
-from open_feature.exception import ErrorCode
-from open_feature.flag_evaluation import FlagResolutionDetails, Reason
-from open_feature.hook import Hook
-from open_feature.provider.metadata import Metadata
-from open_feature.provider.provider import AbstractProvider
+from openfeature._backports.strenum import StrEnum
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.exception import ErrorCode
+from openfeature.flag_evaluation import FlagResolutionDetails, Reason
+from openfeature.hook import Hook
+from openfeature.provider.metadata import Metadata
+from openfeature.provider.provider import AbstractProvider
 
 PASSED_IN_DEFAULT = "Passed in default"
 

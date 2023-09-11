@@ -1,6 +1,6 @@
 from numbers import Number
 
-from open_feature.provider.no_op_provider import NoOpProvider
+from openfeature.provider.no_op_provider import NoOpProvider
 
 
 def test_should_return_no_op_provider_metadata():

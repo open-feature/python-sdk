@@ -1,8 +1,8 @@
 from numbers import Number
 
-from open_feature.exception import ErrorCode
-from open_feature.flag_evaluation import FlagResolutionDetails, Reason
-from open_feature.provider.in_memory_provider import InMemoryProvider, InMemoryFlag
+from openfeature.exception import ErrorCode
+from openfeature.flag_evaluation import FlagResolutionDetails, Reason
+from openfeature.provider.in_memory_provider import InMemoryProvider, InMemoryFlag
 
 
 def test_should_return_in_memory_provider_metadata():

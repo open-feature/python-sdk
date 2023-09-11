@@ -1,4 +1,4 @@
-from open_feature.evaluation_context import EvaluationContext
+from openfeature.evaluation_context import EvaluationContext
 
 
 def test_empty_evaluation_context_can_be_merged_with_non_empty_context():

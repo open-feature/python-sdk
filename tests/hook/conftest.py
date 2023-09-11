@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from open_feature.evaluation_context import EvaluationContext
+from openfeature.evaluation_context import EvaluationContext
 
 
 @pytest.fixture()

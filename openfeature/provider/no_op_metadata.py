@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from open_feature.provider.metadata import Metadata
+from openfeature.provider.metadata import Metadata
 
 
 @dataclass
