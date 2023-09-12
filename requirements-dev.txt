@@ -8,7 +8,7 @@ astroid==2.15.6
     # via pylint
 behave==1.2.6
     # via -r requirements-dev.in
-black==23.9.0
+black==23.9.1
     # via -r requirements-dev.in
 build==1.0.3
     # via pip-tools
@@ -28,7 +28,7 @@ filelock==3.12.3
     # via virtualenv
 flake8==6.1.0
     # via -r requirements-dev.in
-identify==2.5.27
+identify==2.5.28
     # via pre-commit
 iniconfig==2.0.0
     # via pytest

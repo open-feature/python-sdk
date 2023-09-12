@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.0](https://github.com/open-feature/python-sdk/compare/v0.1.0...v0.2.0) (2023-09-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* simplify namespaces to make public API more pythonic ([#172](https://github.com/open-feature/python-sdk/issues/172))
+* move api hooks methods to api module ([#169](https://github.com/open-feature/python-sdk/issues/169))
+* move api evaluation context methods to api module ([#164](https://github.com/open-feature/python-sdk/issues/164))
+
+### Code Refactoring
+
+* move api evaluation context methods to api module ([#164](https://github.com/open-feature/python-sdk/issues/164)) ([67ba861](https://github.com/open-feature/python-sdk/commit/67ba8619b913c4af25f1af9df2bab863cb7989d0))
+* move api hooks methods to api module ([#169](https://github.com/open-feature/python-sdk/issues/169)) ([a7da26f](https://github.com/open-feature/python-sdk/commit/a7da26fd93c5dae33318366f1fc3c8b11e11ddaa))
+* simplify namespaces to make public API more pythonic ([#172](https://github.com/open-feature/python-sdk/issues/172)) ([793ced1](https://github.com/open-feature/python-sdk/commit/793ced19177d6f18f7ecbfc0673a520fbbf2a2cd))
+
 ## [0.1.0](https://github.com/open-feature/python-sdk/compare/v0.0.9...v0.1.0) (2023-07-25)
 
 
