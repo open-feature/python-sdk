@@ -59,7 +59,7 @@ jobs:
         run: coverage run --omit="*/test*" -m pytest
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@8e29a53ea65f98e97f4ad4594d355d8e8fd5bcfe
+        uses: codecov/codecov-action@c9e0f0b3cf5f112462339d69850c01735114b9ed
         with:
           flags: unittests # optional
           name: coverage # optional
