@@ -24,11 +24,11 @@ dill==0.3.7
     # via pylint
 distlib==0.3.7
     # via virtualenv
-filelock==3.12.3
+filelock==3.12.4
     # via virtualenv
 flake8==6.1.0
     # via -r requirements-dev.in
-identify==2.5.28
+identify==2.5.29
     # via pre-commit
 iniconfig==2.0.0
     # via pytest
