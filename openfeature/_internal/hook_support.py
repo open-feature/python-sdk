@@ -2,9 +2,9 @@ import logging
 import typing
 from functools import reduce
 
-from open_feature.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation import FlagEvaluationDetails, FlagType
-from open_feature.hook import Hook, HookContext, HookType
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
+from openfeature.hook import Hook, HookContext, HookType
 
 
 def error_hooks(

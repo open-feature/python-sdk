@@ -2,12 +2,12 @@
 
 from behave import given, then, when
 
-from open_feature.api import get_client, set_provider
-from open_feature.client import OpenFeatureClient
-from open_feature.evaluation_context import EvaluationContext
-from open_feature.exception import ErrorCode
-from open_feature.flag_evaluation import FlagEvaluationDetails, Reason
-from open_feature.provider.in_memory_provider import InMemoryProvider
+from openfeature.api import get_client, set_provider
+from openfeature.client import OpenFeatureClient
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.exception import ErrorCode
+from openfeature.flag_evaluation import FlagEvaluationDetails, Reason
+from openfeature.provider.in_memory_provider import InMemoryProvider
 from tests.features.data import IN_MEMORY_FLAGS
 
 # Common step definitions

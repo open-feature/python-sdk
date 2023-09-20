@@ -66,8 +66,8 @@ pip install requirements.txt
 In order to use the sdk there is some minor configuration. Follow the script below:
 
 ```python
-from open_feature import api
-from open_feature.provider.no_op_provider import NoOpProvider
+from openfeature import api
+from openfeature.provider.no_op_provider import NoOpProvider
 
 api.set_provider(NoOpProvider())
 open_feature_client = api.get_client()
@@ -103,7 +103,7 @@ In OpenFeature, we refer to this as [`targeting`](https://openfeature.dev/specif
 If the flag system you're using supports targeting, you can provide the input data using the `EvaluationContext`.
 
 ```python
-from open_feature.api import (
+from openfeature.api import (
     get_client,
     get_provider,
     set_provider
@@ -142,7 +142,7 @@ See [here](https://openfeature.dev/ecosystem) for a catalog of available provide
 A hook is a mechanism that allows for adding arbitrary behavior at well-defined points of the flag evaluation life-cycle. Use cases include validating the resolved flag value, modifying or adding data to the evaluation context, logging, telemetry, and tracking.
 
 ```python
-from open_feature.hook import Hook
+from openfeature.hook import Hook
 
 class MyHook(Hook):
     def after(self, hook_context: HookContext, details: FlagEvaluationDetails, hints: dict):
@@ -150,7 +150,7 @@ class MyHook(Hook):
 
 
 # set global hooks at the API-level
-from open_feature.api import add_hooks
+from openfeature.api import add_hooks
 add_hooks([MyHook()])
 
 # or configure them in the client

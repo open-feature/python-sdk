@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from open_feature.api import (
+from openfeature.api import (
     get_client,
     get_provider,
     set_provider,
@@ -13,11 +13,11 @@ from open_feature.api import (
     add_hooks,
     clear_hooks,
 )
-from open_feature.evaluation_context import EvaluationContext
-from open_feature.exception import ErrorCode, GeneralError
-from open_feature.hook import Hook
-from open_feature.provider.metadata import Metadata
-from open_feature.provider.no_op_provider import NoOpProvider
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.exception import ErrorCode, GeneralError
+from openfeature.hook import Hook
+from openfeature.provider.metadata import Metadata
+from openfeature.provider.no_op_provider import NoOpProvider
 
 
 def test_should_not_raise_exception_with_noop_client():

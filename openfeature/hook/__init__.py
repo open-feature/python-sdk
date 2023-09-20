@@ -4,8 +4,8 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 
-from open_feature.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation import FlagEvaluationDetails, FlagType
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
 
 
 class HookType(Enum):

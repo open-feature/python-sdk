@@ -1,10 +1,10 @@
 import typing
 from abc import abstractmethod
 
-from open_feature.evaluation_context import EvaluationContext
-from open_feature.flag_evaluation import FlagResolutionDetails
-from open_feature.hook import Hook
-from open_feature.provider.metadata import Metadata
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.flag_evaluation import FlagResolutionDetails
+from openfeature.hook import Hook
+from openfeature.provider.metadata import Metadata
 
 
 class AbstractProvider:

@@ -2,30 +2,30 @@ import logging
 import typing
 from dataclasses import dataclass
 
-from open_feature import api
-from open_feature.evaluation_context import EvaluationContext
-from open_feature.exception import (
+from openfeature import api
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.exception import (
     ErrorCode,
     GeneralError,
     OpenFeatureError,
     TypeMismatchError,
 )
-from open_feature.flag_evaluation import (
+from openfeature.flag_evaluation import (
     FlagEvaluationDetails,
     FlagEvaluationOptions,
     FlagType,
     Reason,
     FlagResolutionDetails,
 )
-from open_feature.hook import Hook, HookContext
-from open_feature.hook.hook_support import (
+from openfeature.hook import Hook, HookContext
+from openfeature.hook.hook_support import (
     after_all_hooks,
     after_hooks,
     before_hooks,
     error_hooks,
 )
-from open_feature.provider.no_op_provider import NoOpProvider
-from open_feature.provider.provider import AbstractProvider
+from openfeature.provider.no_op_provider import NoOpProvider
+from openfeature.provider.provider import AbstractProvider
 
 GetDetailCallable = typing.Union[
     typing.Callable[

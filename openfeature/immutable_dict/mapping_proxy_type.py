@@ -8,7 +8,7 @@ class MappingProxyType(dict):
 
     When upgrading to Python 3.12, you can update all references
     from:
-    `from open_feature.immutable_dict.mapping_proxy_type import MappingProxyType`
+    `from openfeature.immutable_dict.mapping_proxy_type import MappingProxyType`
 
     to:
     `from types import MappingProxyType`

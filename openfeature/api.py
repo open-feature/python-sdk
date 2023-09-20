@@ -1,12 +1,12 @@
 import typing
 
-from open_feature.client import OpenFeatureClient
-from open_feature.evaluation_context import EvaluationContext
-from open_feature.exception import GeneralError
-from open_feature.hook import Hook
-from open_feature.provider.metadata import Metadata
-from open_feature.provider.no_op_provider import NoOpProvider
-from open_feature.provider.provider import AbstractProvider
+from openfeature.client import OpenFeatureClient
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.exception import GeneralError
+from openfeature.hook import Hook
+from openfeature.provider.metadata import Metadata
+from openfeature.provider.no_op_provider import NoOpProvider
+from openfeature.provider.provider import AbstractProvider
 
 _provider: AbstractProvider = NoOpProvider()
 

@@ -1,7 +1,7 @@
 import pytest
 
-from open_feature import api
-from open_feature.provider.no_op_provider import NoOpProvider
+from openfeature import api
+from openfeature.provider.no_op_provider import NoOpProvider
 
 
 @pytest.fixture(autouse=True)
