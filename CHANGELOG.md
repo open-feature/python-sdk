@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/open-feature/python-sdk/compare/v0.2.0...v0.3.0) (2023-09-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename top-level package to openfeature ([#192](https://github.com/open-feature/python-sdk/issues/192))
+
+### Code Refactoring
+
+* rename top-level package to openfeature ([#192](https://github.com/open-feature/python-sdk/issues/192)) ([51f0d26](https://github.com/open-feature/python-sdk/commit/51f0d260f02cce5ab673305f212770ffcfc0744f))
+
 ## [0.2.0](https://github.com/open-feature/python-sdk/compare/v0.1.0...v0.2.0) (2023-09-09)
 
 
