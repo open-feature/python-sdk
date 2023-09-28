@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/open-feature/python-sdk/compare/v0.3.0...v0.3.1) (2023-09-28)
+
+
+### Features
+
+* make openfeature an implicit namespace package ([#199](https://github.com/open-feature/python-sdk/issues/199)) ([c544918](https://github.com/open-feature/python-sdk/commit/c544918d65c2b0af621ec9e2261784e9a715dd9d))
+
 ## [0.3.0](https://github.com/open-feature/python-sdk/compare/v0.2.0...v0.3.0) (2023-09-25)
 
 
