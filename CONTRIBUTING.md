@@ -20,7 +20,7 @@ Run `make init` to initialize the project's virtual environment and install all 
 
 Run tests with `make test`.
 
-We use `pytest` for our unit testing, making use of `parametrized` to inject cases at scale. 
+We use `pytest` for our unit testing, making use of `parametrized` to inject cases at scale.
 
 ### Integration tests
 

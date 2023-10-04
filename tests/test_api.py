@@ -3,15 +3,15 @@ from unittest.mock import MagicMock
 import pytest
 
 from openfeature.api import (
-    get_client,
-    get_provider,
-    set_provider,
-    get_provider_metadata,
-    get_evaluation_context,
-    set_evaluation_context,
-    get_hooks,
     add_hooks,
     clear_hooks,
+    get_client,
+    get_evaluation_context,
+    get_hooks,
+    get_provider,
+    get_provider_metadata,
+    set_evaluation_context,
+    set_provider,
 )
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import ErrorCode, GeneralError
