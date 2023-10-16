@@ -4,7 +4,7 @@
 #
 #    pip-compile requirements-dev.in
 #
-astroid==2.15.8
+astroid==3.0.1
     # via pylint
 behave==1.2.6
     # via -r requirements-dev.in
