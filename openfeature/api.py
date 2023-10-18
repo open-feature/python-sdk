@@ -25,7 +25,10 @@ def set_provider(provider: AbstractProvider):
     global _provider
     if provider is None:
         raise GeneralError(error_message="No provider")
+    if _provider:
+        _provider.shutdown()
     _provider = provider
+    provider.initialize(_evaluation_context)
 
 
 def get_provider() -> typing.Optional[AbstractProvider]:
@@ -63,3 +66,7 @@ def clear_hooks():
 def get_hooks() -> typing.List[Hook]:
     global _hooks
     return _hooks
+
+
+def shutdown():
+    _provider.shutdown()
