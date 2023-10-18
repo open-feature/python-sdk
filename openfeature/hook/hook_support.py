@@ -76,17 +76,11 @@ def _execute_hooks(
     :param kwargs: arguments that need to be provided to the hook method
     :return: a list of results from the applied hook methods
     """
-    if hooks:
-        filtered_hooks = list(
-            filter(
-                lambda hook: hook.supports_flag_value_type(flag_type=flag_type), hooks
-            )
-        )
-        return [
-            _execute_hook_checked(hook, hook_method, **kwargs)
-            for hook in filtered_hooks
-        ]
-    return []
+    return [
+        _execute_hook_checked(hook, hook_method, **kwargs)
+        for hook in hooks
+        if hook.supports_flag_value_type(flag_type)
+    ]
 
 
 def _execute_hooks_unchecked(
@@ -103,15 +97,11 @@ def _execute_hooks_unchecked(
     :param kwargs: arguments that need to be provided to the hook method
     :return: a list of results from the applied hook methods
     """
-    if hooks:
-        filtered_hooks = list(
-            filter(
-                lambda hook: hook.supports_flag_value_type(flag_type=flag_type), hooks
-            )
-        )
-        return [getattr(hook, hook_method.value)(**kwargs) for hook in filtered_hooks]
-
-    return []
+    return [
+        getattr(hook, hook_method.value)(**kwargs)
+        for hook in hooks
+        if hook.supports_flag_value_type(flag_type)
+    ]
 
 
 def _execute_hook_checked(hook: Hook, hook_method: HookType, **kwargs):
