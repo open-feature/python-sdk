@@ -13,9 +13,9 @@ from openfeature.exception import (
 from openfeature.flag_evaluation import (
     FlagEvaluationDetails,
     FlagEvaluationOptions,
+    FlagResolutionDetails,
     FlagType,
     Reason,
-    FlagResolutionDetails,
 )
 from openfeature.hook import Hook, HookContext
 from openfeature.hook.hook_support import (

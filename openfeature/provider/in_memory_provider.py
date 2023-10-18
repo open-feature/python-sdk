@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 import typing
+from dataclasses import dataclass
 
 from openfeature._backports.strenum import StrEnum
 from openfeature.evaluation_context import EvaluationContext

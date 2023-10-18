@@ -10,14 +10,14 @@ on:
     branches:
       - main
 
-permissions:  # added using https://github.com/step-security/secure-workflows
+permissions: # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
   release-please:
     permissions:
-      contents: write  # for google-github-actions/release-please-action to create release commit
-      pull-requests: write  # for google-github-actions/release-please-action to create release PR
+      contents: write # for google-github-actions/release-please-action to create release commit
+      pull-requests: write # for google-github-actions/release-please-action to create release PR
     runs-on: ubuntu-latest
 
     steps:
@@ -52,8 +52,7 @@ jobs:
 
       - name: Create and activate Virtualenv
         run: |
-          pip install virtualenv
-          [ ! -d ".venv" ] && virtualenv .venv
+          [ ! -d ".venv" ] && python -m venv .venv
           . .venv/bin/activate
 
       - name: Install dependencies

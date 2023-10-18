@@ -2,7 +2,7 @@ from numbers import Number
 
 from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
-from openfeature.provider.in_memory_provider import InMemoryProvider, InMemoryFlag
+from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 
 
 def test_should_return_in_memory_provider_metadata():
