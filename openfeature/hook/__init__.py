@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import typing
-from abc import abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 
@@ -27,7 +26,6 @@ class HookContext:
 
 
 class Hook:
-    @abstractmethod
     def before(self, hook_context: HookContext, hints: dict) -> EvaluationContext:
         """
         Runs before flag is resolved.
@@ -40,7 +38,6 @@ class Hook:
         """
         pass
 
-    @abstractmethod
     def after(
         self, hook_context: HookContext, details: FlagEvaluationDetails, hints: dict
     ):
@@ -54,7 +51,6 @@ class Hook:
         """
         pass
 
-    @abstractmethod
     def error(self, hook_context: HookContext, exception: Exception, hints: dict):
         """
         Run when evaluation encounters an error. Errors thrown will be swallowed.
@@ -65,7 +61,6 @@ class Hook:
         """
         pass
 
-    @abstractmethod
     def finally_after(self, hook_context: HookContext, hints: dict):
         """
         Run after flag evaluation, including any error processing.
@@ -76,7 +71,6 @@ class Hook:
         """
         pass
 
-    @abstractmethod
     def supports_flag_value_type(self, flag_type: FlagType) -> bool:
         """
         Check to see if the hook supports the particular flag type.
