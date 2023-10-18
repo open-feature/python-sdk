@@ -8,6 +8,12 @@ from openfeature.provider.metadata import Metadata
 
 
 class AbstractProvider:
+    def initialize(self, evaluation_context: EvaluationContext):
+        pass
+
+    def shutdown(self):
+        pass
+
     @abstractmethod
     def get_metadata(self) -> Metadata:
         pass

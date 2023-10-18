@@ -1,14 +1,11 @@
 import typing
+from dataclasses import dataclass, field
 
 
+@dataclass
 class EvaluationContext:
-    def __init__(
-        self,
-        targeting_key: typing.Optional[str] = None,
-        attributes: typing.Optional[dict] = None,
-    ):
-        self.targeting_key = targeting_key
-        self.attributes = attributes or {}
+    targeting_key: typing.Optional[str] = None
+    attributes: dict = field(default_factory=dict)
 
     def merge(self, ctx2: "EvaluationContext") -> "EvaluationContext":
         if not (self and ctx2):

@@ -1,10 +1,10 @@
 import typing
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import ErrorCode
-from openfeature.flag_evaluation import FlagResolutionDetails, Reason
+from openfeature.flag_evaluation import FlagMetadata, FlagResolutionDetails, Reason
 from openfeature.hook import Hook
 from openfeature.provider.metadata import Metadata
 from openfeature.provider.provider import AbstractProvider
@@ -29,6 +29,7 @@ class InMemoryFlag(typing.Generic[T]):
     flag_key: str
     default_variant: str
     variants: typing.Dict[str, T]
+    flag_metadata: FlagMetadata = field(default_factory=dict)
     state: State = State.ENABLED
     context_evaluator: typing.Optional[
         typing.Callable[["InMemoryFlag", EvaluationContext], FlagResolutionDetails[T]]
@@ -46,6 +47,7 @@ class InMemoryFlag(typing.Generic[T]):
             value=self.variants[self.default_variant],
             reason=Reason.STATIC,
             variant=self.default_variant,
+            flag_metadata=self.flag_metadata,
         )
 
 

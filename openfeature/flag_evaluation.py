@@ -29,6 +29,8 @@ class Reason(StrEnum):
     UNKNOWN = "UNKNOWN"
 
 
+FlagMetadata = typing.Mapping[str, typing.Any]
+
 T = typing.TypeVar("T", covariant=True)
 
 
@@ -37,6 +39,7 @@ class FlagEvaluationDetails(typing.Generic[T]):
     flag_key: str
     value: T
     variant: typing.Optional[str] = None
+    flag_metadata: FlagMetadata = field(default_factory=dict)
     reason: typing.Optional[Reason] = None
     error_code: typing.Optional[ErrorCode] = None
     error_message: typing.Optional[str] = None
@@ -58,4 +61,4 @@ class FlagResolutionDetails(typing.Generic[U]):
     error_message: typing.Optional[str] = None
     reason: typing.Optional[Reason] = None
     variant: typing.Optional[str] = None
-    flag_metadata: typing.Optional[str] = None
+    flag_metadata: FlagMetadata = field(default_factory=dict)
