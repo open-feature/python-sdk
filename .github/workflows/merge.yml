@@ -34,8 +34,7 @@ jobs:
 
       - name: Create and activate Virtualenv
         run: |
-          pip install virtualenv
-          [ ! -d ".venv" ] && virtualenv .venv
+          [ ! -d ".venv" ] && python -m venv .venv
           . .venv/bin/activate
 
       - name: Initialize CodeQL
