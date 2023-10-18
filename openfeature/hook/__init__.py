@@ -26,7 +26,9 @@ class HookContext:
 
 
 class Hook:
-    def before(self, hook_context: HookContext, hints: dict) -> EvaluationContext:
+    def before(
+        self, hook_context: HookContext, hints: dict
+    ) -> typing.Optional[EvaluationContext]:
         """
         Runs before flag is resolved.
 
@@ -36,7 +38,7 @@ class Hook:
         :return: An EvaluationContext. It will be merged with the
         EvaluationContext instances from other hooks, the client and API.
         """
-        pass
+        return None
 
     def after(
         self, hook_context: HookContext, details: FlagEvaluationDetails, hints: dict
