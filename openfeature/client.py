@@ -377,6 +377,7 @@ class OpenFeatureClient:
             flag_key=flag_key,
             value=resolution.value,
             variant=resolution.variant,
+            flag_metadata=resolution.flag_metadata or {},
             reason=resolution.reason,
             error_code=resolution.error_code,
             error_message=resolution.error_message,

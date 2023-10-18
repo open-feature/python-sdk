@@ -12,12 +12,14 @@ from openfeature.api import (
     get_provider_metadata,
     set_evaluation_context,
     set_provider,
+    shutdown,
 )
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import ErrorCode, GeneralError
 from openfeature.hook import Hook
 from openfeature.provider.metadata import Metadata
 from openfeature.provider.no_op_provider import NoOpProvider
+from openfeature.provider.provider import AbstractProvider
 
 
 def test_should_not_raise_exception_with_noop_client():
@@ -54,6 +56,32 @@ def test_should_try_set_provider_and_fail_if_none_provided():
     # Then
     assert ge.value.error_message == "No provider"
     assert ge.value.error_code == ErrorCode.GENERAL
+
+
+def test_should_invoke_provider_initialize_function_on_newly_registered_provider():
+    # Given
+    evaluation_context = EvaluationContext("targeting_key", {"attr1": "val1"})
+    provider = MagicMock(spec=AbstractProvider)
+
+    # When
+    set_evaluation_context(evaluation_context)
+    set_provider(provider)
+
+    # Then
+    provider.initialize.assert_called_with(evaluation_context)
+
+
+def test_should_invoke_provider_shutdown_function_once_provider_is_no_longer_in_use():
+    # Given
+    provider_1 = MagicMock(spec=AbstractProvider)
+    provider_2 = MagicMock(spec=AbstractProvider)
+
+    # When
+    set_provider(provider_1)
+    set_provider(provider_2)
+
+    # Then
+    assert provider_1.shutdown.called
 
 
 def test_should_return_a_provider_if_setup_correctly():
@@ -116,3 +144,15 @@ def test_should_add_hooks_to_api_hooks():
 
     # Then
     assert get_hooks() == [hook_1, hook_2]
+
+
+def test_should_call_provider_shutdown_on_api_shutdown():
+    # Given
+    provider = MagicMock(spec=AbstractProvider)
+    set_provider(provider)
+
+    # When
+    shutdown()
+
+    # Then
+    assert provider.shutdown.called
