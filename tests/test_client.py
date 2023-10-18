@@ -7,6 +7,7 @@ from openfeature.client import OpenFeatureClient
 from openfeature.exception import ErrorCode, OpenFeatureError
 from openfeature.flag_evaluation import Reason
 from openfeature.hook import Hook
+from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 from openfeature.provider.no_op_provider import NoOpProvider
 
 
@@ -95,6 +96,28 @@ def test_should_raise_exception_when_invalid_flag_type_provided(no_op_provider_c
     assert flag.error_message == "Unknown flag type"
     assert flag.error_code == ErrorCode.GENERAL
     assert flag.reason == Reason.ERROR
+
+
+def test_should_pass_flag_metadata_from_resolution_to_evaluation_details():
+    # Given
+    provider = InMemoryProvider(
+        {
+            "Key": InMemoryFlag(
+                "Key",
+                "true",
+                {"true": True, "false": False},
+                flag_metadata={"foo": "bar"},
+            )
+        }
+    )
+    client = OpenFeatureClient("my-client", None, provider)
+
+    # When
+    details = client.get_boolean_details(flag_key="Key", default_value=False)
+
+    # Then
+    assert details is not None
+    assert details.flag_metadata == {"foo": "bar"}
 
 
 def test_should_handle_a_generic_exception_thrown_by_a_provider(no_op_provider_client):
