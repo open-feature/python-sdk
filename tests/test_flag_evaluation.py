@@ -2,11 +2,12 @@ from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import FlagEvaluationDetails, Reason
 
 
-def test_evaulation_details_reason_should_be_a_string():
+def test_evaluation_details_reason_should_be_a_string():
     # Given
     flag_key = "my-flag"
     flag_value = 100
     variant = "1-hundred"
+    flag_metadata = {}
     reason = Reason.DEFAULT
     error_code = ErrorCode.GENERAL
     error_message = "message"
@@ -16,6 +17,7 @@ def test_evaulation_details_reason_should_be_a_string():
         flag_key,
         flag_value,
         variant,
+        flag_metadata,
         reason,
         error_code,
         error_message,
@@ -30,7 +32,7 @@ def test_evaulation_details_reason_should_be_a_string():
     assert reason == flag_details.reason
 
 
-def test_evaulation_details_reason_should_be_a_string_when_set():
+def test_evaluation_details_reason_should_be_a_string_when_set():
     # Given
     flag_key = "my-flag"
     flag_value = 100
