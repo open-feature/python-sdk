@@ -14,28 +14,47 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        container: ["python:3.8", "python:3.9", "python:3.10", "python:3.11"]
-    container:
-      image: ${{ matrix.container }}
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Cache virtualenvironment
-        uses: actions/cache@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
         with:
-          path: ~/.venv
-          key: ${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
 
-      - name: Upgrade pip
-        run: pip install --upgrade pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - name: Create and activate Virtualenv
+      - name: Test with pytest
+        run: coverage run --omit="*/test*" -m pytest
+
+      - name: Run E2E tests with behave
         run: |
-          [ ! -d ".venv" ] && python -m venv .venv
-          . .venv/bin/activate
+          cp test-harness/features/evaluation.feature tests/features/
+          behave tests/features/
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@c9e0f0b3cf5f112462339d69850c01735114b9ed
+        with:
+          flags: unittests # optional
+          name: coverage # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -53,22 +72,6 @@ jobs:
 
       - name: Run isort formatter check
         run: isort .
-
-      - name: Test with pytest
-        run: coverage run --omit="*/test*" -m pytest
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@c9e0f0b3cf5f112462339d69850c01735114b9ed
-        with:
-          flags: unittests # optional
-          name: coverage # optional
-          fail_ci_if_error: true # optional (default = false)
-          verbose: true # optional (default = false)
-
-      - name: Run E2E tests with behave
-        run: |
-          cp test-harness/features/evaluation.feature tests/features/
-          behave tests/features/
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
