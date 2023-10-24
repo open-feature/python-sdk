@@ -1,0 +1,81 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: "Build, lint, and test"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Test with pytest
+        run: coverage run --omit="*/test*" -m pytest
+
+      - name: Run E2E tests with behave
+        run: |
+          cp test-harness/features/evaluation.feature tests/features/
+          behave tests/features/
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@c9e0f0b3cf5f112462339d69850c01735114b9ed
+        with:
+          flags: unittests # optional
+          name: coverage # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: python
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run black formatter check
+        run: black --check .
+
+      - name: Run flake8 formatter check
+        run: flake8 .
+
+      - name: Run isort formatter check
+        run: isort .
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
