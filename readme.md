@@ -1,36 +1,59 @@
 <!-- markdownlint-disable MD033 -->
+<!-- x-hide-in-docs-start -->
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/open-feature/community/0e23508c163a6a1ac8c0ced3e4bd78faafe627c7/assets/logo/horizontal/white/openfeature-horizontal-white.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/open-feature/community/0e23508c163a6a1ac8c0ced3e4bd78faafe627c7/assets/logo/horizontal/black/openfeature-horizontal-black.svg">
-    <img align="center" alt="OpenFeature Logo">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/open-feature/community/0e23508c163a6a1ac8c0ced3e4bd78faafe627c7/assets/logo/horizontal/white/openfeature-horizontal-white.svg" />
+    <img align="center" alt="OpenFeature Logo" src="https://raw.githubusercontent.com/open-feature/community/0e23508c163a6a1ac8c0ced3e4bd78faafe627c7/assets/logo/horizontal/black/openfeature-horizontal-black.svg" />
   </picture>
 </p>
 
 <h2 align="center">OpenFeature Python SDK</h2>
 
-[![PyPI version](https://badge.fury.io/py/openfeature-sdk.svg)](https://badge.fury.io/py/openfeature-sdk)
-![Python 3.8+](https://img.shields.io/badge/python->=3.8-blue.svg)
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-[![Specification](https://img.shields.io/static/v1?label=Specification&message=v0.3.0&color=red)](https://github.com/open-feature/spec/tree/v0.3.0)
-[![on-merge](https://github.com/open-feature/python-sdk/actions/workflows/merge.yml/badge.svg)](https://github.com/open-feature/python-sdk/actions/workflows/merge.yml)
-[![codecov](https://codecov.io/gh/open-feature/python-sdk/branch/main/graph/badge.svg?token=FQ1I444HB3)](https://codecov.io/gh/open-feature/python-sdk)
+<!-- x-hide-in-docs-end -->
+<!-- The 'github-badges' class is used in the docs -->
+<p align="center" class="github-badges">
 
-> ⚠️ Development is in progress, but there's not a stable release available. ⚠️
+  <a href="https://github.com/open-feature/spec/tree/v0.3.0">
+    <img alt="Specification" src="https://img.shields.io/static/v1?label=Specification&message=v0.3.0&color=red&style=for-the-badge" />
+  </a>
 
-This is the Python implementation of [OpenFeature](https://openfeature.dev), a vendor-agnostic abstraction library for evaluating feature flags.
+  <!-- x-release-please-start-version -->
 
-We support multiple data types for flags (numbers, strings, booleans, objects) as well as hooks, which can alter the lifecycle of a flag evaluation.
+  <a href="https://badge.fury.io/py/openfeature-sdk">
+    <img alt="Codecov" src="https://img.shields.io/static/v1?label=release&message=v0.3.1&color=blue&style=for-the-badge" />
+  </a>
 
-This library is intended to be used in server-side contexts and has not been evaluated for use in mobile devices.
+  <!-- x-release-please-end -->
+  <br/>
+  <a href="https://github.com/open-feature/python-sdk/actions/workflows/merge.yml">
+    <img alt="Codecov" src="https://github.com/open-feature/python-sdk/actions/workflows/build.yml/badge.svg" />
+  </a>
 
-## 🔍 Requirements:
+  <a href="https://codecov.io/gh/open-feature/python-sdk">
+    <img alt="Codecov" src="https://codecov.io/gh/open-feature/python-sdk/branch/main/graph/badge.svg?token=FQ1I444HB3" />
+  </a>
+
+<a >
+    <img alt="Codecov" src="https://img.shields.io/badge/python->=3.8-blue.svg" />
+  </a>
+
+  <a href="https://www.repostatus.org/#wip">
+    <img alt="Codecov" src="https://www.repostatus.org/badges/latest/wip.svg" />
+  </a>
+</p>
+<!-- x-hide-in-docs-start -->
+
+[OpenFeature](https://openfeature.dev) is an open standard that provides a vendor-agnostic, community-driven API for feature flagging that works with your favorite feature flag management tool.
+
+<!-- x-hide-in-docs-end -->
+
+## 🚀 Quick start
+
+### Requirements
 
 - Python 3.8+
 
-## 📦 Installation:
-
-### Add it to your build
+### Install
 
 <!---x-release-please-start-version-->
 
@@ -52,18 +75,36 @@ pip install requirements.txt
 
 <!---x-release-please-end-->
 
-## 🌟 Features:
+### Usage
 
-- support for various backend [providers](https://openfeature.dev/docs/reference/concepts/provider)
-- easy integration and extension via [hooks](https://openfeature.dev/docs/reference/concepts/hooks)
-- bool, string, numeric, and object flag types
-- [context-aware](https://openfeature.dev/docs/reference/concepts/evaluation-context) evaluation
+<!-- TODO: basic usage instructions, setting the in-memory provider and getting a boolean flag called "v2_enabled" -->
 
-## 🚀 Usage:
+### API Reference
 
-### Configure it
+<!-- TODO: link to formal API docs (ie: Javadoc) if available or remove this section -->
 
-In order to use the sdk there is some minor configuration. Follow the script below:
+## 🌟 Features
+
+| Status | Features                        | Description                                                                                                                        |
+| ------ | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| ✅      | [Providers](#providers)         | Integrate with a commercial, open source, or in-house feature management tool.                                                     |
+| ✅      | [Targeting](#targeting)         | Contextually-aware flag evaluation using [evaluation context](https://openfeature.dev/docs/reference/concepts/evaluation-context). |
+| ✅      | [Hooks](#hooks)                 | Add functionality to various stages of the flag evaluation life-cycle.                                                             |
+| ❌      | [Logging](#logging)             | Integrate with popular logging packages.                                                                                           |
+| ❌      | [Named clients](#named-clients) | Utilize multiple providers in a single application.                                                                                |
+| ❌      | [Eventing](#eventing)           | React to state changes in the provider or flag management system.                                                                  |
+| ✅      | [Shutdown](#shutdown)           | Gracefully clean up a provider during application shutdown.                                                                        |
+| ✅      | [Extending](#extending)         | Extend OpenFeature with custom providers and hooks.                                                                                |
+
+<sub>Implemented: ✅ | In-progress: ⚠️ | Not implemented yet: ❌</sub>
+
+### Providers
+
+[Providers](https://openfeature.dev/docs/reference/concepts/provider) are an abstraction between a flag management system and the OpenFeature SDK.
+Look [here](https://openfeature.dev/ecosystem?instant_search%5BrefinementList%5D%5Btype%5D%5B0%5D=Provider&instant_search%5BrefinementList%5D%5Btechnology%5D%5B0%5D=python) for a complete list of available providers.
+If the provider you're looking for hasn't been created yet, see the [develop a provider](#develop-a-provider) section to learn how to build it yourself.
+
+Once you've added a provider as a dependency, it can be registered with OpenFeature like this:
 
 ```python
 from openfeature import api
@@ -73,34 +114,14 @@ api.set_provider(NoOpProvider())
 open_feature_client = api.get_client()
 ```
 
-### Basics:
+In some situations, it may be beneficial to register multiple providers in the same application.
+This is possible using [named clients](#named-clients), which is covered in more detail below.
 
-While Boolean provides the simplest introduction, we offer a variety of flag types.
+### Targeting
 
-```python
-# Depending on the flag type, use one of the methods below
-flag_key = "PROVIDER_FLAG"
-boolean_result = open_feature_client.get_boolean_value(key=flag_key,default_value=False)
-integer_result = open_feature_client.get_integer_value(key=flag_key,default_value=-1)
-float_result = open_feature_client.get_float_value(key=flag_key,default_value=-1)
-string_result = open_feature_client.get_string_value(key=flag_key,default_value="")
-object_result = open_feature_client.get_object_value(key=flag_key,default_value={})
-```
-
-You can also bind a provider to a specific client by name instead of setting that provider globally:
-
-```python
-
-api.set_provider(NoOpProvider())
-```
-
-Each provider class may have further setup required i.e. secret keys, environment variables etc
-
-### Context-aware evaluation:
-
-Sometimes the value of a flag must take into account some dynamic criteria about the application or user, such as the user location, IP, email address, or the location of the server.
-In OpenFeature, we refer to this as [`targeting`](https://openfeature.dev/specification/glossary#targeting).
-If the flag system you're using supports targeting, you can provide the input data using the `EvaluationContext`.
+Sometimes, the value of a flag must consider some dynamic criteria about the application or user, such as the user's location, IP, email address, or the server's location.
+In OpenFeature, we refer to this as [targeting](https://openfeature.dev/specification/glossary#targeting).
+If the flag management system you're using supports targeting, you can provide the input data using the [evaluation context](https://openfeature.dev/docs/reference/concepts/evaluation-context).
 
 ```python
 from openfeature.api import (
@@ -127,28 +148,15 @@ client.get_string_value("email", None, request_context)
 
 ```
 
-### Events
+### Hooks
 
-TBD (See Issue [#131](https://github.com/open-feature/python-sdk/issues/131))
+[Hooks](https://openfeature.dev/docs/reference/concepts/hooks) allow for custom logic to be added at well-defined points of the flag evaluation life-cycle.
+Look [here](https://openfeature.dev/ecosystem/?instant_search%5BrefinementList%5D%5Btype%5D%5B0%5D=Hook&instant_search%5BrefinementList%5D%5Btechnology%5D%5B0%5D=python) for a complete list of available hooks.
+If the hook you're looking for hasn't been created yet, see the [develop a hook](#develop-a-hook) section to learn how to build it yourself.
 
-### Providers:
-
-To develop a provider, you need to create a new project and include the OpenFeature SDK as a dependency. This can be a new repository or included in [the existing contrib repository](https://github.com/open-feature/python-sdk-contrib) available under the OpenFeature organization. Finally, you’ll then need to write the provider itself. This can be accomplished by implementing the `Provider` interface exported by the OpenFeature SDK.
-
-See [here](https://openfeature.dev/ecosystem) for a catalog of available providers.
-
-### Hooks:
-
-A hook is a mechanism that allows for adding arbitrary behavior at well-defined points of the flag evaluation life-cycle. Use cases include validating the resolved flag value, modifying or adding data to the evaluation context, logging, telemetry, and tracking.
+Once you've added a hook as a dependency, it can be registered at the global, client, or flag invocation level.
 
 ```python
-from openfeature.hook import Hook
-
-class MyHook(Hook):
-    def after(self, hook_context: HookContext, details: FlagEvaluationDetails, hints: dict):
-        print("This runs after the flag has been evaluated")
-
-
 # set global hooks at the API-level
 from openfeature.api import add_hooks
 add_hooks([MyHook()])
@@ -158,11 +166,56 @@ client = OpenFeatureClient()
 client.add_hooks([MyHook()])
 ```
 
-See [here](https://openfeature.dev/ecosystem) for a catalog of available hooks.
+<!-- TODO: example of invocation-level hook -->
 
-### Logging:
+### Logging
 
-TBD
+Logging customization is not yet available in the Python SDK.
+
+### Named clients
+
+Named clients are not yet available in the Python SDK. Progress on this feature can be tracked [here](https://github.com/open-feature/python-sdk/issues/125).
+
+### Eventing
+
+Events are not yet available in the Python SDK. Progress on this feature can be tracked [here](https://github.com/open-feature/python-sdk/issues/125).
+
+### Shutdown
+
+A shutdown method is not yet available in the Python SDK. Progress on this feature can be tracked [here](https://github.com/open-feature/python-sdk/issues/125).
+
+## Extending
+
+### Develop a provider
+
+To develop a provider, you need to create a new project and include the OpenFeature SDK as a dependency.
+This can be a new repository or included in [the existing contrib repository](https://github.com/open-feature/python-sdk-contrib) available under the OpenFeature organization.
+You’ll then need to write the provider by implementing the `FeatureProvider` interface exported by the OpenFeature SDK.
+
+<!-- TODO: code example of provider implementation, see: https://github.com/open-feature/java-sdk#usage -->
+
+> Built a new provider? [Let us know](https://github.com/open-feature/openfeature.dev/issues/new?assignees=&labels=provider&projects=&template=document-provider.yaml&title=%5BProvider%5D%3A+) so we can add it to the docs!
+
+### Develop a hook
+
+To develop a hook, you need to create a new project and include the OpenFeature SDK as a dependency.
+This can be a new repository or included in [the existing contrib repository](https://github.com/open-feature/python-sdk-contrib) available under the OpenFeature organization.
+Implement your own hook by conforming to the `Hook interface`.
+To satisfy the interface, all methods (`Before`/`After`/`Finally`/`Error`) need to be defined.
+To avoid defining empty functions, make use of the `UnimplementedHook` struct (which already implements all the empty functions).
+
+```python
+from openfeature.hook import Hook
+
+class MyHook(Hook):
+    def after(self, hook_context: HookContext, details: FlagEvaluationDetails, hints: dict):
+        print("This runs after the flag has been evaluated")
+
+```
+
+> Built a new hook? [Let us know](https://github.com/open-feature/openfeature.dev/issues/new?assignees=&labels=hook&projects=&template=document-hook.yaml&title=%5BHook%5D%3A+) so we can add it to the docs!
+
+<!-- x-hide-in-docs-start -->
 
 ## ⭐️ Support the project
 
@@ -171,31 +224,18 @@ TBD
   - Twitter: [@openfeature](https://twitter.com/openfeature)
   - LinkedIn: [OpenFeature](https://www.linkedin.com/company/openfeature/)
 - Join us on [Slack](https://cloud-native.slack.com/archives/C0344AANLA1)
-- For more check out our [community page](https://openfeature.dev/community/)
+- For more, check out our [community page](https://openfeature.dev/community/)
 
 ## 🤝 Contributing
 
 Interested in contributing? Great, we'd love your help! To get started, take a look at the [CONTRIBUTING](CONTRIBUTING.md) guide.
 
-### Thanks to everyone that has already contributed
+### Thanks to everyone who has already contributed
 
-<!-- TODO: update with correct repo -->
 <a href="https://github.com/open-feature/python-sdk/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=open-feature/python-sdk" alt="Pictures of the folks who have contributed to the project" />
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).
 
-## Contacting us
-
-We hold regular meetings which you can see [here](https://github.com/open-feature/community/#meetings-and-events).
-
-We are also present on the `#openfeature` channel in the [CNCF slack](https://slack.cncf.io/).
-
-## 📜 License
-
-[Apache License 2.0](LICENSE)
-
-<!-- TODO: add FOSSA widget -->
-
-[openfeature-website]: https://openfeature.dev
+<!-- x-hide-in-docs-end -->
