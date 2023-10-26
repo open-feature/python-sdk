@@ -19,7 +19,7 @@
 
   <!-- x-release-please-start-version -->
 
-  <a href="https://badge.fury.io/py/openfeature-sdk">
+  <a href="https://github.com/open-feature/python-sdk/releases/tag/v0.3.1">
     <img alt="Latest version" src="https://img.shields.io/static/v1?label=release&message=v0.3.1&color=blue&style=for-the-badge" />
   </a>
 
