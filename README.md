@@ -57,7 +57,7 @@
 
 <!---x-release-please-start-version-->
 
-Pip install
+#### Pip install
 
 ```bash
 pip install openfeature-sdk==0.3.1
