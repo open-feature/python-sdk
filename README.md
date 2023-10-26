@@ -20,13 +20,13 @@
   <!-- x-release-please-start-version -->
 
   <a href="https://badge.fury.io/py/openfeature-sdk">
-    <img alt="Codecov" src="https://img.shields.io/static/v1?label=release&message=v0.3.1&color=blue&style=for-the-badge" />
+    <img alt="Latest version" src="https://img.shields.io/static/v1?label=release&message=v0.3.1&color=blue&style=for-the-badge" />
   </a>
 
   <!-- x-release-please-end -->
   <br/>
   <a href="https://github.com/open-feature/python-sdk/actions/workflows/merge.yml">
-    <img alt="Codecov" src="https://github.com/open-feature/python-sdk/actions/workflows/build.yml/badge.svg" />
+    <img alt="Build status" src="https://github.com/open-feature/python-sdk/actions/workflows/build.yml/badge.svg" />
   </a>
 
   <a href="https://codecov.io/gh/open-feature/python-sdk">
@@ -34,11 +34,11 @@
   </a>
 
 <a >
-    <img alt="Codecov" src="https://img.shields.io/badge/python->=3.8-blue.svg" />
+    <img alt="Min python version" src="https://img.shields.io/badge/python->=3.8-blue.svg" />
   </a>
 
   <a href="https://www.repostatus.org/#wip">
-    <img alt="Codecov" src="https://www.repostatus.org/badges/latest/wip.svg" />
+    <img alt="Repo status" src="https://www.repostatus.org/badges/latest/wip.svg" />
   </a>
 </p>
 <!-- x-hide-in-docs-start -->
