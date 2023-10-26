@@ -70,7 +70,7 @@ openfeature-sdk==0.3.1
 ```
 
 ```python
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 <!---x-release-please-end-->
