@@ -140,7 +140,7 @@ request_context = EvaluationContext(
 )
 
 ## set global context
-set_evaluation_context(first_context)
+set_evaluation_context(global_context)
 
 # merge second context
 client = get_client(name="No-op Provider", version="0.5.2")
