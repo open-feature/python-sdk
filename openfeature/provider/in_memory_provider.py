@@ -26,7 +26,6 @@ class InMemoryFlag(typing.Generic[T]):
         ENABLED = "ENABLED"
         DISABLED = "DISABLED"
 
-    flag_key: str
     default_variant: str
     variants: typing.Dict[str, T]
     flag_metadata: FlagMetadata = field(default_factory=dict)
@@ -74,7 +73,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[bool]:
-        return self._resolve(flag_key, default_value, evaluation_context)
+        return self._resolve(flag_key, evaluation_context)
 
     def resolve_string_details(
         self,
@@ -82,7 +81,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[str]:
-        return self._resolve(flag_key, default_value, evaluation_context)
+        return self._resolve(flag_key, evaluation_context)
 
     def resolve_integer_details(
         self,
@@ -90,7 +89,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[int]:
-        return self._resolve(flag_key, default_value, evaluation_context)
+        return self._resolve(flag_key, evaluation_context)
 
     def resolve_float_details(
         self,
@@ -98,7 +97,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[float]:
-        return self._resolve(flag_key, default_value, evaluation_context)
+        return self._resolve(flag_key, evaluation_context)
 
     def resolve_object_details(
         self,
@@ -106,7 +105,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[typing.Union[dict, list]]:
-        return self._resolve(flag_key, default_value, evaluation_context)
+        return self._resolve(flag_key, evaluation_context)
 
     def _resolve(
         self,
