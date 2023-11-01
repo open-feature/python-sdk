@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
 from openfeature.evaluation_context import EvaluationContext
-from openfeature.exception import ErrorCode
+from openfeature.exception import FlagNotFoundError
 from openfeature.flag_evaluation import FlagMetadata, FlagResolutionDetails, Reason
 from openfeature.hook import Hook
 from openfeature.provider.metadata import Metadata
@@ -26,7 +26,6 @@ class InMemoryFlag(typing.Generic[T]):
         ENABLED = "ENABLED"
         DISABLED = "DISABLED"
 
-    flag_key: str
     default_variant: str
     variants: typing.Dict[str, T]
     flag_metadata: FlagMetadata = field(default_factory=dict)
@@ -74,7 +73,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[bool]:
-        return self._resolve(flag_key, default_value, evaluation_context)
+        return self._resolve(flag_key, evaluation_context)
 
     def resolve_string_details(
         self,
@@ -82,7 +81,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[str]:
-        return self._resolve(flag_key, default_value, evaluation_context)
+        return self._resolve(flag_key, evaluation_context)
 
     def resolve_integer_details(
         self,
@@ -90,7 +89,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[int]:
-        return self._resolve(flag_key, default_value, evaluation_context)
+        return self._resolve(flag_key, evaluation_context)
 
     def resolve_float_details(
         self,
@@ -98,7 +97,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[float]:
-        return self._resolve(flag_key, default_value, evaluation_context)
+        return self._resolve(flag_key, evaluation_context)
 
     def resolve_object_details(
         self,
@@ -106,20 +105,14 @@ class InMemoryProvider(AbstractProvider):
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[typing.Union[dict, list]]:
-        return self._resolve(flag_key, default_value, evaluation_context)
+        return self._resolve(flag_key, evaluation_context)
 
     def _resolve(
         self,
         flag_key: str,
-        default_value: V,
         evaluation_context: typing.Optional[EvaluationContext],
     ) -> FlagResolutionDetails[V]:
         flag = self._flags.get(flag_key)
         if flag is None:
-            return FlagResolutionDetails(
-                value=default_value,
-                reason=Reason.ERROR,
-                error_code=ErrorCode.FLAG_NOT_FOUND,
-                error_message=f"Flag '{flag_key}' not found",
-            )
+            raise FlagNotFoundError(f"Flag '{flag_key}' not found")
         return flag.resolve(evaluation_context)

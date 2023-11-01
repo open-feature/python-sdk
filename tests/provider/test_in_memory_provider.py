@@ -1,6 +1,7 @@
+import pytest
 from numbers import Number
 
-from openfeature.exception import ErrorCode
+from openfeature.exception import FlagNotFoundError
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 
@@ -19,14 +20,9 @@ def test_should_handle_unknown_flags_correctly():
     # Given
     provider = InMemoryProvider({})
     # When
-    flag = provider.resolve_boolean_details(flag_key="Key", default_value=True)
+    with pytest.raises(FlagNotFoundError):
+        provider.resolve_boolean_details(flag_key="Key", default_value=True)
     # Then
-    assert flag is not None
-    assert flag.value is True
-    assert isinstance(flag.value, bool)
-    assert flag.reason == Reason.ERROR
-    assert flag.error_code == ErrorCode.FLAG_NOT_FOUND
-    assert flag.error_message == "Flag 'Key' not found"
 
 
 def test_calls_context_evaluator_if_present():
@@ -40,7 +36,6 @@ def test_calls_context_evaluator_if_present():
     provider = InMemoryProvider(
         {
             "Key": InMemoryFlag(
-                "Key",
                 "true",
                 {"true": True, "false": False},
                 context_evaluator=context_evaluator,
@@ -59,7 +54,7 @@ def test_calls_context_evaluator_if_present():
 def test_should_resolve_boolean_flag_from_in_memory():
     # Given
     provider = InMemoryProvider(
-        {"Key": InMemoryFlag("Key", "true", {"true": True, "false": False})}
+        {"Key": InMemoryFlag("true", {"true": True, "false": False})}
     )
     # When
     flag = provider.resolve_boolean_details(flag_key="Key", default_value=False)
@@ -73,7 +68,7 @@ def test_should_resolve_boolean_flag_from_in_memory():
 def test_should_resolve_integer_flag_from_in_memory():
     # Given
     provider = InMemoryProvider(
-        {"Key": InMemoryFlag("Key", "hundred", {"zero": 0, "hundred": 100})}
+        {"Key": InMemoryFlag("hundred", {"zero": 0, "hundred": 100})}
     )
     # When
     flag = provider.resolve_integer_details(flag_key="Key", default_value=0)
@@ -87,7 +82,7 @@ def test_should_resolve_integer_flag_from_in_memory():
 def test_should_resolve_float_flag_from_in_memory():
     # Given
     provider = InMemoryProvider(
-        {"Key": InMemoryFlag("Key", "ten", {"zero": 0.0, "ten": 10.23})}
+        {"Key": InMemoryFlag("ten", {"zero": 0.0, "ten": 10.23})}
     )
     # When
     flag = provider.resolve_float_details(flag_key="Key", default_value=0.0)
@@ -103,7 +98,6 @@ def test_should_resolve_string_flag_from_in_memory():
     provider = InMemoryProvider(
         {
             "Key": InMemoryFlag(
-                "Key",
                 "stringVariant",
                 {"defaultVariant": "Default", "stringVariant": "String"},
             )
@@ -121,11 +115,7 @@ def test_should_resolve_string_flag_from_in_memory():
 def test_should_resolve_list_flag_from_in_memory():
     # Given
     provider = InMemoryProvider(
-        {
-            "Key": InMemoryFlag(
-                "Key", "twoItems", {"empty": [], "twoItems": ["item1", "item2"]}
-            )
-        }
+        {"Key": InMemoryFlag("twoItems", {"empty": [], "twoItems": ["item1", "item2"]})}
     )
     # When
     flag = provider.resolve_object_details(flag_key="Key", default_value=[])
@@ -144,7 +134,7 @@ def test_should_resolve_object_flag_from_in_memory():
         "Boolean": True,
     }
     provider = InMemoryProvider(
-        {"Key": InMemoryFlag("Key", "obj", {"obj": return_value, "empty": {}})}
+        {"Key": InMemoryFlag("obj", {"obj": return_value, "empty": {}})}
     )
     # When
     flag = provider.resolve_object_details(flag_key="Key", default_value={})

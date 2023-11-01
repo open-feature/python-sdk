@@ -103,7 +103,6 @@ def test_should_pass_flag_metadata_from_resolution_to_evaluation_details():
     provider = InMemoryProvider(
         {
             "Key": InMemoryFlag(
-                "Key",
                 "true",
                 {"true": True, "false": False},
                 flag_metadata={"foo": "bar"},
