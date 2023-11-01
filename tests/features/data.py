@@ -22,35 +22,30 @@ def context_func(flag: InMemoryFlag, evaluation_context: EvaluationContext):
 
 IN_MEMORY_FLAGS = {
     "boolean-flag": InMemoryFlag(
-        flag_key="boolean-flag",
         state=InMemoryFlag.State.ENABLED,
         default_variant="on",
         variants={"on": True, "off": False},
         context_evaluator=None,
     ),
     "string-flag": InMemoryFlag(
-        flag_key="string-flag",
         state=InMemoryFlag.State.ENABLED,
         default_variant="greeting",
         variants={"greeting": "hi", "parting": "bye"},
         context_evaluator=None,
     ),
     "integer-flag": InMemoryFlag(
-        flag_key="integer-flag",
         state=InMemoryFlag.State.ENABLED,
         default_variant="ten",
         variants={"one": 1, "ten": 10},
         context_evaluator=None,
     ),
     "float-flag": InMemoryFlag(
-        flag_key="float-flag",
         state=InMemoryFlag.State.ENABLED,
         default_variant="half",
         variants={"tenth": 0.1, "half": 0.5},
         context_evaluator=None,
     ),
     "object-flag": InMemoryFlag(
-        flag_key="object-flag",
         state=InMemoryFlag.State.ENABLED,
         default_variant="template",
         variants={
@@ -64,14 +59,12 @@ IN_MEMORY_FLAGS = {
         context_evaluator=None,
     ),
     "context-aware": InMemoryFlag(
-        flag_key="context-aware",
         state=InMemoryFlag.State.ENABLED,
         variants={"internal": "INTERNAL", "external": "EXTERNAL"},
         default_variant="external",
         context_evaluator=context_func,
     ),
     "wrong-flag": InMemoryFlag(
-        flag_key="wrong-flag",
         state="ENABLED",
         variants={"one": "uno", "two": "dos"},
         default_variant="one",
