@@ -115,11 +115,7 @@ def test_should_resolve_string_flag_from_in_memory():
 def test_should_resolve_list_flag_from_in_memory():
     # Given
     provider = InMemoryProvider(
-        {
-            "Key": InMemoryFlag(
-                "twoItems", {"empty": [], "twoItems": ["item1", "item2"]}
-            )
-        }
+        {"Key": InMemoryFlag("twoItems", {"empty": [], "twoItems": ["item1", "item2"]})}
     )
     # When
     flag = provider.resolve_object_details(flag_key="Key", default_value=[])
