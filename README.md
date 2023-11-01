@@ -33,7 +33,7 @@
     <img alt="Codecov" src="https://codecov.io/gh/open-feature/python-sdk/branch/main/graph/badge.svg?token=FQ1I444HB3" />
   </a>
 
-<a >
+  <a href="https://www.python.org/downloads/">
     <img alt="Min python version" src="https://img.shields.io/badge/python->=3.8-blue.svg" />
   </a>
 
@@ -43,7 +43,7 @@
 </p>
 <!-- x-hide-in-docs-start -->
 
-[OpenFeature](https://openfeature.dev) is an open standard that provides a vendor-agnostic, community-driven API for feature flagging that works with your favorite feature flag management tool.
+[OpenFeature](https://openfeature.dev) is an open specification that provides a vendor-agnostic, community-driven API for feature flagging that works with your favorite feature flag management tool.
 
 <!-- x-hide-in-docs-end -->
 
@@ -77,11 +77,25 @@ pip install -r requirements.txt
 
 ### Usage
 
-<!-- TODO: basic usage instructions, setting the in-memory provider and getting a boolean flag called "v2_enabled" -->
+```python
+from openfeature import api
+from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 
-### API Reference
+# flags defined in memory
+my_flags = {
+  "v2_enabled": InMemoryFlag("on", {"on": True, "off": False})
+}
 
-<!-- TODO: link to formal API docs (ie: Javadoc) if available or remove this section -->
+# configure a provider
+api.set_provider(InMemoryProvider(my_flags))
+
+# create a client
+client = api.get_client()
+
+# get a bool flag value
+flag_value = client.get_boolean_value("v2_enabled", False)
+print("Value: " + str(flag_value))
+```
 
 ## 🌟 Features
 
@@ -114,8 +128,8 @@ api.set_provider(NoOpProvider())
 open_feature_client = api.get_client()
 ```
 
-In some situations, it may be beneficial to register multiple providers in the same application.
-This is possible using [named clients](#named-clients), which is covered in more detail below.
+<!-- In some situations, it may be beneficial to register multiple providers in the same application.
+This is possible using [named clients](#named-clients), which is covered in more detail below. -->
 
 ### Targeting
 
@@ -127,7 +141,7 @@ If the flag management system you're using supports targeting, you can provide t
 from openfeature.api import (
     get_client,
     get_provider,
-    set_provider
+    set_provider,
     get_evaluation_context,
     set_evaluation_context,
 )
@@ -143,9 +157,8 @@ request_context = EvaluationContext(
 set_evaluation_context(global_context)
 
 # merge second context
-client = get_client(name="No-op Provider", version="0.5.2")
-client.get_string_value("email", None, request_context)
-
+client = get_client(name="No-op Provider")
+client.get_string_value("email", "fallback", request_context)
 ```
 
 ### Hooks
@@ -157,16 +170,20 @@ If the hook you're looking for hasn't been created yet, see the [develop a hook]
 Once you've added a hook as a dependency, it can be registered at the global, client, or flag invocation level.
 
 ```python
-# set global hooks at the API-level
 from openfeature.api import add_hooks
+from openfeature.flag_evaluation import FlagEvaluationOptions
+
+# set global hooks at the API-level
 add_hooks([MyHook()])
 
 # or configure them in the client
 client = OpenFeatureClient()
 client.add_hooks([MyHook()])
-```
 
-<!-- TODO: example of invocation-level hook -->
+# or at the invocation-level
+options = FlagEvaluationOptions(hooks=[MyHook()])
+client.get_boolean_flag("my-flag", False, flag_evaluation_options=options)
+```
 
 ### Logging
 
@@ -190,9 +207,62 @@ A shutdown method is not yet available in the Python SDK. Progress on this featu
 
 To develop a provider, you need to create a new project and include the OpenFeature SDK as a dependency.
 This can be a new repository or included in [the existing contrib repository](https://github.com/open-feature/python-sdk-contrib) available under the OpenFeature organization.
-You’ll then need to write the provider by implementing the `FeatureProvider` interface exported by the OpenFeature SDK.
+You’ll then need to write the provider by implementing the `AbstractProvider` class exported by the OpenFeature SDK.
 
-<!-- TODO: code example of provider implementation, see: https://github.com/open-feature/java-sdk#usage -->
+```python
+from typing import List, Optional
+
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.flag_evaluation import FlagResolutionDetails
+from openfeature.provider.provider import AbstractProvider
+
+class MyProvider(AbstractProvider):
+    def get_metadata(self) -> Metadata:
+        ...
+
+    def get_provider_hooks(self) -> List[Hook]:
+        return []
+
+    def resolve_boolean_details(
+        self,
+        flag_key: str,
+        default_value: bool,
+        evaluation_context: Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[bool]:
+        ...
+
+    def resolve_string_details(
+        self,
+        flag_key: str,
+        default_value: str,
+        evaluation_context: Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[str]:
+        ...
+
+    def resolve_integer_details(
+        self,
+        flag_key: str,
+        default_value: int,
+        evaluation_context: Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[int]:
+        ...
+
+    def resolve_float_details(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[float]:
+        ...
+
+    def resolve_object_details(
+        self,
+        flag_key: str,
+        default_value: Union[dict, list],
+        evaluation_context: Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[Union[dict, list]]:
+        ...
+```
 
 > Built a new provider? [Let us know](https://github.com/open-feature/openfeature.dev/issues/new?assignees=&labels=provider&projects=&template=document-provider.yaml&title=%5BProvider%5D%3A+) so we can add it to the docs!
 
@@ -200,9 +270,8 @@ You’ll then need to write the provider by implementing the `FeatureProvider` i
 
 To develop a hook, you need to create a new project and include the OpenFeature SDK as a dependency.
 This can be a new repository or included in [the existing contrib repository](https://github.com/open-feature/python-sdk-contrib) available under the OpenFeature organization.
-Implement your own hook by conforming to the `Hook interface`.
-To satisfy the interface, all methods (`Before`/`After`/`Finally`/`Error`) need to be defined.
-To avoid defining empty functions, make use of the `UnimplementedHook` struct (which already implements all the empty functions).
+Implement your own hook by creating a hook that inherits from the `Hook` class.
+Any of the evaluation life-cycle stages (`before`/`after`/`error`/`finally_after`) can be override to add the desired business logic.
 
 ```python
 from openfeature.hook import Hook
