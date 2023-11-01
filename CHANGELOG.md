@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.0](https://github.com/open-feature/python-sdk/compare/v0.3.1...v0.4.0) (2023-11-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* raise error if the flag wasn't found using the in-memory provider ([#228](https://github.com/open-feature/python-sdk/issues/228))
+
+### Features
+
+* implement initialize/shutdown on provider registration ([#213](https://github.com/open-feature/python-sdk/issues/213)) ([84af1ae](https://github.com/open-feature/python-sdk/commit/84af1aec01241842289bce2beb35486153876706))
+* pass flag_metadata from resolution to evaluation details ([#212](https://github.com/open-feature/python-sdk/issues/212)) ([88a204d](https://github.com/open-feature/python-sdk/commit/88a204dc27c435f3b5faec231a07a96cb011518c))
+
+
+### Bug Fixes
+
+* Hook methods should have default non-abstract implementations ([#216](https://github.com/open-feature/python-sdk/issues/216)) ([c661ab2](https://github.com/open-feature/python-sdk/commit/c661ab20a43ff4411b7f0847c71df886af87e7ed))
+* raise error if the flag wasn't found using the in-memory provider ([#228](https://github.com/open-feature/python-sdk/issues/228)) ([0c314ab](https://github.com/open-feature/python-sdk/commit/0c314ab77cd60d3347aea7f733d324a6228e8871))
+
 ## [0.3.1](https://github.com/open-feature/python-sdk/compare/v0.3.0...v0.3.1) (2023-09-28)
 
 
