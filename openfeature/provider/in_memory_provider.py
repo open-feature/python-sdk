@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
 from openfeature.evaluation_context import EvaluationContext
-from openfeature.exception import ErrorCode
+from openfeature.exception import FlagNotFoundError
 from openfeature.flag_evaluation import FlagMetadata, FlagResolutionDetails, Reason
 from openfeature.hook import Hook
 from openfeature.provider.metadata import Metadata
@@ -111,15 +111,9 @@ class InMemoryProvider(AbstractProvider):
     def _resolve(
         self,
         flag_key: str,
-        default_value: V,
         evaluation_context: typing.Optional[EvaluationContext],
     ) -> FlagResolutionDetails[V]:
         flag = self._flags.get(flag_key)
         if flag is None:
-            return FlagResolutionDetails(
-                value=default_value,
-                reason=Reason.ERROR,
-                error_code=ErrorCode.FLAG_NOT_FOUND,
-                error_message=f"Flag '{flag_key}' not found",
-            )
+            raise FlagNotFoundError(f"Flag '{flag_key}' not found")
         return flag.resolve(evaluation_context)
