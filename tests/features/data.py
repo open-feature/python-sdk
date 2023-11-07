@@ -65,7 +65,7 @@ IN_MEMORY_FLAGS = {
         context_evaluator=context_func,
     ),
     "wrong-flag": InMemoryFlag(
-        state="ENABLED",
+        state=InMemoryFlag.State.ENABLED,
         variants={"one": "uno", "two": "dos"},
         default_variant="one",
     ),
