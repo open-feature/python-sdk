@@ -28,3 +28,6 @@ Homepage = "https://github.com/open-feature/python-sdk"
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+
+[tool.setuptools.package-data]
+openfeature = ["py.typed"]
