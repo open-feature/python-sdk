@@ -3,9 +3,14 @@ from __future__ import annotations
 import typing
 from dataclasses import dataclass
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
+
+if TYPE_CHECKING:
+    from openfeature.client import ClientMetadata
+    from openfeature.provider.metadata import Metadata
 
 
 class HookType(Enum):
@@ -21,8 +26,8 @@ class HookContext:
     flag_type: FlagType
     default_value: typing.Any
     evaluation_context: EvaluationContext
-    client_metadata: typing.Optional[dict] = None
-    provider_metadata: typing.Optional[dict] = None
+    client_metadata: typing.Optional["ClientMetadata"] = None
+    provider_metadata: typing.Optional["Metadata"] = None
 
 
 class Hook:
