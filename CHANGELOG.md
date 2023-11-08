@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.1](https://github.com/open-feature/python-sdk/compare/v0.4.0...v0.4.1) (2023-11-08)
+
+
+### Bug Fixes
+
+* add PEP 561 py.typed marker file ([#232](https://github.com/open-feature/python-sdk/issues/232)) ([db50494](https://github.com/open-feature/python-sdk/commit/db504946d1aea7e653e5755d703cff3d52b455dd))
+* fix types for HookContext.{client,provider}_metadata ([#233](https://github.com/open-feature/python-sdk/issues/233)) ([4bdd384](https://github.com/open-feature/python-sdk/commit/4bdd384544c24f5d9942c1e6261689c6b8ceb7de))
+* replace str with enum value in InMemoryFlag definition ([#234](https://github.com/open-feature/python-sdk/issues/234)) ([963b01e](https://github.com/open-feature/python-sdk/commit/963b01e66d6ebe8062beaf3bfa0d034a312c037e))
+
 ## [0.4.0](https://github.com/open-feature/python-sdk/compare/v0.3.1...v0.4.0) (2023-11-01)
 
 
