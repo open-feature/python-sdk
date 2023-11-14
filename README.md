@@ -199,7 +199,13 @@ Events are not yet available in the Python SDK. Progress on this feature can be 
 
 ### Shutdown
 
-A shutdown method is not yet available in the Python SDK. Progress on this feature can be tracked [here](https://github.com/open-feature/python-sdk/issues/125).
+The OpenFeature API provides a shutdown function to perform a cleanup of all registered providers. This should only be called when your application is in the process of shutting down.
+
+```python
+from openfeature import api
+
+api.shutdown()
+```
 
 ## Extending
 
