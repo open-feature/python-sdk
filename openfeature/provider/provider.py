@@ -2,6 +2,7 @@ import typing
 from abc import abstractmethod
 
 from openfeature.evaluation_context import EvaluationContext
+from openfeature.event import ProviderEvent, ProviderEventDetails
 from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
@@ -66,3 +67,22 @@ class AbstractProvider(FeatureProvider):
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[typing.Union[dict, list]]:
         pass
+
+    def emit_provider_ready(self, details: ProviderEventDetails) -> None:
+        self.emit(ProviderEvent.PROVIDER_READY, details)
+
+    def emit_provider_configuration_changed(
+        self, details: ProviderEventDetails
+    ) -> None:
+        self.emit(ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, details)
+
+    def emit_provider_error(self, details: ProviderEventDetails) -> None:
+        self.emit(ProviderEvent.PROVIDER_ERROR, details)
+
+    def emit_provider_stale(self, details: ProviderEventDetails) -> None:
+        self.emit(ProviderEvent.PROVIDER_STALE, details)
+
+    def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
+        from openfeature.api import _run_handlers_for_provider
+
+        _run_handlers_for_provider(self, event, details)

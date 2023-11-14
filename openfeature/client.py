@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from openfeature import api
 from openfeature.evaluation_context import EvaluationContext
+from openfeature.event import EventHandler, ProviderEvent
 from openfeature.exception import (
     ErrorCode,
     GeneralError,
@@ -439,6 +440,12 @@ class OpenFeatureClient:
             error_code=resolution.error_code,
             error_message=resolution.error_message,
         )
+
+    def add_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
+        api._add_client_handler(self, event, handler)
+
+    def remove_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
+        api._remove_client_handler(self, event, handler)
 
 
 def _typecheck_flag_value(value: typing.Any, flag_type: FlagType) -> None:
