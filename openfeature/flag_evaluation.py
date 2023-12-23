@@ -31,13 +31,13 @@ class Reason(StrEnum):
 
 FlagMetadata = typing.Mapping[str, typing.Any]
 
-T = typing.TypeVar("T", covariant=True)
+T_co = typing.TypeVar("T_co", covariant=True)
 
 
 @dataclass
-class FlagEvaluationDetails(typing.Generic[T]):
+class FlagEvaluationDetails(typing.Generic[T_co]):
     flag_key: str
-    value: T
+    value: T_co
     variant: typing.Optional[str] = None
     flag_metadata: FlagMetadata = field(default_factory=dict)
     reason: typing.Optional[Reason] = None
@@ -51,12 +51,12 @@ class FlagEvaluationOptions:
     hook_hints: dict = field(default_factory=dict)
 
 
-U = typing.TypeVar("U", covariant=True)
+U_co = typing.TypeVar("U_co", covariant=True)
 
 
 @dataclass
-class FlagResolutionDetails(typing.Generic[U]):
-    value: U
+class FlagResolutionDetails(typing.Generic[U_co]):
+    value: U_co
     error_code: typing.Optional[ErrorCode] = None
     error_message: typing.Optional[str] = None
     reason: typing.Optional[Reason] = None

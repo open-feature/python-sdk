@@ -53,4 +53,4 @@ def test_evaluation_details_reason_should_be_a_string_when_set():
     flag_details.reason = Reason.STATIC
 
     # Then
-    assert Reason.STATIC == flag_details.reason
+    assert Reason.STATIC == flag_details.reason  # noqa: SIM300

@@ -13,6 +13,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -64,18 +67,13 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: python
+          config-file: ./.github/codeql-config.yml
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run black formatter check
-        run: black --check .
-
-      - name: Run flake8 formatter check
-        run: flake8 .
-
-      - name: Run isort formatter check
-        run: isort .
+      - name: Run pre-commit
+        run: pre-commit/action@v3
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

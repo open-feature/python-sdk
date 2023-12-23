@@ -314,7 +314,7 @@ class OpenFeatureClient:
             )
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
-        except Exception as err:  # noqa
+        except Exception as err:  # pragma: no cover
             error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
             error_message = getattr(err, "error_message", str(err))

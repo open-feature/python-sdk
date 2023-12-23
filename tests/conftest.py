@@ -11,7 +11,7 @@ def clear_provider():
     in other tests.
     """
     yield
-    _provider = None  # noqa: F841
+    _provider = None
 
 
 @pytest.fixture()

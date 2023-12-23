@@ -20,14 +20,62 @@ dependencies = []
 requires-python = ">=3.8"
 
 [project.optional-dependencies]
-dev = ["black", "flake8", "isort", "pip-tools", "pytest", "pre-commit"]
+dev = ["pip-tools", "pytest", "pre-commit"]
 
 [project.urls]
 Homepage = "https://github.com/open-feature/python-sdk"
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
+[tool.ruff]
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "venv",
+]
+target-version = "py38"
+
+[tool.ruff.lint]
+select = [
+    "A",
+    "B",
+    "C4",
+    "C90",
+    "E",
+    "F",
+    "FLY",
+    "FURB",
+    "I",
+    "LOG",
+    "N",
+    "PERF",
+    "PGH",
+    "PLC",
+    "PLR0913",
+    "PLR0915",
+    "RUF",
+    "S",
+    "SIM",
+    "T10",
+    "T20",
+    "UP",
+    "W",
+    "YTT",
+]
+ignore = [
+    "E501" # the formatter will handle any too long line
+]
+preview = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*" = ["PLR0913", "S101"]
+
+[tool.ruff.lint.pylint]
+max-args = 6
+max-statements = 30
+
+[tool.ruff.lint.pyupgrade]
+# Preserve types, even if a file imports `from __future__ import annotations`.
+keep-runtime-typing = true
 
 [tool.setuptools.package-data]
 openfeature = ["py.typed"]

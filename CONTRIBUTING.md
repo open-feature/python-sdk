@@ -12,7 +12,7 @@ Python 3.8 and above are supported by the SDK.
 
 ### Installation and Dependencies
 
-A [`Makefile`](./Makefile) has been included in the project which should make it straightforward to start the project locally. We utilize virtual environments (see [`venv`](https://docs.python.org/3/tutorial/venv.html)) in order to provide isolated development environments for the project. This reduces the risk of invalid or corrupt global packages. It also integrates nicely with Make, which will detect changes in the `requirements-dev.txt` file and update the virtual environment if any occur.
+A [`Makefile`](./Makefile) has been included in the project which should make it straightforward to start the project locally. We utilize virtual environments (see [`venv`](https://docs.python.org/3/tutorial/venv.html)) in order to provide isolated development environments for the project. This reduces the risk of invalid or corrupt global packages. It also integrates nicely with Make, which will detect changes in the `requirements.txt` file and update the virtual environment if any occur.
 
 Run `make init` to initialize the project's virtual environment and install all dev dependencies.
 
