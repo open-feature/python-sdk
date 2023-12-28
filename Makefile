@@ -33,13 +33,11 @@ test-harness:
 
 .PHONY: lint
 lint: venv
-	$(VENV_ACTIVATE); flake8 .
-	$(VENV_ACTIVATE); isort .
-	$(VENV_ACTIVATE); black --check .
+	$(VENV_ACTIVATE); pre-commit run -a
 
 .PHONY: format
 format: venv
-	$(VENV_ACTIVATE); black .
+	$(VENV_ACTIVATE); pre-commit run -a ruff-format
 
 .PHONY: e2e
 e2e: venv test-harness
