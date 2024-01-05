@@ -32,6 +32,7 @@
   <a href="https://codecov.io/gh/open-feature/python-sdk">
     <img alt="Codecov" src="https://codecov.io/gh/open-feature/python-sdk/branch/main/graph/badge.svg?token=FQ1I444HB3" />
   </a>
+<a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fopen-feature%2Fpython-sdk?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopen-feature%2Fpython-sdk.svg?type=shield"/></a>
 
   <a href="https://www.python.org/downloads/">
     <img alt="Min python version" src="https://img.shields.io/badge/python->=3.8-blue.svg" />
@@ -314,3 +315,7 @@ Interested in contributing? Great, we'd love your help! To get started, take a l
 Made with [contrib.rocks](https://contrib.rocks).
 
 <!-- x-hide-in-docs-end -->
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopen-feature%2Fpython-sdk.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopen-feature%2Fpython-sdk?ref=badge_large)
