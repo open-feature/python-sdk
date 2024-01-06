@@ -68,14 +68,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run black formatter check
-        run: black --check .
-
-      - name: Run flake8 formatter check
-        run: flake8 .
-
-      - name: Run isort formatter check
-        run: isort .
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.0
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

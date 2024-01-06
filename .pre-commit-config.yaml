@@ -1,28 +1,16 @@
 default_stages: [commit]
 repos:
-  - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.9
     hooks:
-      - id: isort
-        args: ["--profile", "black", "--filter-files"]
-
-  - repo: https://github.com/psf/black
-    rev: 23.9.1
-    hooks:
-      - id: black
-        language_version: python3.9
+      - id: ruff
+#        args: [ --fix ]
+      - id: ruff-format
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.5.0
     hooks:
+      - id: check-toml
       - id: check-yaml
       - id: trailing-whitespace
       - id: check-merge-conflict
-      - id: debug-statements
-
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8
-        additional_dependencies:
-          ["flake8-print", "flake8-builtins", "flake8-functions==0.0.4"]
