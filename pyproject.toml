@@ -63,14 +63,6 @@ select = [
 ]
 ignore = [
     "E501", # the formatter will handle any too long line
-    # all following rules will be removed in the next PR
-    "PGH004",
-    "RUF100",
-    "PLC0105",
-    "UP037",
-    "C408",
-    "I001",
-    "SIM300",
 ]
 preview = true
 

@@ -17,26 +17,28 @@ class InMemoryMetadata(Metadata):
     name: str = "In-Memory Provider"
 
 
-T = typing.TypeVar("T", covariant=True)
+T_co = typing.TypeVar("T_co", covariant=True)
 
 
 @dataclass(frozen=True)
-class InMemoryFlag(typing.Generic[T]):
+class InMemoryFlag(typing.Generic[T_co]):
     class State(StrEnum):
         ENABLED = "ENABLED"
         DISABLED = "DISABLED"
 
     default_variant: str
-    variants: typing.Dict[str, T]
+    variants: typing.Dict[str, T_co]
     flag_metadata: FlagMetadata = field(default_factory=dict)
     state: State = State.ENABLED
     context_evaluator: typing.Optional[
-        typing.Callable[["InMemoryFlag", EvaluationContext], FlagResolutionDetails[T]]
+        typing.Callable[
+            ["InMemoryFlag", EvaluationContext], FlagResolutionDetails[T_co]
+        ]
     ] = None
 
     def resolve(
         self, evaluation_context: typing.Optional[EvaluationContext]
-    ) -> FlagResolutionDetails[T]:
+    ) -> FlagResolutionDetails[T_co]:
         if self.context_evaluator:
             return self.context_evaluator(
                 self, evaluation_context or EvaluationContext()
