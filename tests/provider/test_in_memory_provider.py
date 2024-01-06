@@ -1,5 +1,6 @@
-import pytest
 from numbers import Number
+
+import pytest
 
 from openfeature.exception import FlagNotFoundError
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason

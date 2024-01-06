@@ -116,5 +116,5 @@ def _execute_hook_checked(hook: Hook, hook_method: HookType, **kwargs):
     """
     try:
         return getattr(hook, hook_method.value)(**kwargs)
-    except Exception:  # noqa
+    except Exception:  # pragma: no cover
         logging.error(f"Exception when running {hook_method.value} hooks")

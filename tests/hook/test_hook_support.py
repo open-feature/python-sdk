@@ -15,7 +15,7 @@ from openfeature.immutable_dict.mapping_proxy_type import MappingProxyType
 def test_error_hooks_run_error_method(mock_hook):
     # Given
     hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
-    hook_hints = MappingProxyType(dict())
+    hook_hints = MappingProxyType({})
     # When
     error_hooks(FlagType.BOOLEAN, hook_context, Exception, [mock_hook], hook_hints)
     # Then
@@ -29,7 +29,7 @@ def test_error_hooks_run_error_method(mock_hook):
 def test_before_hooks_run_before_method(mock_hook):
     # Given
     hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
-    hook_hints = MappingProxyType(dict())
+    hook_hints = MappingProxyType({})
     # When
     before_hooks(FlagType.BOOLEAN, hook_context, [mock_hook], hook_hints)
     # Then
@@ -61,7 +61,7 @@ def test_after_hooks_run_after_method(mock_hook):
     flag_evaluation_details = FlagEvaluationDetails(
         hook_context.flag_key, "val", "unknown"
     )
-    hook_hints = MappingProxyType(dict())
+    hook_hints = MappingProxyType({})
     # When
     after_hooks(
         FlagType.BOOLEAN, hook_context, flag_evaluation_details, [mock_hook], hook_hints
@@ -77,7 +77,7 @@ def test_after_hooks_run_after_method(mock_hook):
 def test_finally_after_hooks_run_finally_after_method(mock_hook):
     # Given
     hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
-    hook_hints = MappingProxyType(dict())
+    hook_hints = MappingProxyType({})
     # When
     after_all_hooks(FlagType.BOOLEAN, hook_context, [mock_hook], hook_hints)
     # Then
