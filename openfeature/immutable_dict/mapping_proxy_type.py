@@ -1,3 +1,6 @@
+import typing
+
+
 class MappingProxyType(dict):
     """
     MappingProxyType is an immutable dictionary type, written to
@@ -14,16 +17,16 @@ class MappingProxyType(dict):
     `from types import MappingProxyType`
     """
 
-    def __hash__(self):
+    def __hash__(self) -> int:  # type:ignore[override]
         return id(self)
 
-    def _immutable(self, *args, **kws):
+    def _immutable(self, *args: typing.Any, **kws: typing.Any) -> typing.NoReturn:
         raise TypeError("immutable instance of dictionary")
 
     __setitem__ = _immutable
     __delitem__ = _immutable
     clear = _immutable
-    update = _immutable
-    setdefault = _immutable
-    pop = _immutable
+    update = _immutable  # type:ignore[assignment]
+    setdefault = _immutable  # type:ignore[assignment]
+    pop = _immutable  # type:ignore[assignment]
     popitem = _immutable
