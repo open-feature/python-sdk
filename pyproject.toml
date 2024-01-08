@@ -29,6 +29,9 @@ Homepage = "https://github.com/open-feature/python-sdk"
 files = "openfeature"
 namespace_packages = true
 explicit_package_bases = true
+pretty = true
+strict = true
+disallow_any_generics = false
 
 [tool.ruff]
 exclude = [

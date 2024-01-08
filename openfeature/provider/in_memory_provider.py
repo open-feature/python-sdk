@@ -32,7 +32,7 @@ class InMemoryFlag(typing.Generic[T_co]):
     state: State = State.ENABLED
     context_evaluator: typing.Optional[
         typing.Callable[
-            ["InMemoryFlag", EvaluationContext], FlagResolutionDetails[T_co]
+            ["InMemoryFlag[T_co]", EvaluationContext], FlagResolutionDetails[T_co]
         ]
     ] = None
 
@@ -52,7 +52,7 @@ class InMemoryFlag(typing.Generic[T_co]):
         )
 
 
-FlagStorage = typing.Dict[str, InMemoryFlag]
+FlagStorage = typing.Dict[str, InMemoryFlag[typing.Any]]
 
 V = typing.TypeVar("V")
 
@@ -60,7 +60,7 @@ V = typing.TypeVar("V")
 class InMemoryProvider(AbstractProvider):
     _flags: FlagStorage
 
-    def __init__(self, flags: FlagStorage):
+    def __init__(self, flags: FlagStorage) -> None:
         self._flags = flags.copy()
 
     def get_metadata(self) -> Metadata:
