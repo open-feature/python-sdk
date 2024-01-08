@@ -45,11 +45,21 @@ GetDetailCallable = typing.Union[
         FlagResolutionDetails[typing.Union[dict, list]],
     ],
 ]
+TypeMap = typing.Dict[
+    FlagType,
+    typing.Union[
+        typing.Type[bool],
+        typing.Type[int],
+        typing.Type[float],
+        typing.Type[str],
+        typing.Tuple[typing.Type[dict], typing.Type[list]],
+    ],
+]
 
 
 @dataclass
 class ClientMetadata:
-    name: str
+    name: typing.Optional[str]
 
 
 class OpenFeatureClient:
@@ -60,17 +70,17 @@ class OpenFeatureClient:
         provider: AbstractProvider,
         context: typing.Optional[EvaluationContext] = None,
         hooks: typing.Optional[typing.List[Hook]] = None,
-    ):
+    ) -> None:
         self.name = name
         self.version = version
         self.context = context or EvaluationContext()
         self.hooks = hooks or []
         self.provider = provider
 
-    def get_metadata(self):
+    def get_metadata(self) -> ClientMetadata:
         return ClientMetadata(name=self.name)
 
-    def add_hooks(self, hooks: typing.List[Hook]):
+    def add_hooks(self, hooks: typing.List[Hook]) -> None:
         self.hooks = self.hooks + hooks
 
     def get_boolean_value(
@@ -93,7 +103,7 @@ class OpenFeatureClient:
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails:
+    ) -> FlagEvaluationDetails[bool]:
         return self.evaluate_flag_details(
             FlagType.BOOLEAN,
             flag_key,
@@ -122,7 +132,7 @@ class OpenFeatureClient:
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails:
+    ) -> FlagEvaluationDetails[str]:
         return self.evaluate_flag_details(
             FlagType.STRING,
             flag_key,
@@ -151,7 +161,7 @@ class OpenFeatureClient:
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails:
+    ) -> FlagEvaluationDetails[int]:
         return self.evaluate_flag_details(
             FlagType.INTEGER,
             flag_key,
@@ -180,7 +190,7 @@ class OpenFeatureClient:
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails:
+    ) -> FlagEvaluationDetails[float]:
         return self.evaluate_flag_details(
             FlagType.FLOAT,
             flag_key,
@@ -195,7 +205,7 @@ class OpenFeatureClient:
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> dict:
+    ) -> typing.Union[dict, list]:
         return self.get_object_details(
             flag_key,
             default_value,
@@ -209,7 +219,7 @@ class OpenFeatureClient:
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails:
+    ) -> FlagEvaluationDetails[typing.Union[dict, list]]:
         return self.evaluate_flag_details(
             FlagType.OBJECT,
             flag_key,
@@ -225,7 +235,7 @@ class OpenFeatureClient:
         default_value: typing.Any,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails:
+    ) -> FlagEvaluationDetails[typing.Any]:
         """
         Evaluate the flag requested by the user from the clients provider.
 
@@ -335,7 +345,7 @@ class OpenFeatureClient:
         flag_key: str,
         default_value: typing.Any,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails:
+    ) -> FlagEvaluationDetails[typing.Any]:
         """
         Encapsulated method to create a FlagEvaluationDetail from a specific provider.
 
@@ -384,8 +394,8 @@ class OpenFeatureClient:
         )
 
 
-def _typecheck_flag_value(value, flag_type):
-    type_map = {
+def _typecheck_flag_value(value: typing.Any, flag_type: FlagType) -> None:
+    type_map: TypeMap = {
         FlagType.BOOLEAN: bool,
         FlagType.STRING: str,
         FlagType.OBJECT: (dict, list),

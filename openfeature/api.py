@@ -21,7 +21,7 @@ def get_client(
     return OpenFeatureClient(name=name, version=version, provider=_provider)
 
 
-def set_provider(provider: AbstractProvider):
+def set_provider(provider: AbstractProvider) -> None:
     global _provider
     if provider is None:
         raise GeneralError(error_message="No provider")
@@ -46,19 +46,19 @@ def get_evaluation_context() -> EvaluationContext:
     return _evaluation_context
 
 
-def set_evaluation_context(evaluation_context: EvaluationContext):
+def set_evaluation_context(evaluation_context: EvaluationContext) -> None:
     global _evaluation_context
     if evaluation_context is None:
         raise GeneralError(error_message="No api level evaluation context")
     _evaluation_context = evaluation_context
 
 
-def add_hooks(hooks: typing.List[Hook]):
+def add_hooks(hooks: typing.List[Hook]) -> None:
     global _hooks
     _hooks = _hooks + hooks
 
 
-def clear_hooks():
+def clear_hooks() -> None:
     global _hooks
     _hooks = []
 
@@ -68,5 +68,5 @@ def get_hooks() -> typing.List[Hook]:
     return _hooks
 
 
-def shutdown():
+def shutdown() -> None:
     _provider.shutdown()

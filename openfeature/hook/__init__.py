@@ -46,8 +46,11 @@ class Hook:
         return None
 
     def after(
-        self, hook_context: HookContext, details: FlagEvaluationDetails, hints: dict
-    ):
+        self,
+        hook_context: HookContext,
+        details: FlagEvaluationDetails[typing.Any],
+        hints: dict,
+    ) -> None:
         """
         Runs after a flag is resolved.
 
@@ -58,7 +61,9 @@ class Hook:
         """
         pass
 
-    def error(self, hook_context: HookContext, exception: Exception, hints: dict):
+    def error(
+        self, hook_context: HookContext, exception: Exception, hints: dict
+    ) -> None:
         """
         Run when evaluation encounters an error. Errors thrown will be swallowed.
 
@@ -68,7 +73,7 @@ class Hook:
         """
         pass
 
-    def finally_after(self, hook_context: HookContext, hints: dict):
+    def finally_after(self, hook_context: HookContext, hints: dict) -> None:
         """
         Run after flag evaluation, including any error processing.
         This will always run. Errors will be swallowed.
