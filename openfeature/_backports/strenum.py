@@ -1,7 +1,8 @@
 import sys
 
 if sys.version_info >= (3, 11):
-    from enum import StrEnum
+    # re-export needed for type checking
+    from enum import StrEnum as StrEnum
 else:
     from enum import Enum
 
