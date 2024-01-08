@@ -25,6 +25,11 @@ dev = ["pip-tools", "pytest", "pre-commit"]
 [project.urls]
 Homepage = "https://github.com/open-feature/python-sdk"
 
+[tool.mypy]
+files = "openfeature"
+namespace_packages = true
+explicit_package_bases = true
+
 [tool.ruff]
 exclude = [
     ".git",
