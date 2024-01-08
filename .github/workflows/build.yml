@@ -63,17 +63,23 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.0
+
+  sast:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: python
           config-file: ./.github/codeql-config.yml
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run pre-commit
-        uses: pre-commit/action@v3.0.0
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
