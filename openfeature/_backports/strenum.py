@@ -2,7 +2,7 @@ import sys
 
 if sys.version_info >= (3, 11):
     # re-export needed for type checking
-    from enum import StrEnum as StrEnum
+    from enum import StrEnum as StrEnum  # noqa: PLC0414
 else:
     from enum import Enum
 
