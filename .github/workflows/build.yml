@@ -46,7 +46,7 @@ jobs:
           behave tests/features/
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@c9e0f0b3cf5f112462339d69850c01735114b9ed
+        uses: codecov/codecov-action@c256d56669214045a65809a3e1cdc0eef01bdd9e
         with:
           flags: unittests # optional
           name: coverage # optional
