@@ -30,6 +30,32 @@ def test_evaluation_details_reason_should_be_a_string():
     assert error_code == flag_details.error_code
     assert error_message == flag_details.error_message
     assert reason == flag_details.reason
+    assert isinstance(flag_details.reason, str)
+
+
+def test_evaluation_details_reason_can_be_arbitrary_string():
+    # Given
+    flag_key = "my-flag"
+    flag_value = 100
+    variant = "1-hundred"
+    flag_metadata = {}
+    reason = "Non-standard reason"
+    error_code = ErrorCode.GENERAL
+    error_message = "message"
+
+    # When
+    flag_details = FlagEvaluationDetails(
+        flag_key,
+        flag_value,
+        variant,
+        flag_metadata,
+        reason,
+        error_code,
+        error_message,
+    )
+
+    # Then
+    assert reason == flag_details.reason
 
 
 def test_evaluation_details_reason_should_be_a_string_when_set():
@@ -54,3 +80,4 @@ def test_evaluation_details_reason_should_be_a_string_when_set():
 
     # Then
     assert Reason.STATIC == flag_details.reason  # noqa: SIM300
+    assert isinstance(flag_details.reason, str)

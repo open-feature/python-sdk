@@ -40,7 +40,7 @@ class FlagEvaluationDetails(typing.Generic[T_co]):
     value: T_co
     variant: typing.Optional[str] = None
     flag_metadata: FlagMetadata = field(default_factory=dict)
-    reason: typing.Optional[Reason] = None
+    reason: typing.Optional[typing.Union[str, Reason]] = None
     error_code: typing.Optional[ErrorCode] = None
     error_message: typing.Optional[str] = None
 
@@ -59,6 +59,6 @@ class FlagResolutionDetails(typing.Generic[U_co]):
     value: U_co
     error_code: typing.Optional[ErrorCode] = None
     error_message: typing.Optional[str] = None
-    reason: typing.Optional[Reason] = None
+    reason: typing.Optional[typing.Union[str, Reason]] = None
     variant: typing.Optional[str] = None
     flag_metadata: FlagMetadata = field(default_factory=dict)
