@@ -27,6 +27,8 @@ from openfeature.hook.hook_support import (
 from openfeature.provider.no_op_provider import NoOpProvider
 from openfeature.provider.provider import AbstractProvider
 
+logger = logging.getLogger("openfeature")
+
 GetDetailCallable = typing.Union[
     typing.Callable[
         [str, bool, typing.Optional[EvaluationContext]], FlagResolutionDetails[bool]
@@ -313,6 +315,12 @@ class OpenFeatureClient:
             return flag_evaluation
 
         except OpenFeatureError as err:
+            logger.exception(
+                "Error %s while evaluating flag with key: '%s'",
+                err.error_code,
+                flag_key,
+            )
+
             error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
             return FlagEvaluationDetails(
@@ -325,6 +333,10 @@ class OpenFeatureClient:
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
         except Exception as err:  # pragma: no cover
+            logger.exception(
+                "Unable to correctly evaluate flag with key: '%s'", flag_key
+            )
+
             error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
             error_message = getattr(err, "error_message", str(err))
@@ -363,7 +375,7 @@ class OpenFeatureClient:
         )
 
         if not self.provider:
-            logging.info("No provider configured, using no-op provider.")
+            logger.info("No provider configured, using no-op provider.")
             self.provider = NoOpProvider()
 
         get_details_callables: typing.Mapping[FlagType, GetDetailCallable] = {
