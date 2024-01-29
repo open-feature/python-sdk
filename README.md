@@ -187,7 +187,7 @@ client.get_boolean_flag("my-flag", False, flag_evaluation_options=options)
 
 ### Logging
 
-Logging customization is not yet available in the Python SDK.
+The OpenFeature SDK logs to the `openfeature` logger using the `logging` package from the Python Standard Library.
 
 ### Named clients
 

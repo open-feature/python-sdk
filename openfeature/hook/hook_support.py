@@ -6,6 +6,8 @@ from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
 from openfeature.hook import Hook, HookContext, HookType
 
+logger = logging.getLogger("openfeature")
+
 
 def error_hooks(
     flag_type: FlagType,
@@ -128,5 +130,5 @@ def _execute_hook_checked(
             getattr(hook, hook_method.value)(**kwargs),
         )
     except Exception:  # pragma: no cover
-        logging.error(f"Exception when running {hook_method.value} hooks")
+        logger.exception(f"Exception when running {hook_method.value} hooks")
         return None
