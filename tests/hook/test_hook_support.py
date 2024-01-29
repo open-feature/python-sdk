@@ -1,5 +1,8 @@
 from unittest.mock import ANY, MagicMock
 
+import pytest
+
+from openfeature.client import ClientMetadata
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
 from openfeature.hook import Hook, HookContext
@@ -10,6 +13,57 @@ from openfeature.hook.hook_support import (
     error_hooks,
 )
 from openfeature.immutable_dict.mapping_proxy_type import MappingProxyType
+from openfeature.provider.metadata import Metadata
+
+
+def test_hook_context_has_required_and_optional_fields():
+    """Requirement
+
+    4.1.1 - Hook context MUST provide: the "flag key", "flag value type", "evaluation context", and the "default value".
+    4.1.2 - The "hook context" SHOULD provide: access to the "client metadata" and the "provider metadata" fields.
+    """
+
+    # Given/When
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
+
+    # Then
+    assert hasattr(hook_context, "flag_key")
+    assert hasattr(hook_context, "flag_type")
+    assert hasattr(hook_context, "default_value")
+    assert hasattr(hook_context, "evaluation_context")
+    assert hasattr(hook_context, "client_metadata")
+    assert hasattr(hook_context, "provider_metadata")
+
+
+def test_hook_context_has_immutable_and_mutable_fields():
+    """Requirement
+
+    4.1.3 - The "flag key", "flag type", and "default value" properties MUST be immutable.
+    4.1.4.1 - The evaluation context MUST be mutable only within the before hook.
+    """
+
+    # Given
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
+
+    # When
+    with pytest.raises(AttributeError):
+        hook_context.flag_key = "new_key"
+    with pytest.raises(AttributeError):
+        hook_context.flag_type = FlagType.STRING
+    with pytest.raises(AttributeError):
+        hook_context.default_value = "new_value"
+
+    hook_context.evaluation_context = EvaluationContext("targeting_key")
+    hook_context.client_metadata = ClientMetadata("name")
+    hook_context.provider_metadata = Metadata("name")
+
+    # Then
+    assert hook_context.flag_key == "flag_key"
+    assert hook_context.flag_type is FlagType.BOOLEAN
+    assert hook_context.default_value is True
+    assert hook_context.evaluation_context.targeting_key == "targeting_key"
+    assert hook_context.client_metadata.name == "name"
+    assert hook_context.provider_metadata.name == "name"
 
 
 def test_error_hooks_run_error_method(mock_hook):

@@ -29,6 +29,11 @@ class HookContext:
     client_metadata: typing.Optional[ClientMetadata] = None
     provider_metadata: typing.Optional[Metadata] = None
 
+    def __setattr__(self, key: str, value: typing.Any) -> None:
+        if hasattr(self, key) and key in ("flag_key", "flag_type", "default_value"):
+            raise AttributeError(f"Attribute {key!r} is immutable")
+        super().__setattr__(key, value)
+
 
 class Hook:
     def before(
