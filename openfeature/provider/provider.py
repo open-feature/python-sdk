@@ -4,10 +4,11 @@ from abc import abstractmethod
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.hook import Hook
+from openfeature.provider import FeatureProvider
 from openfeature.provider.metadata import Metadata
 
 
-class AbstractProvider:
+class AbstractProvider(FeatureProvider):
     def initialize(self, evaluation_context: EvaluationContext) -> None:
         pass
 

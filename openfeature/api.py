@@ -4,11 +4,11 @@ from openfeature.client import OpenFeatureClient
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import GeneralError
 from openfeature.hook import Hook
+from openfeature.provider import FeatureProvider
 from openfeature.provider.metadata import Metadata
 from openfeature.provider.no_op_provider import NoOpProvider
-from openfeature.provider.provider import AbstractProvider
 
-_provider: AbstractProvider = NoOpProvider()
+_provider: FeatureProvider = NoOpProvider()
 
 _evaluation_context = EvaluationContext()
 
@@ -21,7 +21,7 @@ def get_client(
     return OpenFeatureClient(name=name, version=version, provider=_provider)
 
 
-def set_provider(provider: AbstractProvider) -> None:
+def set_provider(provider: FeatureProvider) -> None:
     global _provider
     if provider is None:
         raise GeneralError(error_message="No provider")
@@ -31,7 +31,7 @@ def set_provider(provider: AbstractProvider) -> None:
     provider.initialize(_evaluation_context)
 
 
-def get_provider() -> typing.Optional[AbstractProvider]:
+def get_provider() -> typing.Optional[FeatureProvider]:
     global _provider
     return _provider
 

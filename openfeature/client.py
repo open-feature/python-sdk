@@ -24,8 +24,8 @@ from openfeature.hook.hook_support import (
     before_hooks,
     error_hooks,
 )
+from openfeature.provider import FeatureProvider
 from openfeature.provider.no_op_provider import NoOpProvider
-from openfeature.provider.provider import AbstractProvider
 
 logger = logging.getLogger("openfeature")
 
@@ -69,7 +69,7 @@ class OpenFeatureClient:
         self,
         name: typing.Optional[str],
         version: typing.Optional[str],
-        provider: AbstractProvider,
+        provider: FeatureProvider,
         context: typing.Optional[EvaluationContext] = None,
         hooks: typing.Optional[typing.List[Hook]] = None,
     ) -> None:
