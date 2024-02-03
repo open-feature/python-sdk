@@ -7,7 +7,7 @@ from openfeature.hook import Hook
 from .metadata import Metadata
 
 
-class FeatureProvider(typing.Protocol):
+class FeatureProvider(typing.Protocol):  # pragma: no cover
     def initialize(self, evaluation_context: EvaluationContext) -> None:
         ...
 
