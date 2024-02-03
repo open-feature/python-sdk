@@ -13,8 +13,8 @@
 <!-- The 'github-badges' class is used in the docs -->
 <p align="center" class="github-badges">
 
-  <a href="https://github.com/open-feature/spec/releases/tag/v0.3.0">
-    <img alt="Specification" src="https://img.shields.io/static/v1?label=Specification&message=v0.3.0&color=red&style=for-the-badge" />
+  <a href="https://github.com/open-feature/spec/releases/tag/v0.5.2">
+    <img alt="Specification" src="https://img.shields.io/static/v1?label=Specification&message=v0.5.2&color=red&style=for-the-badge" />
   </a>
 
   <!-- x-release-please-start-version -->
