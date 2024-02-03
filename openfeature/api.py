@@ -31,12 +31,12 @@ def set_provider(provider: FeatureProvider) -> None:
     provider.initialize(_evaluation_context)
 
 
-def get_provider() -> typing.Optional[FeatureProvider]:
+def get_provider() -> FeatureProvider:
     global _provider
     return _provider
 
 
-def get_provider_metadata() -> typing.Optional[Metadata]:
+def get_provider_metadata() -> Metadata:
     global _provider
     return _provider.get_metadata()
 

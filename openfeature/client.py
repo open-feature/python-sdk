@@ -25,7 +25,6 @@ from openfeature.hook.hook_support import (
     error_hooks,
 )
 from openfeature.provider import FeatureProvider
-from openfeature.provider.no_op_provider import NoOpProvider
 
 logger = logging.getLogger("openfeature")
 
@@ -373,10 +372,6 @@ class OpenFeatureClient:
             default_value,
             evaluation_context,
         )
-
-        if not self.provider:
-            logger.info("No provider configured, using no-op provider.")
-            self.provider = NoOpProvider()
 
         get_details_callables: typing.Mapping[FlagType, GetDetailCallable] = {
             FlagType.BOOLEAN: self.provider.resolve_boolean_details,
