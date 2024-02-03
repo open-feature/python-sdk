@@ -14,31 +14,52 @@ _evaluation_context = EvaluationContext()
 
 _hooks: typing.List[Hook] = []
 
+_providers: typing.Dict[str, FeatureProvider] = {}
+
 
 def get_client(
-    name: typing.Optional[str] = None, version: typing.Optional[str] = None
+    domain: typing.Optional[str] = None, version: typing.Optional[str] = None
 ) -> OpenFeatureClient:
-    return OpenFeatureClient(name=name, version=version, provider=_provider)
+    return OpenFeatureClient(domain=domain, version=version)
 
 
-def set_provider(provider: FeatureProvider) -> None:
-    global _provider
+def set_provider(
+    provider: FeatureProvider, domain: typing.Optional[str] = None
+) -> None:
     if provider is None:
         raise GeneralError(error_message="No provider")
+
+    if domain:
+        _set_domain_provider(domain, provider)
+        return
+
+    global _provider
     if _provider:
         _provider.shutdown()
     _provider = provider
     provider.initialize(_evaluation_context)
 
 
-def get_provider() -> FeatureProvider:
-    global _provider
-    return _provider
+def _set_domain_provider(domain: str, provider: FeatureProvider) -> None:
+    if domain in _providers:
+        old_provider = _providers[domain]
+        del _providers[domain]
+        if old_provider not in _providers.values():
+            old_provider.shutdown()
+    if provider not in _providers.values():
+        provider.initialize(_evaluation_context)
+    _providers[domain] = provider
 
 
-def get_provider_metadata() -> Metadata:
+def get_provider(domain: typing.Optional[str] = None) -> FeatureProvider:
     global _provider
-    return _provider.get_metadata()
+    if domain is None:
+        return _provider
+    return _providers.get(domain, _provider)
+
+
+def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
+    return get_provider(domain).get_metadata()
 
 
 def get_evaluation_context() -> EvaluationContext:

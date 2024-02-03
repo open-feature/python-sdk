@@ -27,7 +27,7 @@ def step_impl(context, flag_type, key, expected_reason):
 @given("a provider is registered with cache disabled")
 def step_impl(context):
     set_provider(InMemoryProvider(IN_MEMORY_FLAGS))
-    context.client = get_client(name="Default Provider", version="1.0")
+    context.client = get_client()
 
 
 @when(
@@ -35,7 +35,7 @@ def step_impl(context):
     '"{default_value}"'
 )
 def step_impl(context, flag_type, key, default_value):
-    context.client = get_client(name="Default Provider", version="1.0")
+    context.client = get_client()
     if flag_type == "boolean":
         context.boolean_flag_details = context.client.get_boolean_details(
             key, default_value
