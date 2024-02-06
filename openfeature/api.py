@@ -51,7 +51,7 @@ def _set_domain_provider(domain: str, provider: FeatureProvider) -> None:
     _providers[domain] = provider
 
 
-def get_provider(domain: typing.Optional[str] = None) -> FeatureProvider:
+def _get_provider(domain: typing.Optional[str] = None) -> FeatureProvider:
     global _provider
     if domain is None:
         return _provider
@@ -65,7 +65,7 @@ def clear_providers() -> None:
 
 
 def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
-    return get_provider(domain).get_metadata()
+    return _get_provider(domain).get_metadata()
 
 
 def get_evaluation_context() -> EvaluationContext:

@@ -8,7 +8,6 @@ from openfeature.api import (
     get_client,
     get_evaluation_context,
     get_hooks,
-    get_provider,
     get_provider_metadata,
     set_evaluation_context,
     set_provider,
@@ -78,18 +77,6 @@ def test_should_invoke_provider_shutdown_function_once_provider_is_no_longer_in_
 
     # Then
     assert provider_1.shutdown.called
-
-
-def test_should_return_a_provider_if_setup_correctly():
-    # Given
-    set_provider(NoOpProvider())
-
-    # When
-    provider = get_provider()
-
-    # Then
-    assert provider
-    assert isinstance(provider, NoOpProvider)
 
 
 def test_should_retrieve_metadata_for_configured_provider():
