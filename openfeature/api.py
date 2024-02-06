@@ -58,6 +58,12 @@ def get_provider(domain: typing.Optional[str] = None) -> FeatureProvider:
     return _providers.get(domain, _provider)
 
 
+def clear_providers() -> None:
+    for provider in _providers.values():
+        provider.shutdown()
+    _providers.clear()
+
+
 def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
     return get_provider(domain).get_metadata()
 
