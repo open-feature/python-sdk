@@ -13,8 +13,8 @@
 <!-- The 'github-badges' class is used in the docs -->
 <p align="center" class="github-badges">
 
-  <a href="https://github.com/open-feature/spec/releases/tag/v0.3.0">
-    <img alt="Specification" src="https://img.shields.io/static/v1?label=Specification&message=v0.3.0&color=red&style=for-the-badge" />
+  <a href="https://github.com/open-feature/spec/releases/tag/v0.5.2">
+    <img alt="Specification" src="https://img.shields.io/static/v1?label=Specification&message=v0.5.2&color=red&style=for-the-badge" />
   </a>
 
   <!-- x-release-please-start-version -->
@@ -104,7 +104,7 @@ print("Value: " + str(flag_value))
 | ✅      | [Providers](#providers)         | Integrate with a commercial, open source, or in-house feature management tool.                                                     |
 | ✅      | [Targeting](#targeting)         | Contextually-aware flag evaluation using [evaluation context](https://openfeature.dev/docs/reference/concepts/evaluation-context). |
 | ✅      | [Hooks](#hooks)                 | Add functionality to various stages of the flag evaluation life-cycle.                                                             |
-| ❌      | [Logging](#logging)             | Integrate with popular logging packages.                                                                                           |
+| ✅      | [Logging](#logging)             | Integrate with popular logging packages.                                                                                           |
 | ❌      | [Named clients](#named-clients) | Utilize multiple providers in a single application.                                                                                |
 | ❌      | [Eventing](#eventing)           | React to state changes in the provider or flag management system.                                                                  |
 | ✅      | [Shutdown](#shutdown)           | Gracefully clean up a provider during application shutdown.                                                                        |
