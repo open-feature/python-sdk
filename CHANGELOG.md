@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.4.2](https://github.com/open-feature/python-sdk/compare/v0.4.1...v0.4.2) (2024-02-06)
+
+
+### Features
+
+* add FeatureProvider protocol ([#268](https://github.com/open-feature/python-sdk/issues/268)) ([caa7f36](https://github.com/open-feature/python-sdk/commit/caa7f36c309149bd8d91c214e85f382b026093f6))
+* improve logging setup ([#261](https://github.com/open-feature/python-sdk/issues/261)) ([ccbff2c](https://github.com/open-feature/python-sdk/commit/ccbff2c5e46f69274230fc5ddc3cfb90a283d013))
+* make return value not optional in provider API functions ([#270](https://github.com/open-feature/python-sdk/issues/270)) ([cb1677b](https://github.com/open-feature/python-sdk/commit/cb1677b0a826ad496f1ffa1074018f1400d84c80))
+* make specific fields in HookContext immutable ([#266](https://github.com/open-feature/python-sdk/issues/266)) ([3b89760](https://github.com/open-feature/python-sdk/commit/3b89760d4127a997dadbee920d0e066b2bf08e84))
+
+
+### Bug Fixes
+
+* Allow string values for `FlagEvaluationDetails.reason` and  `FlagResolutionDetails.reason` ([#264](https://github.com/open-feature/python-sdk/issues/264)) ([5ef6ca1](https://github.com/open-feature/python-sdk/commit/5ef6ca1263d2cebdc7c16177fc182eccd56bae2f))
+
+
+### Documentation
+
+* document shutdown function ([#237](https://github.com/open-feature/python-sdk/issues/237)) ([95d69e2](https://github.com/open-feature/python-sdk/commit/95d69e27b3f6b9cb9f716ae4b2d5b0879c0253e3))
+* update supported spec version ([#269](https://github.com/open-feature/python-sdk/issues/269)) ([1282bab](https://github.com/open-feature/python-sdk/commit/1282bab31ea6a554911a9d37c4c4d3e14ffa5133))
+
 ## [0.4.1](https://github.com/open-feature/python-sdk/compare/v0.4.0...v0.4.1) (2023-11-08)
 
 
