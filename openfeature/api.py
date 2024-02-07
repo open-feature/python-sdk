@@ -96,4 +96,5 @@ def get_hooks() -> typing.List[Hook]:
 
 
 def shutdown() -> None:
-    _provider.shutdown()
+    for provider in {_provider, *_providers.values()}:
+        provider.shutdown()

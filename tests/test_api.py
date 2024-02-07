@@ -193,3 +193,20 @@ def test_should_not_shutdown_provider_bound_to_another_domain():
     set_provider(other_provider, "foo")
 
     provider.shutdown.assert_not_called()
+
+
+def test_shutdown_should_shutdown_every_registered_provider_once():
+    # Given
+    provider_1 = MagicMock(spec=FeatureProvider)
+    provider_2 = MagicMock(spec=FeatureProvider)
+    set_provider(provider_1)
+    set_provider(provider_1, "foo")
+    set_provider(provider_2, "bar")
+    set_provider(provider_2, "baz")
+
+    # When
+    shutdown()
+
+    # Then
+    provider_1.shutdown.assert_called_once()
+    provider_2.shutdown.assert_called_once()
