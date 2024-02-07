@@ -6,15 +6,13 @@ from openfeature.exception import GeneralError
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
 from openfeature.provider.metadata import Metadata
-from openfeature.provider.no_op_provider import NoOpProvider
-
-_provider: FeatureProvider = NoOpProvider()
+from openfeature.provider.registry import ProviderRegistry
 
 _evaluation_context = EvaluationContext()
 
 _hooks: typing.List[Hook] = []
 
-_providers: typing.Dict[str, FeatureProvider] = {}
+_provider_registry: ProviderRegistry = ProviderRegistry()
 
 
 def get_client(
@@ -26,46 +24,18 @@ def get_client(
 def set_provider(
     provider: FeatureProvider, domain: typing.Optional[str] = None
 ) -> None:
-    if provider is None:
-        raise GeneralError(error_message="No provider")
-
-    if domain:
-        _set_domain_provider(domain, provider)
-        return
-
-    global _provider
-    if _provider:
-        _provider.shutdown()
-    _provider = provider
-    provider.initialize(_evaluation_context)
-
-
-def _set_domain_provider(domain: str, provider: FeatureProvider) -> None:
-    if domain in _providers:
-        old_provider = _providers[domain]
-        del _providers[domain]
-        if old_provider not in _providers.values():
-            old_provider.shutdown()
-    if provider not in _providers.values():
-        provider.initialize(_evaluation_context)
-    _providers[domain] = provider
-
-
-def _get_provider(domain: typing.Optional[str] = None) -> FeatureProvider:
-    global _provider
     if domain is None:
-        return _provider
-    return _providers.get(domain, _provider)
+        _provider_registry.set_default_provider(provider)
+    else:
+        _provider_registry.set_provider(domain, provider)
 
 
 def clear_providers() -> None:
-    for provider in _providers.values():
-        provider.shutdown()
-    _providers.clear()
+    return _provider_registry.clear_providers()
 
 
 def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
-    return _get_provider(domain).get_metadata()
+    return _provider_registry.get_provider(domain).get_metadata()
 
 
 def get_evaluation_context() -> EvaluationContext:
@@ -96,5 +66,4 @@ def get_hooks() -> typing.List[Hook]:
 
 
 def shutdown() -> None:
-    for provider in {_provider, *_providers.values()}:
-        provider.shutdown()
+    _provider_registry.shutdown()

@@ -79,7 +79,7 @@ class OpenFeatureClient:
 
     @property
     def provider(self) -> FeatureProvider:
-        return api._get_provider(domain=self.domain)
+        return api._provider_registry.get_provider(self.domain)
 
     def get_metadata(self) -> ClientMetadata:
         return ClientMetadata(domain=self.domain)
