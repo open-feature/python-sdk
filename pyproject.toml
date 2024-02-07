@@ -72,7 +72,6 @@ select = [
 ignore = [
     "E501", # the formatter will handle any too long line
 ]
-preview = true
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*" = ["PLR0913", "S101"]
