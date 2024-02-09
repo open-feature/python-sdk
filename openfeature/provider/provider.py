@@ -19,7 +19,6 @@ class AbstractProvider(FeatureProvider):
     def get_metadata(self) -> Metadata:
         pass
 
-    @abstractmethod
     def get_provider_hooks(self) -> typing.List[Hook]:
         return []
 
