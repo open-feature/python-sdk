@@ -44,9 +44,9 @@ class ProviderRegistry:
         return self._default_provider
 
     def clear_providers(self) -> None:
-        for provider in self._providers.values():
-            provider.shutdown()
+        self.shutdown()
         self._providers.clear()
+        self._default_provider = NoOpProvider()
 
     def shutdown(self) -> None:
         for provider in {self._default_provider, *self._providers.values()}:

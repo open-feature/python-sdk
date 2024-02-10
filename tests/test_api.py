@@ -5,6 +5,7 @@ import pytest
 from openfeature.api import (
     add_hooks,
     clear_hooks,
+    clear_providers,
     get_client,
     get_evaluation_context,
     get_hooks,
@@ -210,3 +211,20 @@ def test_shutdown_should_shutdown_every_registered_provider_once():
     # Then
     provider_1.shutdown.assert_called_once()
     provider_2.shutdown.assert_called_once()
+
+
+def test_clear_providers_shutdowns_every_provider_and_resets_default_provider():
+    # Given
+    provider_1 = MagicMock(spec=FeatureProvider)
+    provider_2 = MagicMock(spec=FeatureProvider)
+    set_provider(provider_1)
+    set_provider(provider_2, "foo")
+    set_provider(provider_2, "bar")
+
+    # When
+    clear_providers()
+
+    # Then
+    provider_1.shutdown.assert_called_once()
+    provider_2.shutdown.assert_called_once()
+    assert isinstance(get_client().provider, NoOpProvider)
