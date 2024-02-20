@@ -5,10 +5,10 @@ import pytest
 from openfeature.api import (
     add_hooks,
     clear_hooks,
+    clear_providers,
     get_client,
     get_evaluation_context,
     get_hooks,
-    get_provider,
     get_provider_metadata,
     set_evaluation_context,
     set_provider,
@@ -26,11 +26,9 @@ def test_should_not_raise_exception_with_noop_client():
     # Given
     # No provider has been set
     # When
-    client = get_client(name="Default Provider", version="1.0")
+    client = get_client()
 
     # Then
-    assert client.name == "Default Provider"
-    assert client.version == "1.0"
     assert isinstance(client.provider, NoOpProvider)
 
 
@@ -39,11 +37,9 @@ def test_should_return_open_feature_client_when_configured_correctly():
     set_provider(NoOpProvider())
 
     # When
-    client = get_client(name="No-op Provider", version="1.0")
+    client = get_client()
 
     # Then
-    assert client.name == "No-op Provider"
-    assert client.version == "1.0"
     assert isinstance(client.provider, NoOpProvider)
 
 
@@ -82,18 +78,6 @@ def test_should_invoke_provider_shutdown_function_once_provider_is_no_longer_in_
 
     # Then
     assert provider_1.shutdown.called
-
-
-def test_should_return_a_provider_if_setup_correctly():
-    # Given
-    set_provider(NoOpProvider())
-
-    # When
-    provider = get_provider()
-
-    # Then
-    assert provider
-    assert isinstance(provider, NoOpProvider)
 
 
 def test_should_retrieve_metadata_for_configured_provider():
@@ -156,3 +140,91 @@ def test_should_call_provider_shutdown_on_api_shutdown():
 
     # Then
     assert provider.shutdown.called
+
+
+def test_should_provide_a_function_to_bind_provider_through_domain():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    test_client = get_client("test")
+    default_client = get_client()
+
+    # When
+    set_provider(provider, domain="test")
+
+    # Then
+    assert default_client.provider != provider
+    assert default_client.domain is None
+
+    assert test_client.provider == provider
+    assert test_client.domain == "test"
+
+
+def test_should_not_initialize_provider_already_bound_to_another_domain():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    set_provider(provider, "foo")
+
+    # When
+    set_provider(provider, "bar")
+
+    # Then
+    provider.initialize.assert_called_once()
+
+
+def test_should_shutdown_unbound_provider():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    set_provider(provider, "foo")
+
+    # When
+    other_provider = MagicMock(spec=FeatureProvider)
+    set_provider(other_provider, "foo")
+
+    provider.shutdown.assert_called_once()
+
+
+def test_should_not_shutdown_provider_bound_to_another_domain():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    set_provider(provider, "foo")
+    set_provider(provider, "bar")
+
+    # When
+    other_provider = MagicMock(spec=FeatureProvider)
+    set_provider(other_provider, "foo")
+
+    provider.shutdown.assert_not_called()
+
+
+def test_shutdown_should_shutdown_every_registered_provider_once():
+    # Given
+    provider_1 = MagicMock(spec=FeatureProvider)
+    provider_2 = MagicMock(spec=FeatureProvider)
+    set_provider(provider_1)
+    set_provider(provider_1, "foo")
+    set_provider(provider_2, "bar")
+    set_provider(provider_2, "baz")
+
+    # When
+    shutdown()
+
+    # Then
+    provider_1.shutdown.assert_called_once()
+    provider_2.shutdown.assert_called_once()
+
+
+def test_clear_providers_shutdowns_every_provider_and_resets_default_provider():
+    # Given
+    provider_1 = MagicMock(spec=FeatureProvider)
+    provider_2 = MagicMock(spec=FeatureProvider)
+    set_provider(provider_1)
+    set_provider(provider_2, "foo")
+    set_provider(provider_2, "bar")
+
+    # When
+    clear_providers()
+
+    # Then
+    provider_1.shutdown.assert_called_once()
+    provider_2.shutdown.assert_called_once()
+    assert isinstance(get_client().provider, NoOpProvider)

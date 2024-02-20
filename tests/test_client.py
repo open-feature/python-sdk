@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from openfeature.api import add_hooks, clear_hooks
+from openfeature.api import add_hooks, clear_hooks, set_provider
 from openfeature.client import OpenFeatureClient
 from openfeature.exception import ErrorCode, OpenFeatureError
 from openfeature.flag_evaluation import Reason
@@ -109,7 +109,9 @@ def test_should_pass_flag_metadata_from_resolution_to_evaluation_details():
             )
         }
     )
-    client = OpenFeatureClient("my-client", None, provider)
+    set_provider(provider, "my-client")
+
+    client = OpenFeatureClient("my-client", None)
 
     # When
     details = client.get_boolean_details(flag_key="Key", default_value=False)
@@ -158,14 +160,14 @@ def test_should_handle_an_open_feature_exception_thrown_by_a_provider(
     assert flag_details.error_message == "error_message"
 
 
-def test_should_return_client_metadata_with_name():
+def test_should_return_client_metadata_with_domain():
     # Given
     client = OpenFeatureClient("my-client", None, NoOpProvider())
     # When
     metadata = client.get_metadata()
     # Then
     assert metadata is not None
-    assert metadata.name == "my-client"
+    assert metadata.domain == "my-client"
 
 
 def test_should_call_api_level_hooks(no_op_provider_client):

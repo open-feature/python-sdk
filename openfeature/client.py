@@ -60,26 +60,29 @@ TypeMap = typing.Dict[
 
 @dataclass
 class ClientMetadata:
-    name: typing.Optional[str]
+    name: typing.Optional[str] = None
+    domain: typing.Optional[str] = None
 
 
 class OpenFeatureClient:
     def __init__(
         self,
-        name: typing.Optional[str],
+        domain: typing.Optional[str],
         version: typing.Optional[str],
-        provider: FeatureProvider,
         context: typing.Optional[EvaluationContext] = None,
         hooks: typing.Optional[typing.List[Hook]] = None,
     ) -> None:
-        self.name = name
+        self.domain = domain
         self.version = version
         self.context = context or EvaluationContext()
         self.hooks = hooks or []
-        self.provider = provider
+
+    @property
+    def provider(self) -> FeatureProvider:
+        return api._provider_registry.get_provider(self.domain)
 
     def get_metadata(self) -> ClientMetadata:
-        return ClientMetadata(name=self.name)
+        return ClientMetadata(domain=self.domain)
 
     def add_hooks(self, hooks: typing.List[Hook]) -> None:
         self.hooks = self.hooks + hooks

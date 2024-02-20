@@ -6,39 +6,36 @@ from openfeature.exception import GeneralError
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
 from openfeature.provider.metadata import Metadata
-from openfeature.provider.no_op_provider import NoOpProvider
-
-_provider: FeatureProvider = NoOpProvider()
+from openfeature.provider.registry import ProviderRegistry
 
 _evaluation_context = EvaluationContext()
 
 _hooks: typing.List[Hook] = []
 
+_provider_registry: ProviderRegistry = ProviderRegistry()
+
 
 def get_client(
-    name: typing.Optional[str] = None, version: typing.Optional[str] = None
+    domain: typing.Optional[str] = None, version: typing.Optional[str] = None
 ) -> OpenFeatureClient:
-    return OpenFeatureClient(name=name, version=version, provider=_provider)
+    return OpenFeatureClient(domain=domain, version=version)
 
 
-def set_provider(provider: FeatureProvider) -> None:
-    global _provider
-    if provider is None:
-        raise GeneralError(error_message="No provider")
-    if _provider:
-        _provider.shutdown()
-    _provider = provider
-    provider.initialize(_evaluation_context)
+def set_provider(
+    provider: FeatureProvider, domain: typing.Optional[str] = None
+) -> None:
+    if domain is None:
+        _provider_registry.set_default_provider(provider)
+    else:
+        _provider_registry.set_provider(domain, provider)
 
 
-def get_provider() -> FeatureProvider:
-    global _provider
-    return _provider
+def clear_providers() -> None:
+    return _provider_registry.clear_providers()
 
 
-def get_provider_metadata() -> Metadata:
-    global _provider
-    return _provider.get_metadata()
+def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
+    return _provider_registry.get_provider(domain).get_metadata()
 
 
 def get_evaluation_context() -> EvaluationContext:
@@ -69,4 +66,4 @@ def get_hooks() -> typing.List[Hook]:
 
 
 def shutdown() -> None:
-    _provider.shutdown()
+    _provider_registry.shutdown()

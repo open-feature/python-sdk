@@ -105,7 +105,7 @@ print("Value: " + str(flag_value))
 | ✅      | [Targeting](#targeting)         | Contextually-aware flag evaluation using [evaluation context](https://openfeature.dev/docs/reference/concepts/evaluation-context). |
 | ✅      | [Hooks](#hooks)                 | Add functionality to various stages of the flag evaluation life-cycle.                                                             |
 | ✅      | [Logging](#logging)             | Integrate with popular logging packages.                                                                                           |
-| ❌      | [Named clients](#named-clients) | Utilize multiple providers in a single application.                                                                                |
+| ✅      | [Domains](#domains)             | Logically bind clients with providers.                                                                                             |
 | ❌      | [Eventing](#eventing)           | React to state changes in the provider or flag management system.                                                                  |
 | ✅      | [Shutdown](#shutdown)           | Gracefully clean up a provider during application shutdown.                                                                        |
 | ✅      | [Extending](#extending)         | Extend OpenFeature with custom providers and hooks.                                                                                |
@@ -128,8 +128,8 @@ api.set_provider(NoOpProvider())
 open_feature_client = api.get_client()
 ```
 
-<!-- In some situations, it may be beneficial to register multiple providers in the same application.
-This is possible using [named clients](#named-clients), which is covered in more detail below. -->
+In some situations, it may be beneficial to register multiple providers in the same application.
+This is possible using [domains](#domains), which is covered in more detail below.
 
 ### Targeting
 
@@ -189,9 +189,28 @@ client.get_boolean_flag("my-flag", False, flag_evaluation_options=options)
 
 The OpenFeature SDK logs to the `openfeature` logger using the `logging` package from the Python Standard Library.
 
-### Named clients
+### Domains
 
-Named clients are not yet available in the Python SDK. Progress on this feature can be tracked [here](https://github.com/open-feature/python-sdk/issues/125).
+Clients can be assigned to a domain.
+A domain is a logical identifier which can be used to associate clients with a particular provider.
+If a domain has no associated provider, the global provider is used.
+
+```python
+from openfeature import api
+
+# Registering the default provider
+api.set_provider(MyProvider());
+# Registering a provider to a domain
+api.set_provider(MyProvider(), "my-domain");
+
+# A client bound to the default provider
+default_client = api.get_client();
+# A client bound to the MyProvider provider
+domain_scoped_client = api.get_client("my-domain");
+```
+
+Domains can be defined on a provider during registration.
+For more details, please refer to the [providers](#providers) section.
 
 ### Eventing
 
