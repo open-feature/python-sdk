@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.5.0](https://github.com/open-feature/python-sdk/compare/v0.4.2...v0.5.0) (2024-02-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* add support for domains ([#271](https://github.com/open-feature/python-sdk/issues/271))
+
+### Features
+
+* add support for domains ([#271](https://github.com/open-feature/python-sdk/issues/271)) ([ed6a42f](https://github.com/open-feature/python-sdk/commit/ed6a42f264a6efc149642181bfc4c6de0eb83ce1))
+
 ## [0.4.2](https://github.com/open-feature/python-sdk/compare/v0.4.1...v0.4.2) (2024-02-06)
 
 
