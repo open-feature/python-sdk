@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Union
 
+from openfeature.exception import ErrorCode
 from openfeature.provider import FeatureProvider
 
 if TYPE_CHECKING:
@@ -20,6 +21,7 @@ class ProviderEvent(Enum):
 class ProviderEventDetails:
     flags_changed: Optional[List[str]] = None
     message: Optional[str] = None
+    error_code: Optional[ErrorCode] = None
     metadata: Dict[str, Union[bool, str, int, float]] = field(default_factory=dict)
 
 
@@ -28,6 +30,7 @@ class EventDetails(ProviderEventDetails):
     provider_name: str = ""
     flags_changed: Optional[List[str]] = None
     message: Optional[str] = None
+    error_code: Optional[ErrorCode] = None
     metadata: Dict[str, Union[bool, str, int, float]] = field(default_factory=dict)
 
     @classmethod
@@ -38,6 +41,7 @@ class EventDetails(ProviderEventDetails):
             provider_name=provider_name,
             flags_changed=details.flags_changed,
             message=details.message,
+            error_code=details.error_code,
             metadata=details.metadata,
         )
 
