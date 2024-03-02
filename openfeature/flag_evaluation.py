@@ -6,7 +6,8 @@ from dataclasses import dataclass, field
 from openfeature._backports.strenum import StrEnum
 from openfeature.exception import ErrorCode
 
-if typing.TYPE_CHECKING:  # resolves a circular dependency in type annotations
+if typing.TYPE_CHECKING:  # pragma: no cover
+    # resolves a circular dependency in type annotations
     from openfeature.hook import Hook, HookHints
 
 
