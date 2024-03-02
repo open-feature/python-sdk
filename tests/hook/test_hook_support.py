@@ -40,10 +40,14 @@ def test_hook_context_has_immutable_and_mutable_fields():
 
     4.1.3 - The "flag key", "flag type", and "default value" properties MUST be immutable.
     4.1.4.1 - The evaluation context MUST be mutable only within the before hook.
+    4.2.2.2 - The client "metadata" field in the "hook context" MUST be immutable.
+    4.2.2.3 - The provider "metadata" field in the "hook context" MUST be immutable.
     """
 
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
+    hook_context = HookContext(
+        "flag_key", FlagType.BOOLEAN, True, EvaluationContext(), ClientMetadata("name")
+    )
 
     # When
     with pytest.raises(AttributeError):
@@ -52,10 +56,12 @@ def test_hook_context_has_immutable_and_mutable_fields():
         hook_context.flag_type = FlagType.STRING
     with pytest.raises(AttributeError):
         hook_context.default_value = "new_value"
+    with pytest.raises(AttributeError):
+        hook_context.client_metadata = ClientMetadata("new_name")
+    with pytest.raises(AttributeError):
+        hook_context.provider_metadata = Metadata("name")
 
     hook_context.evaluation_context = EvaluationContext("targeting_key")
-    hook_context.client_metadata = ClientMetadata("name")
-    hook_context.provider_metadata = Metadata("name")
 
     # Then
     assert hook_context.flag_key == "flag_key"
@@ -63,7 +69,7 @@ def test_hook_context_has_immutable_and_mutable_fields():
     assert hook_context.default_value is True
     assert hook_context.evaluation_context.targeting_key == "targeting_key"
     assert hook_context.client_metadata.name == "name"
-    assert hook_context.provider_metadata.name == "name"
+    assert hook_context.provider_metadata is None
 
 
 def test_error_hooks_run_error_method(mock_hook):
