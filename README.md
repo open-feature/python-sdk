@@ -235,10 +235,12 @@ This can be a new repository or included in [the existing contrib repository](ht
 You’ll then need to write the provider by implementing the `AbstractProvider` class exported by the OpenFeature SDK.
 
 ```python
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagResolutionDetails
+from openfeature.hook import Hook
+from openfeature.provider.metadata import Metadata
 from openfeature.provider.provider import AbstractProvider
 
 class MyProvider(AbstractProvider):
