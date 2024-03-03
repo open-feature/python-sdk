@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
@@ -36,7 +38,7 @@ class EventDetails(ProviderEventDetails):
     @classmethod
     def from_provider_event_details(
         cls, provider_name: str, details: ProviderEventDetails
-    ) -> "EventDetails":
+    ) -> EventDetails:
         return cls(
             provider_name=provider_name,
             flags_changed=details.flags_changed,
@@ -51,14 +53,14 @@ EventHandler = Callable[[EventDetails], None]
 
 class EventSupport:
     _global_handlers: Dict[ProviderEvent, List[EventHandler]]
-    _client_handlers: Dict["OpenFeatureClient", Dict[ProviderEvent, List[EventHandler]]]
+    _client_handlers: Dict[OpenFeatureClient, Dict[ProviderEvent, List[EventHandler]]]
 
     def __init__(self) -> None:
         self._global_handlers = defaultdict(list)
         self._client_handlers = defaultdict(lambda: defaultdict(list))
 
     def run_client_handlers(
-        self, client: "OpenFeatureClient", event: ProviderEvent, details: EventDetails
+        self, client: OpenFeatureClient, event: ProviderEvent, details: EventDetails
     ) -> None:
         for handler in self._client_handlers[client][event]:
             handler(details)
@@ -68,13 +70,13 @@ class EventSupport:
             handler(details)
 
     def add_client_handler(
-        self, client: "OpenFeatureClient", event: ProviderEvent, handler: EventHandler
+        self, client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
     ) -> None:
         handlers = self._client_handlers[client][event]
         handlers.append(handler)
 
     def remove_client_handler(
-        self, client: "OpenFeatureClient", event: ProviderEvent, handler: EventHandler
+        self, client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
     ) -> None:
         handlers = self._client_handlers[client][event]
         handlers.remove(handler)
