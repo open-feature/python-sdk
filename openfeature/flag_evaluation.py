@@ -6,8 +6,9 @@ from dataclasses import dataclass, field
 from openfeature._backports.strenum import StrEnum
 from openfeature.exception import ErrorCode
 
-if typing.TYPE_CHECKING:  # resolves a circular dependency in type annotations
-    from openfeature.hook import Hook
+if typing.TYPE_CHECKING:  # pragma: no cover
+    # resolves a circular dependency in type annotations
+    from openfeature.hook import Hook, HookHints
 
 
 class FlagType(StrEnum):
@@ -48,7 +49,7 @@ class FlagEvaluationDetails(typing.Generic[T_co]):
 @dataclass
 class FlagEvaluationOptions:
     hooks: typing.List[Hook] = field(default_factory=list)
-    hook_hints: dict = field(default_factory=dict)
+    hook_hints: HookHints = field(default_factory=dict)
 
 
 U_co = typing.TypeVar("U_co", covariant=True)

@@ -4,7 +4,7 @@ from functools import reduce
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
-from openfeature.hook import Hook, HookContext, HookType
+from openfeature.hook import Hook, HookContext, HookHints, HookType
 
 logger = logging.getLogger("openfeature")
 
@@ -14,7 +14,7 @@ def error_hooks(
     hook_context: HookContext,
     exception: Exception,
     hooks: typing.List[Hook],
-    hints: typing.Optional[typing.Mapping] = None,
+    hints: typing.Optional[HookHints] = None,
 ) -> None:
     kwargs = {"hook_context": hook_context, "exception": exception, "hints": hints}
     _execute_hooks(
@@ -26,7 +26,7 @@ def after_all_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
     hooks: typing.List[Hook],
-    hints: typing.Optional[typing.Mapping] = None,
+    hints: typing.Optional[HookHints] = None,
 ) -> None:
     kwargs = {"hook_context": hook_context, "hints": hints}
     _execute_hooks(
@@ -39,7 +39,7 @@ def after_hooks(
     hook_context: HookContext,
     details: FlagEvaluationDetails[typing.Any],
     hooks: typing.List[Hook],
-    hints: typing.Optional[typing.Mapping] = None,
+    hints: typing.Optional[HookHints] = None,
 ) -> None:
     kwargs = {"hook_context": hook_context, "details": details, "hints": hints}
     _execute_hooks_unchecked(
@@ -51,7 +51,7 @@ def before_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
     hooks: typing.List[Hook],
-    hints: typing.Optional[typing.Mapping] = None,
+    hints: typing.Optional[HookHints] = None,
 ) -> EvaluationContext:
     kwargs = {"hook_context": hook_context, "hints": hints}
     executed_hooks = _execute_hooks_unchecked(

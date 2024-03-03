@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing
-from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -20,24 +20,53 @@ class HookType(Enum):
     ERROR = "error"
 
 
-@dataclass
 class HookContext:
-    flag_key: str
-    flag_type: FlagType
-    default_value: typing.Any
-    evaluation_context: EvaluationContext
-    client_metadata: typing.Optional[ClientMetadata] = None
-    provider_metadata: typing.Optional[Metadata] = None
+    def __init__(  # noqa: PLR0913
+        self,
+        flag_key: str,
+        flag_type: FlagType,
+        default_value: typing.Any,
+        evaluation_context: EvaluationContext,
+        client_metadata: typing.Optional[ClientMetadata] = None,
+        provider_metadata: typing.Optional[Metadata] = None,
+    ):
+        self.flag_key = flag_key
+        self.flag_type = flag_type
+        self.default_value = default_value
+        self.evaluation_context = evaluation_context
+        self.client_metadata = client_metadata
+        self.provider_metadata = provider_metadata
 
     def __setattr__(self, key: str, value: typing.Any) -> None:
-        if hasattr(self, key) and key in ("flag_key", "flag_type", "default_value"):
+        if hasattr(self, key) and key in (
+            "flag_key",
+            "flag_type",
+            "default_value",
+            "client_metadata",
+            "provider_metadata",
+        ):
             raise AttributeError(f"Attribute {key!r} is immutable")
         super().__setattr__(key, value)
 
 
+# https://openfeature.dev/specification/sections/hooks/#requirement-421
+HookHints = typing.Mapping[
+    str,
+    typing.Union[
+        bool,
+        int,
+        float,
+        str,
+        datetime,
+        typing.List[typing.Any],
+        typing.Dict[str, typing.Any],
+    ],
+]
+
+
 class Hook:
     def before(
-        self, hook_context: HookContext, hints: dict
+        self, hook_context: HookContext, hints: HookHints
     ) -> typing.Optional[EvaluationContext]:
         """
         Runs before flag is resolved.
@@ -54,7 +83,7 @@ class Hook:
         self,
         hook_context: HookContext,
         details: FlagEvaluationDetails[typing.Any],
-        hints: dict,
+        hints: HookHints,
     ) -> None:
         """
         Runs after a flag is resolved.
@@ -67,7 +96,7 @@ class Hook:
         pass
 
     def error(
-        self, hook_context: HookContext, exception: Exception, hints: dict
+        self, hook_context: HookContext, exception: Exception, hints: HookHints
     ) -> None:
         """
         Run when evaluation encounters an error. Errors thrown will be swallowed.
@@ -78,7 +107,7 @@ class Hook:
         """
         pass
 
-    def finally_after(self, hook_context: HookContext, hints: dict) -> None:
+    def finally_after(self, hook_context: HookContext, hints: HookHints) -> None:
         """
         Run after flag evaluation, including any error processing.
         This will always run. Errors will be swallowed.
