@@ -75,6 +75,8 @@ class EventSupport:
         handlers = self._client_handlers[client][event]
         handlers.append(handler)
 
+        self._run_immediate_handler(client, event, handler)
+
     def remove_client_handler(
         self, client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
     ) -> None:
@@ -83,6 +85,10 @@ class EventSupport:
 
     def add_global_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
         self._global_handlers[event].append(handler)
+
+        from openfeature.api import get_client
+
+        self._run_immediate_handler(get_client(), event, handler)
 
     def remove_global_handler(
         self, event: ProviderEvent, handler: EventHandler
@@ -104,3 +110,10 @@ class EventSupport:
         for client in self._client_handlers:
             if client.provider == provider:
                 self.run_client_handlers(client, event, details)
+
+    def _run_immediate_handler(
+        self, client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
+    ) -> None:
+        if event == ProviderEvent.PROVIDER_READY:
+            # providers are assumed ready because provider status is not yet implemented
+            handler(EventDetails(provider_name=client.provider.get_metadata().name))

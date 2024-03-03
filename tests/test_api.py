@@ -249,12 +249,12 @@ def test_provider_events():
         provider.get_metadata().name, provider_details
     )
 
-    provider.emit_provider_ready(provider_details)
     provider.emit_provider_configuration_changed(provider_details)
     provider.emit_provider_error(provider_details)
     provider.emit_provider_stale(provider_details)
 
-    spy.provider_ready.assert_called_once_with(details)
+    # NOTE: provider_ready is called immediately after adding the handler
+    spy.provider_ready.assert_called_once()
     spy.provider_configuration_changed.assert_called_once_with(details)
     spy.provider_error.assert_called_once_with(details)
     spy.provider_stale.assert_called_once_with(details)
@@ -266,10 +266,43 @@ def test_add_remove_event_handler():
 
     spy = MagicMock()
 
-    add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
-    remove_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
+    add_handler(
+        ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, spy.provider_configuration_changed
+    )
+    remove_handler(
+        ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, spy.provider_configuration_changed
+    )
 
     provider_details = ProviderEventDetails(message="message")
-    provider.emit_provider_ready(provider_details)
+    provider.emit_provider_configuration_changed(provider_details)
 
-    spy.provider_ready.assert_not_called()
+    spy.provider_configuration_changed.assert_not_called()
+
+
+# Requirement 5.3.3
+def test_handlers_attached_to_provider_already_in_associated_state_should_run_immediately():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+    spy = MagicMock()
+
+    # When
+    add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
+
+    # Then
+    spy.provider_ready.assert_called_once()
+
+
+def test_provider_ready_handlers_run_if_provider_initialize_function_terminates_normally():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+
+    spy = MagicMock()
+    add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
+
+    # When
+    provider.initialize(get_evaluation_context())
+
+    # Then
+    spy.provider_ready.assert_called_once()

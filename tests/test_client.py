@@ -276,7 +276,6 @@ def test_provider_events():
     )
 
     def emit_all_events(provider):
-        provider.emit_provider_ready(provider_details)
         provider.emit_provider_configuration_changed(provider_details)
         provider.emit_provider_error(provider_details)
         provider.emit_provider_stale(provider_details)
@@ -294,7 +293,8 @@ def test_provider_events():
     emit_all_events(provider)
     emit_all_events(other_provider)
 
-    spy.provider_ready.assert_called_once_with(details)
+    # NOTE: provider_ready is called immediately after adding the handler
+    spy.provider_ready.assert_called_once()
     spy.provider_configuration_changed.assert_called_once_with(details)
     spy.provider_error.assert_called_once_with(details)
     spy.provider_stale.assert_called_once_with(details)
@@ -307,10 +307,14 @@ def test_add_remove_event_handler():
     spy = MagicMock()
 
     client = get_client()
-    client.add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
-    client.remove_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
+    client.add_handler(
+        ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, spy.provider_configuration_changed
+    )
+    client.remove_handler(
+        ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, spy.provider_configuration_changed
+    )
 
     provider_details = ProviderEventDetails(message="message")
-    provider.emit_provider_ready(provider_details)
+    provider.emit_provider_configuration_changed(provider_details)
 
-    spy.provider_ready.assert_not_called()
+    spy.provider_configuration_changed.assert_not_called()
