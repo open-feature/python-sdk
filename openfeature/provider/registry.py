@@ -1,7 +1,7 @@
 import typing
 
 from openfeature.evaluation_context import EvaluationContext
-from openfeature.exception import GeneralError
+from openfeature.exception import ErrorCode, GeneralError, OpenFeatureError
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider.no_op_provider import NoOpProvider
 
@@ -66,8 +66,14 @@ class ProviderRegistry:
             if hasattr(provider, "initialize"):
                 provider.initialize(self._get_evaluation_context())
             self._set_provider_status(provider, ProviderStatus.READY)
-        except Exception:
-            self._set_provider_status(provider, ProviderStatus.ERROR)
+        except Exception as err:
+            if (
+                isinstance(err, OpenFeatureError)
+                and err.error_code == ErrorCode.PROVIDER_FATAL
+            ):
+                self._set_provider_status(provider, ProviderStatus.FATAL)
+            else:
+                self._set_provider_status(provider, ProviderStatus.ERROR)
 
     def _shutdown_provider(self, provider: FeatureProvider) -> None:
         try:
