@@ -7,6 +7,7 @@ from openfeature.client import OpenFeatureClient
 from openfeature.exception import ErrorCode, OpenFeatureError
 from openfeature.flag_evaluation import Reason
 from openfeature.hook import Hook
+from openfeature.provider import ProviderStatus
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 from openfeature.provider.no_op_provider import NoOpProvider
 
@@ -182,3 +183,11 @@ def test_should_call_api_level_hooks(no_op_provider_client):
     # Then
     api_hook.before.assert_called_once()
     api_hook.after.assert_called_once()
+
+
+def test_should_define_a_provider_status_accessor(no_op_provider_client):
+    # When
+    status = no_op_provider_client.get_provider_status()
+    # Then
+    assert status is not None
+    assert status == ProviderStatus.READY

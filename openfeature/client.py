@@ -24,7 +24,7 @@ from openfeature.hook.hook_support import (
     before_hooks,
     error_hooks,
 )
-from openfeature.provider import FeatureProvider
+from openfeature.provider import FeatureProvider, ProviderStatus
 
 logger = logging.getLogger("openfeature")
 
@@ -80,6 +80,10 @@ class OpenFeatureClient:
     @property
     def provider(self) -> FeatureProvider:
         return api._provider_registry.get_provider(self.domain)
+
+    def get_provider_status(self) -> ProviderStatus:
+        provider = api._provider_registry.get_provider(self.domain)
+        return api._provider_registry.get_provider_status(provider)
 
     def get_metadata(self) -> ClientMetadata:
         return ClientMetadata(domain=self.domain)

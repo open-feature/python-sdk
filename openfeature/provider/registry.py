@@ -83,6 +83,9 @@ class ProviderRegistry:
         except Exception:
             self._set_provider_status(provider, ProviderStatus.FATAL)
 
+    def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
+        return self._provider_status.get(provider, ProviderStatus.NOT_READY)
+
     def _set_provider_status(
         self, provider: FeatureProvider, status: ProviderStatus
     ) -> None:
