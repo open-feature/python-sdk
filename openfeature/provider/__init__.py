@@ -1,10 +1,19 @@
 import typing
+from enum import Enum
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.hook import Hook
 
 from .metadata import Metadata
+
+
+class ProviderStatus(Enum):
+    NOT_READY = "NOT_READY"
+    READY = "READY"
+    ERROR = "ERROR"
+    STALE = "STALE"
+    FATAL = "FATAL"
 
 
 class FeatureProvider(typing.Protocol):  # pragma: no cover

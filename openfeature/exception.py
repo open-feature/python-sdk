@@ -4,6 +4,7 @@ from enum import Enum
 
 class ErrorCode(Enum):
     PROVIDER_NOT_READY = "PROVIDER_NOT_READY"
+    PROVIDER_FATAL = "PROVIDER_FATAL"
     FLAG_NOT_FOUND = "FLAG_NOT_FOUND"
     PARSE_ERROR = "PARSE_ERROR"
     TYPE_MISMATCH = "TYPE_MISMATCH"
@@ -29,6 +30,36 @@ class OpenFeatureError(Exception):
         """
         self.error_message = error_message
         self.error_code = error_code
+
+
+class ProviderNotReadyError(OpenFeatureError):
+    """
+    This exception should be raised when the provider is not ready to be used.
+    """
+
+    def __init__(self, error_message: typing.Optional[str] = None):
+        """
+        Constructor for the ProviderNotReadyError. The error code for this type of
+        exception is ErrorCode.PROVIDER_NOT_READY.
+        @param error_message: a string message representing why the error has been
+        raised
+        """
+        super().__init__(ErrorCode.PROVIDER_NOT_READY, error_message)
+
+
+class ProviderFatalError(OpenFeatureError):
+    """
+    This exception should be raised when the provider encounters a fatal error.
+    """
+
+    def __init__(self, error_message: typing.Optional[str] = None):
+        """
+        Constructor for the ProviderFatalError. The error code for this type of
+        exception is ErrorCode.PROVIDER_FATAL.
+        @param error_message: a string message representing why the error has been
+        raised
+        """
+        super().__init__(ErrorCode.PROVIDER_FATAL, error_message)
 
 
 class FlagNotFoundError(OpenFeatureError):
