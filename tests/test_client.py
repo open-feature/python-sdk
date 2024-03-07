@@ -185,9 +185,54 @@ def test_should_call_api_level_hooks(no_op_provider_client):
     api_hook.after.assert_called_once()
 
 
+# Requirement 1.7.5
 def test_should_define_a_provider_status_accessor(no_op_provider_client):
     # When
     status = no_op_provider_client.get_provider_status()
     # Then
     assert status is not None
     assert status == ProviderStatus.READY
+
+
+# Requirement 1.7.6
+def test_should_shortcircuit_if_provider_is_not_ready(
+    no_op_provider_client, monkeypatch
+):
+    # Given
+    monkeypatch.setattr(
+        no_op_provider_client, "get_provider_status", lambda: ProviderStatus.NOT_READY
+    )
+    spy_hook = MagicMock(spec=Hook)
+    no_op_provider_client.add_hooks([spy_hook])
+    # When
+    flag_details = no_op_provider_client.get_boolean_details(
+        flag_key="Key", default_value=True
+    )
+    # Then
+    assert flag_details is not None
+    assert flag_details.value
+    assert flag_details.reason == Reason.ERROR
+    assert flag_details.error_code == ErrorCode.PROVIDER_NOT_READY
+    spy_hook.error.assert_called_once()
+
+
+# Requirement 1.7.7
+def test_should_shortcircuit_if_provider_is_in_irrecoverable_error_state(
+    no_op_provider_client, monkeypatch
+):
+    # Given
+    monkeypatch.setattr(
+        no_op_provider_client, "get_provider_status", lambda: ProviderStatus.FATAL
+    )
+    spy_hook = MagicMock(spec=Hook)
+    no_op_provider_client.add_hooks([spy_hook])
+    # When
+    flag_details = no_op_provider_client.get_boolean_details(
+        flag_key="Key", default_value=True
+    )
+    # Then
+    assert flag_details is not None
+    assert flag_details.value
+    assert flag_details.reason == Reason.ERROR
+    assert flag_details.error_code == ErrorCode.PROVIDER_FATAL
+    spy_hook.error.assert_called_once()

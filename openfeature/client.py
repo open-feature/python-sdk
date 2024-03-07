@@ -8,6 +8,8 @@ from openfeature.exception import (
     ErrorCode,
     GeneralError,
     OpenFeatureError,
+    ProviderFatalError,
+    ProviderNotReadyError,
     TypeMismatchError,
 )
 from openfeature.flag_evaluation import (
@@ -236,7 +238,7 @@ class OpenFeatureClient:
             flag_evaluation_options,
         )
 
-    def evaluate_flag_details(
+    def evaluate_flag_details(  # noqa: PLR0915
         self,
         flag_type: FlagType,
         flag_key: str,
@@ -285,6 +287,36 @@ class OpenFeatureClient:
         # after, error, finally: Provider, Invocation, Client, API
         reversed_merged_hooks = merged_hooks[:]
         reversed_merged_hooks.reverse()
+
+        status = self.get_provider_status()
+        if status == ProviderStatus.NOT_READY:
+            error_hooks(
+                flag_type,
+                hook_context,
+                ProviderNotReadyError(),
+                reversed_merged_hooks,
+                hook_hints,
+            )
+            return FlagEvaluationDetails(
+                flag_key=flag_key,
+                value=default_value,
+                reason=Reason.ERROR,
+                error_code=ErrorCode.PROVIDER_NOT_READY,
+            )
+        if status == ProviderStatus.FATAL:
+            error_hooks(
+                flag_type,
+                hook_context,
+                ProviderFatalError(),
+                reversed_merged_hooks,
+                hook_hints,
+            )
+            return FlagEvaluationDetails(
+                flag_key=flag_key,
+                value=default_value,
+                reason=Reason.ERROR,
+                error_code=ErrorCode.PROVIDER_FATAL,
+            )
 
         try:
             # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
