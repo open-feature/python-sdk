@@ -233,6 +233,7 @@ def test_clear_providers_shutdowns_every_provider_and_resets_default_provider():
 
 
 def test_provider_events():
+    # Given
     spy = MagicMock()
 
     add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
@@ -249,10 +250,12 @@ def test_provider_events():
         provider.get_metadata().name, provider_details
     )
 
+    # When
     provider.emit_provider_configuration_changed(provider_details)
     provider.emit_provider_error(provider_details)
     provider.emit_provider_stale(provider_details)
 
+    # Then
     # NOTE: provider_ready is called immediately after adding the handler
     spy.provider_ready.assert_called_once()
     spy.provider_configuration_changed.assert_called_once_with(details)
@@ -261,6 +264,7 @@ def test_provider_events():
 
 
 def test_add_remove_event_handler():
+    # Given
     provider = NoOpProvider()
     set_provider(provider)
 
@@ -274,8 +278,11 @@ def test_add_remove_event_handler():
     )
 
     provider_details = ProviderEventDetails(message="message")
+
+    # When
     provider.emit_provider_configuration_changed(provider_details)
 
+    # Then
     spy.provider_configuration_changed.assert_not_called()
 
 

@@ -264,6 +264,7 @@ def test_should_run_error_hooks_if_provider_returns_resolution_with_error_code()
 
 
 def test_provider_events():
+    # Given
     provider = NoOpProvider()
     set_provider(provider)
 
@@ -290,9 +291,11 @@ def test_provider_events():
     client.add_handler(ProviderEvent.PROVIDER_ERROR, spy.provider_error)
     client.add_handler(ProviderEvent.PROVIDER_STALE, spy.provider_stale)
 
+    # When
     emit_all_events(provider)
     emit_all_events(other_provider)
 
+    # Then
     # NOTE: provider_ready is called immediately after adding the handler
     spy.provider_ready.assert_called_once()
     spy.provider_configuration_changed.assert_called_once_with(details)
@@ -301,6 +304,7 @@ def test_provider_events():
 
 
 def test_add_remove_event_handler():
+    # Given
     provider = NoOpProvider()
     set_provider(provider)
 
@@ -315,6 +319,9 @@ def test_add_remove_event_handler():
     )
 
     provider_details = ProviderEventDetails(message="message")
+
+    # When
     provider.emit_provider_configuration_changed(provider_details)
 
+    # Then
     spy.provider_configuration_changed.assert_not_called()
