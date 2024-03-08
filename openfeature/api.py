@@ -12,10 +12,7 @@ from openfeature.exception import GeneralError
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
 from openfeature.provider.metadata import Metadata
-from openfeature.provider.no_op_provider import NoOpProvider
 from openfeature.provider.registry import ProviderRegistry
-
-_provider: FeatureProvider = NoOpProvider()
 
 _evaluation_context = EvaluationContext()
 
