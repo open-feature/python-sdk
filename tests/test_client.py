@@ -325,3 +325,34 @@ def test_add_remove_event_handler():
 
     # Then
     spy.provider_configuration_changed.assert_not_called()
+
+
+# Requirement 5.1.2, Requirement 5.1.3
+def test_provider_event_late_binding():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider, "my-domain")
+    other_provider = NoOpProvider()
+
+    spy = MagicMock()
+
+    client = get_client("my-domain")
+    client.add_handler(
+        ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, spy.provider_configuration_changed
+    )
+
+    set_provider(other_provider, "my-domain")
+
+    provider_details = ProviderEventDetails(message="message from provider")
+    other_provider_details = ProviderEventDetails(message="message from other provider")
+
+    details = EventDetails.from_provider_event_details(
+        other_provider.get_metadata().name, other_provider_details
+    )
+
+    # When
+    provider.emit_provider_configuration_changed(provider_details)
+    other_provider.emit_provider_configuration_changed(other_provider_details)
+
+    # Then
+    spy.provider_configuration_changed.assert_called_once_with(details)
