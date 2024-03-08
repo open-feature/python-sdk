@@ -39,7 +39,8 @@ def set_provider(
 
 
 def clear_providers() -> None:
-    return _provider_registry.clear_providers()
+    _provider_registry.clear_providers()
+    _event_support.clear()
 
 
 def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:

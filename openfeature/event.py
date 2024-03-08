@@ -6,7 +6,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Union
 
 from openfeature.exception import ErrorCode
-from openfeature.provider import FeatureProvider
+from openfeature.provider import FeatureProvider, ProviderStatus
 
 if TYPE_CHECKING:
     from openfeature.client import OpenFeatureClient
@@ -16,7 +16,16 @@ class ProviderEvent(Enum):
     PROVIDER_READY = "PROVIDER_READY"
     PROVIDER_CONFIGURATION_CHANGED = "PROVIDER_CONFIGURATION_CHANGED"
     PROVIDER_ERROR = "PROVIDER_ERROR"
+    PROVIDER_FATAL = "PROVIDER_FATAL"
     PROVIDER_STALE = "PROVIDER_STALE"
+
+
+_provider_status_to_event = {
+    ProviderStatus.READY: ProviderEvent.PROVIDER_READY,
+    ProviderStatus.ERROR: ProviderEvent.PROVIDER_ERROR,
+    ProviderStatus.FATAL: ProviderEvent.PROVIDER_FATAL,
+    ProviderStatus.STALE: ProviderEvent.PROVIDER_STALE,
+}
 
 
 @dataclass
@@ -114,6 +123,9 @@ class EventSupport:
     def _run_immediate_handler(
         self, client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
     ) -> None:
-        if event == ProviderEvent.PROVIDER_READY:
-            # providers are assumed ready because provider status is not yet implemented
+        if event == _provider_status_to_event.get(client.get_provider_status()):
             handler(EventDetails(provider_name=client.provider.get_metadata().name))
+
+    def clear(self) -> None:
+        self._global_handlers.clear()
+        self._client_handlers.clear()

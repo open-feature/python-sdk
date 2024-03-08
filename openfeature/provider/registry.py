@@ -1,6 +1,10 @@
 import typing
 
 from openfeature.evaluation_context import EvaluationContext
+from openfeature.event import (
+    ProviderEventDetails,
+    _provider_status_to_event,
+)
 from openfeature.exception import ErrorCode, GeneralError, OpenFeatureError
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider.no_op_provider import NoOpProvider
@@ -14,8 +18,9 @@ class ProviderRegistry:
     def __init__(self) -> None:
         self._default_provider = NoOpProvider()
         self._providers = {}
-        self._provider_status = {}
-        self._set_provider_status(self._default_provider, ProviderStatus.NOT_READY)
+        self._provider_status = {
+            self._default_provider: ProviderStatus.READY,
+        }
 
     def set_provider(self, domain: str, provider: FeatureProvider) -> None:
         if provider is None:
@@ -50,6 +55,9 @@ class ProviderRegistry:
         self.shutdown()
         self._providers.clear()
         self._default_provider = NoOpProvider()
+        self._provider_status = {
+            self._default_provider: ProviderStatus.READY,
+        }
 
     def shutdown(self) -> None:
         for provider in {self._default_provider, *self._providers.values()}:
@@ -90,3 +98,8 @@ class ProviderRegistry:
         self, provider: FeatureProvider, status: ProviderStatus
     ) -> None:
         self._provider_status[provider] = status
+
+        if event := _provider_status_to_event.get(status):
+            from openfeature.api import _run_handlers_for_provider
+
+            _run_handlers_for_provider(provider, event, ProviderEventDetails())
