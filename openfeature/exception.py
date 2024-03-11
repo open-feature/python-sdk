@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 from enum import Enum
 
@@ -11,6 +13,24 @@ class ErrorCode(Enum):
     TARGETING_KEY_MISSING = "TARGETING_KEY_MISSING"
     INVALID_CONTEXT = "INVALID_CONTEXT"
     GENERAL = "GENERAL"
+
+    @classmethod
+    def to_exception(
+        cls, error_code: ErrorCode, error_message: str
+    ) -> OpenFeatureError:
+        return typing.cast(
+            OpenFeatureError,
+            {
+                ErrorCode.PROVIDER_NOT_READY: ProviderNotReadyError,
+                ErrorCode.PROVIDER_FATAL: ProviderFatalError,
+                ErrorCode.FLAG_NOT_FOUND: FlagNotFoundError,
+                ErrorCode.PARSE_ERROR: ParseError,
+                ErrorCode.TYPE_MISMATCH: TypeMismatchError,
+                ErrorCode.TARGETING_KEY_MISSING: TargetingKeyMissingError,
+                ErrorCode.INVALID_CONTEXT: InvalidContextError,
+                ErrorCode.GENERAL: GeneralError,
+            }.get(error_code, GeneralError)(error_message),
+        )
 
 
 class OpenFeatureError(Exception):

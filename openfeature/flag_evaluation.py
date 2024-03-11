@@ -63,3 +63,8 @@ class FlagResolutionDetails(typing.Generic[U_co]):
     reason: typing.Optional[typing.Union[str, Reason]] = None
     variant: typing.Optional[str] = None
     flag_metadata: FlagMetadata = field(default_factory=dict)
+
+    def raise_for_error(self) -> None:
+        if self.error_code:
+            raise ErrorCode.to_exception(self.error_code, self.error_message or "")
+        return None
