@@ -1,36 +1,8 @@
 from __future__ import annotations
 
 import typing
+from collections.abc import Mapping
 from enum import Enum
-
-
-class ErrorCode(Enum):
-    PROVIDER_NOT_READY = "PROVIDER_NOT_READY"
-    PROVIDER_FATAL = "PROVIDER_FATAL"
-    FLAG_NOT_FOUND = "FLAG_NOT_FOUND"
-    PARSE_ERROR = "PARSE_ERROR"
-    TYPE_MISMATCH = "TYPE_MISMATCH"
-    TARGETING_KEY_MISSING = "TARGETING_KEY_MISSING"
-    INVALID_CONTEXT = "INVALID_CONTEXT"
-    GENERAL = "GENERAL"
-
-    @classmethod
-    def to_exception(
-        cls, error_code: ErrorCode, error_message: str
-    ) -> OpenFeatureError:
-        return typing.cast(
-            OpenFeatureError,
-            {
-                ErrorCode.PROVIDER_NOT_READY: ProviderNotReadyError,
-                ErrorCode.PROVIDER_FATAL: ProviderFatalError,
-                ErrorCode.FLAG_NOT_FOUND: FlagNotFoundError,
-                ErrorCode.PARSE_ERROR: ParseError,
-                ErrorCode.TYPE_MISMATCH: TypeMismatchError,
-                ErrorCode.TARGETING_KEY_MISSING: TargetingKeyMissingError,
-                ErrorCode.INVALID_CONTEXT: InvalidContextError,
-                ErrorCode.GENERAL: GeneralError,
-            }.get(error_code, GeneralError)(error_message),
-        )
 
 
 class OpenFeatureError(Exception):
@@ -176,3 +148,32 @@ class InvalidContextError(OpenFeatureError):
         raised
         """
         super().__init__(ErrorCode.INVALID_CONTEXT, error_message)
+
+
+class ErrorCode(Enum):
+    PROVIDER_NOT_READY = "PROVIDER_NOT_READY"
+    PROVIDER_FATAL = "PROVIDER_FATAL"
+    FLAG_NOT_FOUND = "FLAG_NOT_FOUND"
+    PARSE_ERROR = "PARSE_ERROR"
+    TYPE_MISMATCH = "TYPE_MISMATCH"
+    TARGETING_KEY_MISSING = "TARGETING_KEY_MISSING"
+    INVALID_CONTEXT = "INVALID_CONTEXT"
+    GENERAL = "GENERAL"
+
+    __exceptions__: Mapping[str, typing.Callable[[str], OpenFeatureError]] = {
+        PROVIDER_NOT_READY: ProviderNotReadyError,
+        PROVIDER_FATAL: ProviderFatalError,
+        FLAG_NOT_FOUND: FlagNotFoundError,
+        PARSE_ERROR: ParseError,
+        TYPE_MISMATCH: TypeMismatchError,
+        TARGETING_KEY_MISSING: TargetingKeyMissingError,
+        INVALID_CONTEXT: InvalidContextError,
+        GENERAL: GeneralError,
+    }
+
+    @classmethod
+    def to_exception(
+        cls, error_code: ErrorCode, error_message: str
+    ) -> OpenFeatureError:
+        exc = cls.__exceptions__.get(error_code.value, GeneralError)
+        return exc(error_message)
