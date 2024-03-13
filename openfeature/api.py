@@ -1,12 +1,11 @@
 import typing
 
-from openfeature._event_support import EventSupport
+from openfeature import _event_support
 from openfeature.client import OpenFeatureClient
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import (
     EventHandler,
     ProviderEvent,
-    ProviderEventDetails,
 )
 from openfeature.exception import GeneralError
 from openfeature.hook import Hook
@@ -19,8 +18,6 @@ _evaluation_context = EvaluationContext()
 _hooks: typing.List[Hook] = []
 
 _provider_registry: ProviderRegistry = ProviderRegistry()
-
-_event_support: EventSupport = EventSupport()
 
 
 def get_client(
@@ -84,23 +81,3 @@ def add_handler(event: ProviderEvent, handler: EventHandler) -> None:
 
 def remove_handler(event: ProviderEvent, handler: EventHandler) -> None:
     _event_support.remove_global_handler(event, handler)
-
-
-def _add_client_handler(
-    client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
-) -> None:
-    _event_support.add_client_handler(client, event, handler)
-
-
-def _remove_client_handler(
-    client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
-) -> None:
-    _event_support.remove_client_handler(client, event, handler)
-
-
-def _run_handlers_for_provider(
-    provider: FeatureProvider,
-    event: ProviderEvent,
-    provider_details: ProviderEventDetails,
-) -> None:
-    _event_support.run_handlers_for_provider(provider, event, provider_details)

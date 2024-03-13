@@ -1,5 +1,6 @@
 import typing
 
+from openfeature._event_support import run_handlers_for_provider
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import (
     ProviderEvent,
@@ -100,6 +101,4 @@ class ProviderRegistry:
         self._provider_status[provider] = status
 
         if event := ProviderEvent.from_provider_status(status):
-            from openfeature.api import _run_handlers_for_provider
-
-            _run_handlers_for_provider(provider, event, ProviderEventDetails())
+            run_handlers_for_provider(provider, event, ProviderEventDetails())

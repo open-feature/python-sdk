@@ -2,7 +2,7 @@ import logging
 import typing
 from dataclasses import dataclass
 
-from openfeature import api
+from openfeature import _event_support, api
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import EventHandler, ProviderEvent
 from openfeature.exception import (
@@ -441,10 +441,10 @@ class OpenFeatureClient:
         )
 
     def add_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
-        api._add_client_handler(self, event, handler)
+        _event_support.add_client_handler(self, event, handler)
 
     def remove_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
-        api._remove_client_handler(self, event, handler)
+        _event_support.remove_client_handler(self, event, handler)
 
 
 def _typecheck_flag_value(value: typing.Any, flag_type: FlagType) -> None:
