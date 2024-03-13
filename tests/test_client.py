@@ -2,12 +2,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from openfeature.api import add_hooks, clear_hooks, set_provider
+from openfeature.api import add_hooks, clear_hooks, get_client, set_provider
 from openfeature.client import OpenFeatureClient
 from openfeature.exception import ErrorCode, OpenFeatureError
-from openfeature.flag_evaluation import Reason
+from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.hook import Hook
-from openfeature.provider import ProviderStatus
+from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 from openfeature.provider.no_op_provider import NoOpProvider
 
@@ -230,6 +230,30 @@ def test_should_shortcircuit_if_provider_is_in_irrecoverable_error_state(
     flag_details = no_op_provider_client.get_boolean_details(
         flag_key="Key", default_value=True
     )
+    # Then
+    assert flag_details is not None
+    assert flag_details.value
+    assert flag_details.reason == Reason.ERROR
+    assert flag_details.error_code == ErrorCode.PROVIDER_FATAL
+    spy_hook.error.assert_called_once()
+
+
+def test_should_run_error_hooks_if_provider_returns_resolution_with_error_code():
+    # Given
+    spy_hook = MagicMock(spec=Hook)
+    provider = MagicMock(spec=FeatureProvider)
+    provider.get_provider_hooks.return_value = []
+    provider.resolve_boolean_details.return_value = FlagResolutionDetails(
+        value=True,
+        reason=Reason.ERROR,
+        error_code=ErrorCode.PROVIDER_FATAL,
+        error_message="This is an error message",
+    )
+    set_provider(provider)
+    client = get_client()
+    client.add_hooks([spy_hook])
+    # When
+    flag_details = client.get_boolean_details(flag_key="Key", default_value=True)
     # Then
     assert flag_details is not None
     assert flag_details.value

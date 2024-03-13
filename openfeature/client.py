@@ -425,6 +425,7 @@ class OpenFeatureClient:
             raise GeneralError(error_message="Unknown flag type")
 
         resolution = get_details_callable(*args)
+        resolution.raise_for_error()
 
         # we need to check the get_args to be compatible with union types.
         _typecheck_flag_value(resolution.value, flag_type)
