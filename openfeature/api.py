@@ -1,10 +1,10 @@
 import typing
 
+from openfeature._event_support import EventSupport
 from openfeature.client import OpenFeatureClient
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import (
     EventHandler,
-    EventSupport,
     ProviderEvent,
     ProviderEventDetails,
 )
