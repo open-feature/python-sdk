@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Callable, ClassVar, Dict, List, Optional, Union
 
 from openfeature.exception import ErrorCode
 from openfeature.provider import FeatureProvider, ProviderStatus
@@ -19,13 +19,17 @@ class ProviderEvent(Enum):
     PROVIDER_FATAL = "PROVIDER_FATAL"
     PROVIDER_STALE = "PROVIDER_STALE"
 
+    __status__: ClassVar[Dict[ProviderStatus, str]] = {
+        ProviderStatus.READY: PROVIDER_READY,
+        ProviderStatus.ERROR: PROVIDER_ERROR,
+        ProviderStatus.FATAL: PROVIDER_FATAL,
+        ProviderStatus.STALE: PROVIDER_STALE,
+    }
 
-_provider_status_to_event = {
-    ProviderStatus.READY: ProviderEvent.PROVIDER_READY,
-    ProviderStatus.ERROR: ProviderEvent.PROVIDER_ERROR,
-    ProviderStatus.FATAL: ProviderEvent.PROVIDER_FATAL,
-    ProviderStatus.STALE: ProviderEvent.PROVIDER_STALE,
-}
+    @classmethod
+    def from_provider_status(cls, status: ProviderStatus) -> Optional[ProviderEvent]:
+        value = ProviderEvent.__status__.get(status)
+        return ProviderEvent[value] if value else None
 
 
 @dataclass
@@ -123,7 +127,7 @@ class EventSupport:
     def _run_immediate_handler(
         self, client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
     ) -> None:
-        if event == _provider_status_to_event.get(client.get_provider_status()):
+        if event == ProviderEvent.from_provider_status(client.get_provider_status()):
             handler(EventDetails(provider_name=client.provider.get_metadata().name))
 
     def clear(self) -> None:

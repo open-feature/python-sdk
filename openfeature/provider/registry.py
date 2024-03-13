@@ -2,8 +2,8 @@ import typing
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import (
+    ProviderEvent,
     ProviderEventDetails,
-    _provider_status_to_event,
 )
 from openfeature.exception import ErrorCode, GeneralError, OpenFeatureError
 from openfeature.provider import FeatureProvider, ProviderStatus
@@ -99,7 +99,7 @@ class ProviderRegistry:
     ) -> None:
         self._provider_status[provider] = status
 
-        if event := _provider_status_to_event.get(status):
+        if event := ProviderEvent.from_provider_status(status):
             from openfeature.api import _run_handlers_for_provider
 
             _run_handlers_for_provider(provider, event, ProviderEventDetails())
