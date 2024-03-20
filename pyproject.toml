@@ -1,7 +1,7 @@
 # pyproject.toml
 [build-system]
-requires      = ["setuptools>=61.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "openfeature_sdk"
@@ -19,11 +19,44 @@ keywords = []
 dependencies = []
 requires-python = ">=3.8"
 
-[project.optional-dependencies]
-dev = ["pip-tools", "pytest", "pre-commit"]
-
 [project.urls]
 Homepage = "https://github.com/open-feature/python-sdk"
+
+[tool.hatch]
+
+[tool.hatch.envs.default]
+dependencies = [
+    "behave",
+    "coverage[toml]>=6.5",
+    "pytest",
+]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+    "coverage xml",
+]
+cov = [
+    "test-cov",
+    "cov-report",
+]
+e2e = [
+    "git submodule update --init",
+    "cp test-harness/features/evaluation.feature tests/features/",
+    "behave tests/features/",
+    "rm tests/features/*.feature",
+]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    ".gitignore",
+    "test-harness",
+    "venv",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["openfeature"]
 
 [tool.mypy]
 files = "openfeature"
@@ -83,6 +116,3 @@ max-statements = 30
 [tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.
 keep-runtime-typing = true
-
-[tool.setuptools.package-data]
-openfeature = ["py.typed"]

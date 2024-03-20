@@ -45,38 +45,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache virtualenvironment
-        uses: actions/cache@v4
-        with:
-          path: ~/.venv
-          key: ${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
-
       - name: Upgrade pip
         run: pip install --upgrade pip
 
-      - name: Create and activate Virtualenv
-        run: |
-          [ ! -d ".venv" ] && python -m venv .venv
-          . .venv/bin/activate
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Install pypa/build
-        run: >-
-          python -m
-          pip install
-          build
-          --user
+      - name: Install hatch
+        run: pip install hatch
 
       - name: Build a binary wheel and a source tarball
-        run: >-
-          python -m
-          build
-          --sdist
-          --wheel
-          --outdir dist/
-          .
+        run: hatch build
 
       - name: Publish a Python distribution to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
