@@ -16,9 +16,9 @@ if TYPE_CHECKING:
 
 
 _global_handlers: Dict[ProviderEvent, List[EventHandler]] = defaultdict(list)
-_client_handlers: Dict[
-    OpenFeatureClient, Dict[ProviderEvent, List[EventHandler]]
-] = defaultdict(lambda: defaultdict(list))
+_client_handlers: Dict[OpenFeatureClient, Dict[ProviderEvent, List[EventHandler]]] = (
+    defaultdict(lambda: defaultdict(list))
+)
 
 
 def run_client_handlers(
