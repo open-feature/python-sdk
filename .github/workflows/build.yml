@@ -34,16 +34,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install hatch
+        run: pip install hatch
 
       - name: Test with pytest
-        run: coverage run --omit="*/test*" -m pytest
+        run: hatch run cov
 
       - name: Run E2E tests with behave
-        run: |
-          cp test-harness/features/evaluation.feature tests/features/
-          behave tests/features/
+        run: hatch run e2e
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
