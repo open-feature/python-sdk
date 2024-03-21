@@ -1,7 +1,12 @@
 import typing
 
+from openfeature import _event_support
 from openfeature.client import OpenFeatureClient
 from openfeature.evaluation_context import EvaluationContext
+from openfeature.event import (
+    EventHandler,
+    ProviderEvent,
+)
 from openfeature.exception import GeneralError
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
@@ -31,7 +36,8 @@ def set_provider(
 
 
 def clear_providers() -> None:
-    return _provider_registry.clear_providers()
+    _provider_registry.clear_providers()
+    _event_support.clear()
 
 
 def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
@@ -67,3 +73,11 @@ def get_hooks() -> typing.List[Hook]:
 
 def shutdown() -> None:
     _provider_registry.shutdown()
+
+
+def add_handler(event: ProviderEvent, handler: EventHandler) -> None:
+    _event_support.add_global_handler(event, handler)
+
+
+def remove_handler(event: ProviderEvent, handler: EventHandler) -> None:
+    _event_support.remove_global_handler(event, handler)

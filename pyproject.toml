@@ -62,6 +62,7 @@ packages = ["openfeature"]
 files = "openfeature"
 namespace_packages = true
 explicit_package_bases = true
+local_partial_types = true # will become the new default from version 2
 pretty = true
 strict = true
 disallow_any_generics = false
