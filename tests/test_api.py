@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from openfeature.api import (
+    add_handler,
     add_hooks,
     clear_hooks,
     clear_providers,
@@ -10,16 +11,17 @@ from openfeature.api import (
     get_evaluation_context,
     get_hooks,
     get_provider_metadata,
+    remove_handler,
     set_evaluation_context,
     set_provider,
     shutdown,
 )
 from openfeature.evaluation_context import EvaluationContext
+from openfeature.event import EventDetails, ProviderEvent, ProviderEventDetails
 from openfeature.exception import ErrorCode, GeneralError
 from openfeature.hook import Hook
-from openfeature.provider.metadata import Metadata
+from openfeature.provider import FeatureProvider, Metadata
 from openfeature.provider.no_op_provider import NoOpProvider
-from openfeature.provider.provider import FeatureProvider
 
 
 def test_should_not_raise_exception_with_noop_client():
@@ -228,3 +230,86 @@ def test_clear_providers_shutdowns_every_provider_and_resets_default_provider():
     provider_1.shutdown.assert_called_once()
     provider_2.shutdown.assert_called_once()
     assert isinstance(get_client().provider, NoOpProvider)
+
+
+def test_provider_events():
+    # Given
+    spy = MagicMock()
+
+    add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
+    add_handler(
+        ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, spy.provider_configuration_changed
+    )
+    add_handler(ProviderEvent.PROVIDER_ERROR, spy.provider_error)
+    add_handler(ProviderEvent.PROVIDER_STALE, spy.provider_stale)
+
+    provider = NoOpProvider()
+
+    provider_details = ProviderEventDetails(message="message")
+    details = EventDetails.from_provider_event_details(
+        provider.get_metadata().name, provider_details
+    )
+
+    # When
+    provider.emit_provider_configuration_changed(provider_details)
+    provider.emit_provider_error(provider_details)
+    provider.emit_provider_stale(provider_details)
+
+    # Then
+    # NOTE: provider_ready is called immediately after adding the handler
+    spy.provider_ready.assert_called_once()
+    spy.provider_configuration_changed.assert_called_once_with(details)
+    spy.provider_error.assert_called_once_with(details)
+    spy.provider_stale.assert_called_once_with(details)
+
+
+def test_add_remove_event_handler():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+
+    spy = MagicMock()
+
+    add_handler(
+        ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, spy.provider_configuration_changed
+    )
+    remove_handler(
+        ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, spy.provider_configuration_changed
+    )
+
+    provider_details = ProviderEventDetails(message="message")
+
+    # When
+    provider.emit_provider_configuration_changed(provider_details)
+
+    # Then
+    spy.provider_configuration_changed.assert_not_called()
+
+
+# Requirement 5.3.3
+def test_handlers_attached_to_provider_already_in_associated_state_should_run_immediately():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+    spy = MagicMock()
+
+    # When
+    add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
+
+    # Then
+    spy.provider_ready.assert_called_once()
+
+
+def test_provider_ready_handlers_run_if_provider_initialize_function_terminates_normally():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+
+    spy = MagicMock()
+    add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
+
+    # When
+    provider.initialize(get_evaluation_context())
+
+    # Then
+    spy.provider_ready.assert_called_once()

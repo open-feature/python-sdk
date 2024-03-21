@@ -106,7 +106,7 @@ print("Value: " + str(flag_value))
 | ✅      | [Hooks](#hooks)                 | Add functionality to various stages of the flag evaluation life-cycle.                                                             |
 | ✅      | [Logging](#logging)             | Integrate with popular logging packages.                                                                                           |
 | ✅      | [Domains](#domains)             | Logically bind clients with providers.                                                                                             |
-| ❌      | [Eventing](#eventing)           | React to state changes in the provider or flag management system.                                                                  |
+| ✅      | [Eventing](#eventing)           | React to state changes in the provider or flag management system.                                                                  |
 | ✅      | [Shutdown](#shutdown)           | Gracefully clean up a provider during application shutdown.                                                                        |
 | ✅      | [Extending](#extending)         | Extend OpenFeature with custom providers and hooks.                                                                                |
 
@@ -214,7 +214,26 @@ For more details, please refer to the [providers](#providers) section.
 
 ### Eventing
 
-Events are not yet available in the Python SDK. Progress on this feature can be tracked [here](https://github.com/open-feature/python-sdk/issues/125).
+Events allow you to react to state changes in the provider or underlying flag management system, such as flag definition changes, provider readiness, or error conditions. Initialization events (PROVIDER_READY on success, PROVIDER_ERROR on failure) are dispatched for every provider. Some providers support additional events, such as PROVIDER_CONFIGURATION_CHANGED.
+
+Please refer to the documentation of the provider you're using to see what events are supported.
+
+```python
+from openfeature import api
+from openfeature.provider import ProviderEvent
+
+def on_provider_ready(event_details: EventDetails):
+    print(f"Provider {event_details.provider_name} is ready")
+
+api.add_handler(ProviderEvent.PROVIDER_READY, on_provider_ready)
+
+client = api.get_client()
+
+def on_provider_ready(event_details: EventDetails):
+    print(f"Provider {event_details.provider_name} is ready")
+
+client.add_handler(ProviderEvent.PROVIDER_READY, on_provider_ready)
+```
 
 ### Shutdown
 

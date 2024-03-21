@@ -2,8 +2,9 @@ import logging
 import typing
 from dataclasses import dataclass
 
-from openfeature import api
+from openfeature import _event_support, api
 from openfeature.evaluation_context import EvaluationContext
+from openfeature.event import EventHandler, ProviderEvent
 from openfeature.exception import (
     ErrorCode,
     GeneralError,
@@ -84,8 +85,7 @@ class OpenFeatureClient:
         return api._provider_registry.get_provider(self.domain)
 
     def get_provider_status(self) -> ProviderStatus:
-        provider = api._provider_registry.get_provider(self.domain)
-        return api._provider_registry.get_provider_status(provider)
+        return api._provider_registry.get_provider_status(self.provider)
 
     def get_metadata(self) -> ClientMetadata:
         return ClientMetadata(domain=self.domain)
@@ -439,6 +439,12 @@ class OpenFeatureClient:
             error_code=resolution.error_code,
             error_message=resolution.error_message,
         )
+
+    def add_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
+        _event_support.add_client_handler(self, event, handler)
+
+    def remove_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
+        _event_support.remove_client_handler(self, event, handler)
 
 
 def _typecheck_flag_value(value: typing.Any, flag_type: FlagType) -> None:
