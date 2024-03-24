@@ -272,8 +272,8 @@ class OpenFeatureClient:
             flag_type=flag_type,
             default_value=default_value,
             evaluation_context=evaluation_context,
-            client_metadata=None,
-            provider_metadata=None,
+            client_metadata=self.get_metadata(),
+            provider_metadata=self.provider.get_metadata(),
         )
         # Hooks need to be handled in different orders at different stages
         # in the flag evaluation
