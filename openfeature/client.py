@@ -264,6 +264,7 @@ class OpenFeatureClient:
         if flag_evaluation_options is None:
             flag_evaluation_options = FlagEvaluationOptions()
 
+        provider = self.provider  # call this once to maintain a consistent reference
         evaluation_hooks = flag_evaluation_options.hooks
         hook_hints = flag_evaluation_options.hook_hints
 
@@ -273,7 +274,7 @@ class OpenFeatureClient:
             default_value=default_value,
             evaluation_context=evaluation_context,
             client_metadata=self.get_metadata(),
-            provider_metadata=self.provider.get_metadata(),
+            provider_metadata=provider.get_metadata(),
         )
         # Hooks need to be handled in different orders at different stages
         # in the flag evaluation
@@ -282,7 +283,7 @@ class OpenFeatureClient:
             api.get_hooks()
             + self.hooks
             + evaluation_hooks
-            + self.provider.get_provider_hooks()
+            + provider.get_provider_hooks()
         )
         # after, error, finally: Provider, Invocation, Client, API
         reversed_merged_hooks = merged_hooks[:]
@@ -336,6 +337,7 @@ class OpenFeatureClient:
             )
 
             flag_evaluation = self._create_provider_evaluation(
+                provider,
                 flag_type,
                 flag_key,
                 default_value,
@@ -391,6 +393,7 @@ class OpenFeatureClient:
 
     def _create_provider_evaluation(
         self,
+        provider: FeatureProvider,
         flag_type: FlagType,
         flag_key: str,
         default_value: typing.Any,
@@ -413,11 +416,11 @@ class OpenFeatureClient:
         )
 
         get_details_callables: typing.Mapping[FlagType, GetDetailCallable] = {
-            FlagType.BOOLEAN: self.provider.resolve_boolean_details,
-            FlagType.INTEGER: self.provider.resolve_integer_details,
-            FlagType.FLOAT: self.provider.resolve_float_details,
-            FlagType.OBJECT: self.provider.resolve_object_details,
-            FlagType.STRING: self.provider.resolve_string_details,
+            FlagType.BOOLEAN: provider.resolve_boolean_details,
+            FlagType.INTEGER: provider.resolve_integer_details,
+            FlagType.FLOAT: provider.resolve_float_details,
+            FlagType.OBJECT: provider.resolve_object_details,
+            FlagType.STRING: provider.resolve_string_details,
         }
 
         get_details_callable = get_details_callables.get(flag_type)
