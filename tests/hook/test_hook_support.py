@@ -6,7 +6,7 @@ from openfeature.client import ClientMetadata
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
 from openfeature.hook import Hook, HookContext
-from openfeature.hook.hook_support import (
+from openfeature.hook._hook_support import (
     after_all_hooks,
     after_hooks,
     before_hooks,
