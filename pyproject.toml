@@ -15,7 +15,12 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = []
+keywords = [
+    "openfeature",
+    "feature",
+    "flags",
+    "toggles",
+]
 dependencies = []
 requires-python = ">=3.8"
 
