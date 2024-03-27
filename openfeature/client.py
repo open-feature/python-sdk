@@ -30,6 +30,11 @@ from openfeature.hook._hook_support import (
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider._registry import provider_registry
 
+__all__ = [
+    "ClientMetadata",
+    "OpenFeatureClient",
+]
+
 logger = logging.getLogger("openfeature")
 
 GetDetailCallable = typing.Union[

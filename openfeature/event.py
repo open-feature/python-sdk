@@ -7,6 +7,8 @@ from typing import Callable, ClassVar, Dict, List, Optional, Union
 from openfeature.exception import ErrorCode
 from openfeature.provider import ProviderStatus
 
+__all__ = ["ProviderEvent", "ProviderEventDetails", "EventDetails", "EventHandler"]
+
 
 class ProviderEvent(Enum):
     PROVIDER_READY = "PROVIDER_READY"

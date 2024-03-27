@@ -8,6 +8,8 @@ from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
 from openfeature.provider.metadata import Metadata
 
+__all__ = ["AbstractProvider"]
+
 
 class AbstractProvider(FeatureProvider):
     def initialize(self, evaluation_context: EvaluationContext) -> None:
