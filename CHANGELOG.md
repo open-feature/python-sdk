@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.6.1](https://github.com/open-feature/python-sdk/compare/v0.6.0...v0.6.1) (2024-03-26)
+
+
+### ✨ New Features
+
+* populate provider and client metadata in HookContext  ([#302](https://github.com/open-feature/python-sdk/issues/302)) ([78ea3b9](https://github.com/open-feature/python-sdk/commit/78ea3b991499231f42efda41ba6f672e20cb346c))
+
+
+### 🧹 Chore
+
+* add keywords to pyproject.toml ([#305](https://github.com/open-feature/python-sdk/issues/305)) ([05d0da2](https://github.com/open-feature/python-sdk/commit/05d0da2e3df86833986618243e18b66218425db8))
+
+
+### 🔄 Refactoring
+
+* mark hook_support module as private/internal ([#303](https://github.com/open-feature/python-sdk/issues/303)) ([4a323b0](https://github.com/open-feature/python-sdk/commit/4a323b0f9622663c9c43c292364fa25062d70715))
+
 ## [0.6.0](https://github.com/open-feature/python-sdk/compare/v0.5.0...v0.6.0) (2024-03-22)
 
 
