@@ -4,8 +4,11 @@
     "config:base"
   ],
   "semanticCommits": "enabled",
-  "pip_requirements": {
-    "fileMatch": ["requirements.txt", "requirements-dev.txt"]
+  "pep621": {
+    "enabled": true
+  },
+  "pre-commit": {
+    "enabled": true
   },
   "packageRules": [
     {
