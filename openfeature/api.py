@@ -10,8 +10,8 @@ from openfeature.event import (
 from openfeature.exception import GeneralError
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
+from openfeature.provider._registry import default_registry
 from openfeature.provider.metadata import Metadata
-from openfeature.provider.registry import default_registry
 
 _evaluation_context = EvaluationContext()
 
