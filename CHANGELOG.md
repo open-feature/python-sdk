@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.2](https://github.com/open-feature/python-sdk/compare/v0.6.1...v0.6.2) (2024-03-28)
+
+
+### 🐛 Bug Fixes
+
+* remove ProviderEvent.PROVIDER_FATAL ([#307](https://github.com/open-feature/python-sdk/issues/307)) ([de36b21](https://github.com/open-feature/python-sdk/commit/de36b214dcba717d3ff72cb5d9cc3d3c8de45461))
+
 ## [0.6.1](https://github.com/open-feature/python-sdk/compare/v0.6.0...v0.6.1) (2024-03-26)
 
 
