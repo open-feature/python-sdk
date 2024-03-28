@@ -28,7 +28,7 @@ from openfeature.hook._hook_support import (
     error_hooks,
 )
 from openfeature.provider import FeatureProvider, ProviderStatus
-from openfeature.provider.registry import default_registry
+from openfeature.provider._registry import default_registry
 
 logger = logging.getLogger("openfeature")
 
