@@ -74,34 +74,78 @@ class ProviderRegistry:
         try:
             if hasattr(provider, "initialize"):
                 provider.initialize(self._get_evaluation_context())
-            self._set_provider_status(provider, ProviderStatus.READY)
+            self.dispatch_event(
+                provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
+            )
         except Exception as err:
             if (
                 isinstance(err, OpenFeatureError)
                 and err.error_code == ErrorCode.PROVIDER_FATAL
             ):
-                self._set_provider_status(provider, ProviderStatus.FATAL)
+                self.dispatch_event(
+                    provider,
+                    ProviderEvent.PROVIDER_ERROR,
+                    ProviderEventDetails(
+                        message=f"Provider initialization failed: {err}",
+                        error_code=ErrorCode.PROVIDER_FATAL,
+                    ),
+                )
             else:
-                self._set_provider_status(provider, ProviderStatus.ERROR)
+                self.dispatch_event(
+                    provider,
+                    ProviderEvent.PROVIDER_ERROR,
+                    ProviderEventDetails(
+                        message=f"Provider initialization failed: {err}",
+                        error_code=ErrorCode.GENERAL,
+                    ),
+                )
 
     def _shutdown_provider(self, provider: FeatureProvider) -> None:
         try:
             if hasattr(provider, "shutdown"):
                 provider.shutdown()
-            self._set_provider_status(provider, ProviderStatus.NOT_READY)
-        except Exception:
-            self._set_provider_status(provider, ProviderStatus.FATAL)
+            self.dispatch_event(
+                provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
+            )
+        except Exception as err:
+            self.dispatch_event(
+                provider,
+                ProviderEvent.PROVIDER_ERROR,
+                ProviderEventDetails(
+                    message=f"Provider shutdown failed: {err}",
+                    error_code=ErrorCode.PROVIDER_FATAL,
+                ),
+            )
 
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
         return self._provider_status.get(provider, ProviderStatus.NOT_READY)
 
-    def _set_provider_status(
-        self, provider: FeatureProvider, status: ProviderStatus
+    def dispatch_event(
+        self,
+        provider: FeatureProvider,
+        event: ProviderEvent,
+        details: ProviderEventDetails,
     ) -> None:
-        self._provider_status[provider] = status
+        self._update_provider_status(provider, event, details)
+        run_handlers_for_provider(provider, event, details)
 
-        if event := ProviderEvent.from_provider_status(status):
-            run_handlers_for_provider(provider, event, ProviderEventDetails())
+    def _update_provider_status(
+        self,
+        provider: FeatureProvider,
+        event: ProviderEvent,
+        details: ProviderEventDetails,
+    ) -> None:
+        if event == ProviderEvent.PROVIDER_READY:
+            self._provider_status[provider] = ProviderStatus.READY
+        elif event == ProviderEvent.PROVIDER_STALE:
+            self._provider_status[provider] = ProviderStatus.STALE
+        elif event == ProviderEvent.PROVIDER_ERROR:
+            status = (
+                ProviderStatus.FATAL
+                if details.error_code == ErrorCode.PROVIDER_FATAL
+                else ProviderStatus.ERROR
+            )
+            self._provider_status[provider] = status
 
 
 default_registry = ProviderRegistry()
