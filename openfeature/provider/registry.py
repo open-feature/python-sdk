@@ -102,3 +102,6 @@ class ProviderRegistry:
 
         if event := ProviderEvent.from_provider_status(status):
             run_handlers_for_provider(provider, event, ProviderEventDetails())
+
+
+default_registry = ProviderRegistry()
