@@ -44,7 +44,7 @@ jobs:
         run: hatch run e2e
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           flags: unittests # optional
           name: coverage # optional
