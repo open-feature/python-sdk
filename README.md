@@ -13,14 +13,14 @@
 <!-- The 'github-badges' class is used in the docs -->
 <p align="center" class="github-badges">
 
-  <a href="https://github.com/open-feature/spec/releases/tag/v0.5.2">
-    <img alt="Specification" src="https://img.shields.io/static/v1?label=Specification&message=v0.5.2&color=red&style=for-the-badge" />
+  <a href="https://github.com/open-feature/spec/releases/tag/v0.8.0">
+    <img alt="Specification" src="https://img.shields.io/static/v1?label=Specification&message=v0.8.0&color=red&style=for-the-badge" />
   </a>
 
   <!-- x-release-please-start-version -->
 
-  <a href="https://github.com/open-feature/python-sdk/releases/tag/v0.5.0">
-    <img alt="Latest version" src="https://img.shields.io/static/v1?label=release&message=v0.5.0&color=blue&style=for-the-badge" />
+  <a href="https://github.com/open-feature/python-sdk/releases/tag/v0.6.1">
+    <img alt="Latest version" src="https://img.shields.io/static/v1?label=release&message=v0.6.1&color=blue&style=for-the-badge" />
   </a>
 
   <!-- x-release-please-end -->
@@ -60,13 +60,13 @@
 #### Pip install
 
 ```bash
-pip install openfeature-sdk==0.5.0
+pip install openfeature-sdk==0.6.1
 ```
 
 #### requirements.txt
 
 ```bash
-openfeature-sdk==0.5.0
+openfeature-sdk==0.6.1
 ```
 
 ```python

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "openfeature_sdk"
-version = "0.5.0"
+version = "0.6.1"
 description = "Standardizing Feature Flagging for Everyone"
 readme = "README.md"
 authors = [{ name = "OpenFeature", email = "openfeature-core@groups.io" }]
@@ -15,7 +15,12 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = []
+keywords = [
+    "openfeature",
+    "feature",
+    "flags",
+    "toggles",
+]
 dependencies = []
 requires-python = ">=3.8"
 

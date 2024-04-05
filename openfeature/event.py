@@ -12,13 +12,12 @@ class ProviderEvent(Enum):
     PROVIDER_READY = "PROVIDER_READY"
     PROVIDER_CONFIGURATION_CHANGED = "PROVIDER_CONFIGURATION_CHANGED"
     PROVIDER_ERROR = "PROVIDER_ERROR"
-    PROVIDER_FATAL = "PROVIDER_FATAL"
     PROVIDER_STALE = "PROVIDER_STALE"
 
     __status__: ClassVar[Dict[ProviderStatus, str]] = {
         ProviderStatus.READY: PROVIDER_READY,
         ProviderStatus.ERROR: PROVIDER_ERROR,
-        ProviderStatus.FATAL: PROVIDER_FATAL,
+        ProviderStatus.FATAL: PROVIDER_ERROR,
         ProviderStatus.STALE: PROVIDER_STALE,
     }
 

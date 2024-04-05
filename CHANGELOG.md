@@ -1,5 +1,60 @@
 # Changelog
 
+## [0.6.1](https://github.com/open-feature/python-sdk/compare/v0.6.0...v0.6.1) (2024-03-26)
+
+
+### ✨ New Features
+
+* populate provider and client metadata in HookContext  ([#302](https://github.com/open-feature/python-sdk/issues/302)) ([78ea3b9](https://github.com/open-feature/python-sdk/commit/78ea3b991499231f42efda41ba6f672e20cb346c))
+
+
+### 🧹 Chore
+
+* add keywords to pyproject.toml ([#305](https://github.com/open-feature/python-sdk/issues/305)) ([05d0da2](https://github.com/open-feature/python-sdk/commit/05d0da2e3df86833986618243e18b66218425db8))
+
+
+### 🔄 Refactoring
+
+* mark hook_support module as private/internal ([#303](https://github.com/open-feature/python-sdk/issues/303)) ([4a323b0](https://github.com/open-feature/python-sdk/commit/4a323b0f9622663c9c43c292364fa25062d70715))
+
+## [0.6.0](https://github.com/open-feature/python-sdk/compare/v0.5.0...v0.6.0) (2024-03-22)
+
+
+### 🐛 Bug Fixes
+
+* run error hooks if provider returns FlagResolutionDetails with non-empty error_code ([#291](https://github.com/open-feature/python-sdk/issues/291)) ([e747544](https://github.com/open-feature/python-sdk/commit/e7475441bd14323431fdf1850e643f5aaaa21abd))
+
+
+### ✨ New Features
+
+* implement provider events ([#278](https://github.com/open-feature/python-sdk/issues/278)) ([679409f](https://github.com/open-feature/python-sdk/commit/679409fad229d0e675be4a8ee2b3a13860f4e987))
+* implement provider status ([#288](https://github.com/open-feature/python-sdk/issues/288)) ([789e6e0](https://github.com/open-feature/python-sdk/commit/789e6e0f5fcf499604261afd918ed1e8844fa0a0))
+
+
+### 🧹 Chore
+
+* add changelog sections ([#282](https://github.com/open-feature/python-sdk/issues/282)) ([141858d](https://github.com/open-feature/python-sdk/commit/141858d2359bf6bf439426b3ea4ba322f4b10421))
+* **deps:** update dependency coverage to v7.4.3 ([#280](https://github.com/open-feature/python-sdk/issues/280)) ([bafa427](https://github.com/open-feature/python-sdk/commit/bafa427a0da40711d327c435ab199286f68fb6b7))
+* **deps:** update dependency coverage to v7.4.4 ([#293](https://github.com/open-feature/python-sdk/issues/293)) ([f5987ef](https://github.com/open-feature/python-sdk/commit/f5987ef8f41892c9cad776d7716592ac0eac4719))
+* **deps:** update dependency pytest to v8.0.2 ([#281](https://github.com/open-feature/python-sdk/issues/281)) ([b2594a5](https://github.com/open-feature/python-sdk/commit/b2594a567c31e48a1ae675b855e84300201e8132))
+* **deps:** update dependency pytest to v8.1.0 ([#287](https://github.com/open-feature/python-sdk/issues/287)) ([7ba7d61](https://github.com/open-feature/python-sdk/commit/7ba7d6146f0f801cadfd7593dc6df4b7d4f488d4))
+* **deps:** update dependency pytest to v8.1.1 ([#289](https://github.com/open-feature/python-sdk/issues/289)) ([3f336b3](https://github.com/open-feature/python-sdk/commit/3f336b3a248dd8e75e162870d26a4b97c61f2ff6))
+* **deps:** update dependency pytest-mock to v3.13.0 ([#298](https://github.com/open-feature/python-sdk/issues/298)) ([04b4009](https://github.com/open-feature/python-sdk/commit/04b4009dbfd112307e17a6f9273e0118ad337fe1))
+* **deps:** update dependency pytest-mock to v3.14.0 ([#300](https://github.com/open-feature/python-sdk/issues/300)) ([a70ae0c](https://github.com/open-feature/python-sdk/commit/a70ae0cb2e5322cc6290dbe5be12f0a665cc0e86))
+* update mypy and ruff ([#296](https://github.com/open-feature/python-sdk/issues/296)) ([6e4eebc](https://github.com/open-feature/python-sdk/commit/6e4eebce2073aa792444ea9f28906b9c925ebd75))
+
+
+### 📚 Documentation
+
+* add missing imports in provider dev example in README ([ae26217](https://github.com/open-feature/python-sdk/commit/ae26217328a5ca07722c5e12b01720606259d805))
+* add Missing Imports in Provider Dev Example in README ([#286](https://github.com/open-feature/python-sdk/issues/286)) ([ae26217](https://github.com/open-feature/python-sdk/commit/ae26217328a5ca07722c5e12b01720606259d805))
+* update spec version to 0.8.0 ([#299](https://github.com/open-feature/python-sdk/issues/299)) ([58d27c4](https://github.com/open-feature/python-sdk/commit/58d27c4011b4f7fd96cc7d1ba10f017c7a3db958))
+
+
+### 🔄 Refactoring
+
+* improve Hook Hints typing ([#285](https://github.com/open-feature/python-sdk/issues/285)) ([5acd6a6](https://github.com/open-feature/python-sdk/commit/5acd6a6598fa45326ddafb0184d184cadea826d0))
+
 ## [0.5.0](https://github.com/open-feature/python-sdk/compare/v0.4.2...v0.5.0) (2024-02-20)
 
 
