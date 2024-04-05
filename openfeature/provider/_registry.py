@@ -78,27 +78,19 @@ class ProviderRegistry:
                 provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
             )
         except Exception as err:
-            if (
-                isinstance(err, OpenFeatureError)
-                and err.error_code == ErrorCode.PROVIDER_FATAL
-            ):
-                self.dispatch_event(
-                    provider,
-                    ProviderEvent.PROVIDER_ERROR,
-                    ProviderEventDetails(
-                        message=f"Provider initialization failed: {err}",
-                        error_code=ErrorCode.PROVIDER_FATAL,
-                    ),
-                )
-            else:
-                self.dispatch_event(
-                    provider,
-                    ProviderEvent.PROVIDER_ERROR,
-                    ProviderEventDetails(
-                        message=f"Provider initialization failed: {err}",
-                        error_code=ErrorCode.GENERAL,
-                    ),
-                )
+            error_code = (
+                err.error_code
+                if isinstance(err, OpenFeatureError)
+                else ErrorCode.GENERAL
+            )
+            self.dispatch_event(
+                provider,
+                ProviderEvent.PROVIDER_ERROR,
+                ProviderEventDetails(
+                    message=f"Provider initialization failed: {err}",
+                    error_code=error_code,
+                ),
+            )
 
     def _shutdown_provider(self, provider: FeatureProvider) -> None:
         try:
