@@ -83,6 +83,6 @@ class AbstractProvider(FeatureProvider):
         self.emit(ProviderEvent.PROVIDER_STALE, details)
 
     def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
-        from openfeature.provider._registry import default_registry
+        from openfeature.provider._registry import provider_registry
 
-        default_registry.dispatch_event(self, event, details)
+        provider_registry.dispatch_event(self, event, details)

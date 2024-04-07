@@ -10,7 +10,7 @@ from openfeature.event import (
 from openfeature.exception import GeneralError
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
-from openfeature.provider._registry import default_registry
+from openfeature.provider._registry import provider_registry
 from openfeature.provider.metadata import Metadata
 
 _evaluation_context = EvaluationContext()
@@ -28,18 +28,18 @@ def set_provider(
     provider: FeatureProvider, domain: typing.Optional[str] = None
 ) -> None:
     if domain is None:
-        default_registry.set_default_provider(provider)
+        provider_registry.set_default_provider(provider)
     else:
-        default_registry.set_provider(domain, provider)
+        provider_registry.set_provider(domain, provider)
 
 
 def clear_providers() -> None:
-    default_registry.clear_providers()
+    provider_registry.clear_providers()
     _event_support.clear()
 
 
 def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
-    return default_registry.get_provider(domain).get_metadata()
+    return provider_registry.get_provider(domain).get_metadata()
 
 
 def get_evaluation_context() -> EvaluationContext:
@@ -70,7 +70,7 @@ def get_hooks() -> typing.List[Hook]:
 
 
 def shutdown() -> None:
-    default_registry.shutdown()
+    provider_registry.shutdown()
 
 
 def add_handler(event: ProviderEvent, handler: EventHandler) -> None:

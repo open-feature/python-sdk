@@ -138,4 +138,4 @@ class ProviderRegistry:
             self._provider_status[provider] = status
 
 
-default_registry = ProviderRegistry()
+provider_registry = ProviderRegistry()
