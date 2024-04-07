@@ -1,7 +1,6 @@
 import typing
 from abc import abstractmethod
 
-from openfeature._event_support import run_handlers_for_provider
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import ProviderEvent, ProviderEventDetails
 from openfeature.flag_evaluation import FlagResolutionDetails
@@ -84,4 +83,6 @@ class AbstractProvider(FeatureProvider):
         self.emit(ProviderEvent.PROVIDER_STALE, details)
 
     def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
-        run_handlers_for_provider(self, event, details)
+        from openfeature.provider._registry import provider_registry
+
+        provider_registry.dispatch_event(self, event, details)

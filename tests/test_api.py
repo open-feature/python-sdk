@@ -18,9 +18,9 @@ from openfeature.api import (
 )
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import EventDetails, ProviderEvent, ProviderEventDetails
-from openfeature.exception import ErrorCode, GeneralError
+from openfeature.exception import ErrorCode, GeneralError, ProviderFatalError
 from openfeature.hook import Hook
-from openfeature.provider import FeatureProvider, Metadata
+from openfeature.provider import FeatureProvider, Metadata, ProviderStatus
 from openfeature.provider.no_op_provider import NoOpProvider
 
 
@@ -303,13 +303,57 @@ def test_handlers_attached_to_provider_already_in_associated_state_should_run_im
 def test_provider_ready_handlers_run_if_provider_initialize_function_terminates_normally():
     # Given
     provider = NoOpProvider()
-    set_provider(provider)
 
     spy = MagicMock()
     add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
+    spy.reset_mock()  # reset the mock to avoid counting the immediate call on subscribe
 
     # When
-    provider.initialize(get_evaluation_context())
+    set_provider(provider)
 
     # Then
     spy.provider_ready.assert_called_once()
+
+
+def test_provider_error_handlers_run_if_provider_initialize_function_terminates_abnormally():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    provider.initialize.side_effect = ProviderFatalError()
+
+    spy = MagicMock()
+    add_handler(ProviderEvent.PROVIDER_ERROR, spy.provider_error)
+
+    # When
+    set_provider(provider)
+
+    # Then
+    spy.provider_error.assert_called_once()
+
+
+def test_provider_status_is_updated_after_provider_emits_event():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+    client = get_client()
+
+    # When
+    provider.emit_provider_error(ProviderEventDetails(error_code=ErrorCode.GENERAL))
+    # Then
+    assert client.get_provider_status() == ProviderStatus.ERROR
+
+    # When
+    provider.emit_provider_error(
+        ProviderEventDetails(error_code=ErrorCode.PROVIDER_FATAL)
+    )
+    # Then
+    assert client.get_provider_status() == ProviderStatus.FATAL
+
+    # When
+    provider.emit_provider_stale(ProviderEventDetails())
+    # Then
+    assert client.get_provider_status() == ProviderStatus.STALE
+
+    # When
+    provider.emit_provider_ready(ProviderEventDetails())
+    # Then
+    assert client.get_provider_status() == ProviderStatus.READY
