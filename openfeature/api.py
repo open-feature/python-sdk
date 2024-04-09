@@ -13,6 +13,21 @@ from openfeature.provider import FeatureProvider
 from openfeature.provider._registry import provider_registry
 from openfeature.provider.metadata import Metadata
 
+__all__ = [
+    "get_client",
+    "set_provider",
+    "clear_providers",
+    "get_provider_metadata",
+    "get_evaluation_context",
+    "set_evaluation_context",
+    "add_hooks",
+    "clear_hooks",
+    "get_hooks",
+    "shutdown",
+    "add_handler",
+    "remove_handler",
+]
+
 _evaluation_context = EvaluationContext()
 
 _hooks: typing.List[Hook] = []

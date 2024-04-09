@@ -4,6 +4,19 @@ import typing
 from collections.abc import Mapping
 from enum import Enum
 
+__all__ = [
+    "OpenFeatureError",
+    "ProviderNotReadyError",
+    "ProviderFatalError",
+    "FlagNotFoundError",
+    "GeneralError",
+    "ParseError",
+    "TypeMismatchError",
+    "TargetingKeyMissingError",
+    "InvalidContextError",
+    "ErrorCode",
+]
+
 
 class OpenFeatureError(Exception):
     """
