@@ -19,6 +19,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      # IMPORTANT: this permission is mandatory for codecov OIDC
+      id-token: write
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
@@ -46,12 +49,13 @@ jobs:
           behave tests/features/
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           flags: unittests # optional
           name: coverage # optional
           fail_ci_if_error: true # optional (default = false)
           verbose: true # optional (default = false)
+          use_oidc: true
 
   lint:
     runs-on: ubuntu-latest
