@@ -12,6 +12,10 @@ from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
 from openfeature.provider._registry import provider_registry
 from openfeature.provider.metadata import Metadata
+from openfeature.transaction_context import (
+    NoopTransactionContextPropagator,
+    TransactionContextPropagator,
+)
 
 __all__ = [
     "get_client",
@@ -26,11 +30,18 @@ __all__ = [
     "shutdown",
     "add_handler",
     "remove_handler",
+    "set_transaction_context_propagator",
+    "set_transaction_context",
+    "get_transaction_context",
 ]
 
 _evaluation_context = EvaluationContext()
 
 _hooks: typing.List[Hook] = []
+
+_transaction_context_propagator: TransactionContextPropagator = (
+    NoopTransactionContextPropagator()
+)
 
 
 def get_client(
@@ -94,3 +105,17 @@ def add_handler(event: ProviderEvent, handler: EventHandler) -> None:
 
 def remove_handler(event: ProviderEvent, handler: EventHandler) -> None:
     _event_support.remove_global_handler(event, handler)
+
+
+def set_transaction_context_propagator(
+    propagator: TransactionContextPropagator,
+) -> None:
+    _transaction_context_propagator = propagator
+
+
+def set_transaction_context(context: EvaluationContext) -> None:
+    _transaction_context_propagator.set_transaction_context(context)
+
+
+def get_transaction_context() -> EvaluationContext:
+    return _transaction_context_propagator.get_transaction_context()

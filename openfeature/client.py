@@ -335,9 +335,10 @@ class OpenFeatureClient:
             )
             invocation_context = invocation_context.merge(ctx2=evaluation_context)
 
-            # Requirement 3.2.2 merge: API.context->client.context->invocation.context
+            # Requirement 3.2.3 merge: API.context->transaction.context->client.context->invocation.context
             merged_context = (
                 api.get_evaluation_context()
+                .merge(api.get_transaction_context())
                 .merge(self.context)
                 .merge(invocation_context)
             )
