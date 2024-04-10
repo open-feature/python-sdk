@@ -9,7 +9,7 @@ from openfeature.event import (
     ProviderEvent,
     ProviderEventDetails,
 )
-from openfeature.provider import FeatureProvider
+from openfeature.provider import FeatureProvider, ProviderStatus
 
 if TYPE_CHECKING:
     from openfeature.client import OpenFeatureClient
@@ -80,7 +80,13 @@ def run_handlers_for_provider(
 def _run_immediate_handler(
     client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
 ) -> None:
-    if event == ProviderEvent.from_provider_status(client.get_provider_status()):
+    status_to_event = {
+        ProviderStatus.READY: ProviderEvent.PROVIDER_READY,
+        ProviderStatus.ERROR: ProviderEvent.PROVIDER_ERROR,
+        ProviderStatus.FATAL: ProviderEvent.PROVIDER_ERROR,
+        ProviderStatus.STALE: ProviderEvent.PROVIDER_STALE,
+    }
+    if event == status_to_event.get(client.get_provider_status()):
         handler(EventDetails(provider_name=client.provider.get_metadata().name))
 
 

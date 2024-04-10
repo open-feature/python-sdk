@@ -3,9 +3,8 @@ import typing
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.hook import Hook
-from openfeature.provider.metadata import Metadata
+from openfeature.provider import AbstractProvider, Metadata
 from openfeature.provider.no_op_metadata import NoOpMetadata
-from openfeature.provider.provider import AbstractProvider
 
 PASSED_IN_DEFAULT = "Passed in default"
 
