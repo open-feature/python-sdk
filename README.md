@@ -259,8 +259,7 @@ from typing import List, Optional, Union
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.hook import Hook
-from openfeature.provider.metadata import Metadata
-from openfeature.provider.provider import AbstractProvider
+from openfeature.provider import AbstractProvider, Metadata
 
 class MyProvider(AbstractProvider):
     def get_metadata(self) -> Metadata:

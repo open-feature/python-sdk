@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable, ClassVar, Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 from openfeature.exception import ErrorCode
-from openfeature.provider import ProviderStatus
 
 __all__ = ["ProviderEvent", "ProviderEventDetails", "EventDetails", "EventHandler"]
 
@@ -15,18 +14,6 @@ class ProviderEvent(Enum):
     PROVIDER_CONFIGURATION_CHANGED = "PROVIDER_CONFIGURATION_CHANGED"
     PROVIDER_ERROR = "PROVIDER_ERROR"
     PROVIDER_STALE = "PROVIDER_STALE"
-
-    __status__: ClassVar[Dict[ProviderStatus, str]] = {
-        ProviderStatus.READY: PROVIDER_READY,
-        ProviderStatus.ERROR: PROVIDER_ERROR,
-        ProviderStatus.FATAL: PROVIDER_ERROR,
-        ProviderStatus.STALE: PROVIDER_STALE,
-    }
-
-    @classmethod
-    def from_provider_status(cls, status: ProviderStatus) -> Optional[ProviderEvent]:
-        value = ProviderEvent.__status__.get(status)
-        return ProviderEvent[value] if value else None
 
 
 @dataclass

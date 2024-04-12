@@ -6,8 +6,7 @@ from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import FlagNotFoundError
 from openfeature.flag_evaluation import FlagMetadata, FlagResolutionDetails, Reason
 from openfeature.hook import Hook
-from openfeature.provider.metadata import Metadata
-from openfeature.provider.provider import AbstractProvider
+from openfeature.provider import AbstractProvider, Metadata
 
 PASSED_IN_DEFAULT = "Passed in default"
 
