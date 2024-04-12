@@ -45,12 +45,13 @@ jobs:
 
       - if: matrix.python-version == '3.11'
         name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4.3.0
         with:
           flags: unittests # optional
           name: coverage # optional
-          fail_ci_if_error: false # optional (default = false)
+          fail_ci_if_error: true # optional (default = false)
           verbose: true # optional (default = false)
+          token: ${{ secrets.CODECOV_UPLOAD_TOKEN }}
 
   lint:
     runs-on: ubuntu-latest
