@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "openfeature_sdk"
-version = "0.6.1"
+version = "0.7.0"
 description = "Standardizing Feature Flagging for Everyone"
 readme = "README.md"
 authors = [{ name = "OpenFeature", email = "openfeature-core@groups.io" }]
