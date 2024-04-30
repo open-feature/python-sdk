@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.7.0](https://github.com/open-feature/python-sdk/compare/v0.6.1...v0.7.0) (2024-04-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* move AbstractProvider to openfeature.provider ([#314](https://github.com/open-feature/python-sdk/issues/314))
+* restrict exported names with __all__ ([#306](https://github.com/open-feature/python-sdk/issues/306))
+
+### 🐛 Bug Fixes
+
+* remove ProviderEvent.PROVIDER_FATAL ([#307](https://github.com/open-feature/python-sdk/issues/307)) ([de36b21](https://github.com/open-feature/python-sdk/commit/de36b214dcba717d3ff72cb5d9cc3d3c8de45461))
+* restrict exported names with __all__ ([#306](https://github.com/open-feature/python-sdk/issues/306)) ([34ac91c](https://github.com/open-feature/python-sdk/commit/34ac91c707103fa50e905c54148f09615c610c33))
+
+
+### ✨ New Features
+
+* update provider status when provider emits events ([#309](https://github.com/open-feature/python-sdk/issues/309)) ([9966c14](https://github.com/open-feature/python-sdk/commit/9966c14e16329f8d1e70b492b8785be497257a6b))
+
+
+### 🧹 Chore
+
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.3.5 ([#311](https://github.com/open-feature/python-sdk/issues/311)) ([47ae16c](https://github.com/open-feature/python-sdk/commit/47ae16c167fbb4bd8f92eaca3151afabb18a6752))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.3.6 ([#316](https://github.com/open-feature/python-sdk/issues/316)) ([49f0948](https://github.com/open-feature/python-sdk/commit/49f0948e5140151f655e6d34c15810092fda3510))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.3.7 ([#318](https://github.com/open-feature/python-sdk/issues/318)) ([5636620](https://github.com/open-feature/python-sdk/commit/563662054ce0707d9c752bcd639e9d296b9bce9e))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.0 ([#320](https://github.com/open-feature/python-sdk/issues/320)) ([abb14f5](https://github.com/open-feature/python-sdk/commit/abb14f5ed9b1b5e95ea90e6df0a67c9109bd465e))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.1 ([#321](https://github.com/open-feature/python-sdk/issues/321)) ([44f1223](https://github.com/open-feature/python-sdk/commit/44f12239ffe67e6f3a78dc68640bf56fd56fe8d9))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.2 ([#323](https://github.com/open-feature/python-sdk/issues/323)) ([f109df6](https://github.com/open-feature/python-sdk/commit/f109df671c6b446219e52a575ddff70d74792ddf))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.10.0 ([#322](https://github.com/open-feature/python-sdk/issues/322)) ([6dedd27](https://github.com/open-feature/python-sdk/commit/6dedd275cfe71fd76a772dea7a318312aac3d477))
+* **deps:** update pre-commit hook pre-commit/pre-commit-hooks to v4.6.0 ([#312](https://github.com/open-feature/python-sdk/issues/312)) ([faf02a9](https://github.com/open-feature/python-sdk/commit/faf02a98889585e3fbe0215e2a8963a39e626ff1))
+* update codecov/codecov-action action to v4 ([#317](https://github.com/open-feature/python-sdk/issues/317)) ([cd605c4](https://github.com/open-feature/python-sdk/commit/cd605c4f5d130b9823555a9bd465d6874b321701))
+* update renovate config ([#310](https://github.com/open-feature/python-sdk/issues/310)) ([ff62637](https://github.com/open-feature/python-sdk/commit/ff626374ae20311f090a9344aedbde7d37fb35fd))
+
+
+### 🔄 Refactoring
+
+* move AbstractProvider to openfeature.provider ([#314](https://github.com/open-feature/python-sdk/issues/314)) ([96ba793](https://github.com/open-feature/python-sdk/commit/96ba7938de554724edfc1670d4737f4c495f98a6))
+
 ## [0.6.1](https://github.com/open-feature/python-sdk/compare/v0.6.0...v0.6.1) (2024-03-26)
 
 
