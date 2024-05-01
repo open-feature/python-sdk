@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +33,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
+          allow-prereleases: true
+
+      - if: matrix.python-version == '3.13'
+        name: Install wheel
+        run: pip install wheel
 
       - name: Install hatch
         run: pip install hatch
@@ -43,7 +48,7 @@ jobs:
       - name: Run E2E tests with behave
         run: hatch run e2e
 
-      - if: matrix.python-version == '3.11'
+      - if: matrix.python-version == '3.12'
         name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4.3.0
         with:
@@ -60,7 +65,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           cache: "pip"
 
       - name: Run pre-commit
@@ -76,7 +81,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
