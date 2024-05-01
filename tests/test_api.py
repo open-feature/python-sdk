@@ -235,6 +235,8 @@ def test_clear_providers_shutdowns_every_provider_and_resets_default_provider():
 def test_provider_events():
     # Given
     spy = MagicMock()
+    provider = NoOpProvider()
+    set_provider(provider)
 
     add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
     add_handler(
@@ -242,8 +244,6 @@ def test_provider_events():
     )
     add_handler(ProviderEvent.PROVIDER_ERROR, spy.provider_error)
     add_handler(ProviderEvent.PROVIDER_STALE, spy.provider_stale)
-
-    provider = NoOpProvider()
 
     provider_details = ProviderEventDetails(message="message")
     details = EventDetails.from_provider_event_details(

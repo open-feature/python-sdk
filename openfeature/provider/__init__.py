@@ -23,6 +23,15 @@ class ProviderStatus(Enum):
 
 
 class FeatureProvider(typing.Protocol):  # pragma: no cover
+    def attach(
+        self,
+        on_emit: typing.Callable[
+            [FeatureProvider, ProviderEvent, ProviderEventDetails], None
+        ],
+    ) -> None: ...
+
+    def detach(self) -> None: ...
+
     def initialize(self, evaluation_context: EvaluationContext) -> None: ...
 
     def shutdown(self) -> None: ...
@@ -68,6 +77,18 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
 
 
 class AbstractProvider(FeatureProvider):
+    def attach(
+        self,
+        on_emit: typing.Callable[
+            [FeatureProvider, ProviderEvent, ProviderEventDetails], None
+        ],
+    ) -> None:
+        self._on_emit = on_emit
+
+    def detach(self) -> None:
+        if hasattr(self, "_on_emit"):
+            del self._on_emit
+
     def initialize(self, evaluation_context: EvaluationContext) -> None:
         pass
 
@@ -141,6 +162,5 @@ class AbstractProvider(FeatureProvider):
         self.emit(ProviderEvent.PROVIDER_STALE, details)
 
     def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
-        from openfeature.provider._registry import provider_registry
-
-        provider_registry.dispatch_event(self, event, details)
+        if hasattr(self, "_on_emit"):
+            self._on_emit(self, event, details)

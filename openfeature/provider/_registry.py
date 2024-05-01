@@ -71,6 +71,7 @@ class ProviderRegistry:
         return get_evaluation_context()
 
     def _initialize_provider(self, provider: FeatureProvider) -> None:
+        provider.attach(self.dispatch_event)
         try:
             if hasattr(provider, "initialize"):
                 provider.initialize(self._get_evaluation_context())
@@ -106,6 +107,7 @@ class ProviderRegistry:
                     error_code=ErrorCode.PROVIDER_FATAL,
                 ),
             )
+        provider.detach()
 
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
         return self._provider_status.get(provider, ProviderStatus.NOT_READY)
