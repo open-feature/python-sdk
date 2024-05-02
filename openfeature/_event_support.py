@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from collections import defaultdict
 from typing import TYPE_CHECKING, Dict, List
 
@@ -15,7 +16,10 @@ if TYPE_CHECKING:
     from openfeature.client import OpenFeatureClient
 
 
+_global_lock = threading.RLock()
 _global_handlers: Dict[ProviderEvent, List[EventHandler]] = defaultdict(list)
+
+_client_lock = threading.RLock()
 _client_handlers: Dict[OpenFeatureClient, Dict[ProviderEvent, List[EventHandler]]] = (
     defaultdict(lambda: defaultdict(list))
 )
@@ -24,20 +28,23 @@ _client_handlers: Dict[OpenFeatureClient, Dict[ProviderEvent, List[EventHandler]
 def run_client_handlers(
     client: OpenFeatureClient, event: ProviderEvent, details: EventDetails
 ) -> None:
-    for handler in _client_handlers[client][event]:
-        handler(details)
+    with _client_lock:
+        for handler in _client_handlers[client][event]:
+            handler(details)
 
 
 def run_global_handlers(event: ProviderEvent, details: EventDetails) -> None:
-    for handler in _global_handlers[event]:
-        handler(details)
+    with _global_lock:
+        for handler in _global_handlers[event]:
+            handler(details)
 
 
 def add_client_handler(
     client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
 ) -> None:
-    handlers = _client_handlers[client][event]
-    handlers.append(handler)
+    with _client_lock:
+        handlers = _client_handlers[client][event]
+        handlers.append(handler)
 
     _run_immediate_handler(client, event, handler)
 
@@ -45,12 +52,14 @@ def add_client_handler(
 def remove_client_handler(
     client: OpenFeatureClient, event: ProviderEvent, handler: EventHandler
 ) -> None:
-    handlers = _client_handlers[client][event]
-    handlers.remove(handler)
+    with _client_lock:
+        handlers = _client_handlers[client][event]
+        handlers.remove(handler)
 
 
 def add_global_handler(event: ProviderEvent, handler: EventHandler) -> None:
-    _global_handlers[event].append(handler)
+    with _global_lock:
+        _global_handlers[event].append(handler)
 
     from openfeature.api import get_client
 
@@ -58,7 +67,8 @@ def add_global_handler(event: ProviderEvent, handler: EventHandler) -> None:
 
 
 def remove_global_handler(event: ProviderEvent, handler: EventHandler) -> None:
-    _global_handlers[event].remove(handler)
+    with _global_lock:
+        _global_handlers[event].remove(handler)
 
 
 def run_handlers_for_provider(
@@ -72,9 +82,10 @@ def run_handlers_for_provider(
     # run the global handlers
     run_global_handlers(event, details)
     # run the handlers for clients associated to this provider
-    for client in _client_handlers:
-        if client.provider == provider:
-            run_client_handlers(client, event, details)
+    with _client_lock:
+        for client in _client_handlers:
+            if client.provider == provider:
+                run_client_handlers(client, event, details)
 
 
 def _run_immediate_handler(
@@ -91,5 +102,7 @@ def _run_immediate_handler(
 
 
 def clear() -> None:
-    _global_handlers.clear()
-    _client_handlers.clear()
+    with _global_lock:
+        _global_handlers.clear()
+    with _client_lock:
+        _client_handlers.clear()

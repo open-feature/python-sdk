@@ -1,3 +1,6 @@
+import time
+import uuid
+from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import MagicMock
 
 import pytest
@@ -356,3 +359,28 @@ def test_provider_event_late_binding():
 
     # Then
     spy.provider_configuration_changed.assert_called_once_with(details)
+
+
+def test_client_handlers_thread_safety():
+    provider = NoOpProvider()
+    set_provider(provider)
+
+    def add_handlers_task():
+        def handler(*args, **kwargs):
+            time.sleep(0.005)
+
+        for _ in range(10):
+            time.sleep(0.01)
+            client = get_client(str(uuid.uuid4()))
+            client.add_handler(ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, handler)
+
+    def emit_events_task():
+        for _ in range(10):
+            time.sleep(0.01)
+            provider.emit_provider_configuration_changed(ProviderEventDetails())
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        f1 = executor.submit(add_handlers_task)
+        f2 = executor.submit(emit_events_task)
+        f1.result()
+        f2.result()
