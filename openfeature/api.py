@@ -1,3 +1,4 @@
+import threading
 import typing
 
 from openfeature import _event_support
@@ -30,6 +31,7 @@ __all__ = [
 
 _evaluation_context = EvaluationContext()
 
+_hooks_lock = threading.RLock()
 _hooks: typing.List[Hook] = []
 
 
@@ -58,7 +60,6 @@ def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
 
 
 def get_evaluation_context() -> EvaluationContext:
-    global _evaluation_context
     return _evaluation_context
 
 
@@ -70,18 +71,18 @@ def set_evaluation_context(evaluation_context: EvaluationContext) -> None:
 
 
 def add_hooks(hooks: typing.List[Hook]) -> None:
-    global _hooks
-    _hooks = _hooks + hooks
+    with _hooks_lock:
+        _hooks.extend(hooks)
 
 
 def clear_hooks() -> None:
-    global _hooks
-    _hooks = []
+    with _hooks_lock:
+        _hooks.clear()
 
 
 def get_hooks() -> typing.List[Hook]:
-    global _hooks
-    return _hooks
+    with _hooks_lock:
+        return _hooks
 
 
 def shutdown() -> None:
