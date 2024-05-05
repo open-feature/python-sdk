@@ -31,7 +31,7 @@ __all__ = [
 
 _evaluation_context = EvaluationContext()
 
-_hooks_lock = threading.RLock()
+_hooks_lock = threading.Lock()
 _hooks: typing.List[Hook] = []
 
 
