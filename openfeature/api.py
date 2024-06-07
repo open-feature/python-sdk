@@ -58,7 +58,6 @@ def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
 
 
 def get_evaluation_context() -> EvaluationContext:
-    global _evaluation_context
     return _evaluation_context
 
 
@@ -80,7 +79,6 @@ def clear_hooks() -> None:
 
 
 def get_hooks() -> typing.List[Hook]:
-    global _hooks
     return _hooks
 
 
