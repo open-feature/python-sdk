@@ -35,6 +35,10 @@ jobs:
           cache: "pip"
           allow-prereleases: true
 
+      - if: matrix.python-version == '3.13'
+        name: Install cffi
+        run: pip install cffi==1.17.0rc1 wheel
+
       - name: Install hatch
         run: pip install hatch
 
