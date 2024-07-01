@@ -361,19 +361,13 @@ class OpenFeatureClient:
             return flag_evaluation
 
         except OpenFeatureError as err:
-            logger.exception(
-                "Error %s while evaluating flag with key: '%s'",
-                err.error_code,
-                flag_key,
-            )
-
             error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
             return FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
                 reason=Reason.ERROR,
-                error_code=err.error_code,
+                error_code=err.error_code or ErrorCode.GENERAL,
                 error_message=err.error_message,
             )
         # Catch any type of exception here since the user can provide any exception
