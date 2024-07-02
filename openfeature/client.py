@@ -367,7 +367,7 @@ class OpenFeatureClient:
                 flag_key=flag_key,
                 value=default_value,
                 reason=Reason.ERROR,
-                error_code=err.error_code or ErrorCode.GENERAL,
+                error_code=err.error_code,
                 error_message=err.error_message,
             )
         # Catch any type of exception here since the user can provide any exception
