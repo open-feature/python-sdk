@@ -361,12 +361,6 @@ class OpenFeatureClient:
             return flag_evaluation
 
         except OpenFeatureError as err:
-            logger.exception(
-                "Error %s while evaluating flag with key: '%s'",
-                err.error_code,
-                flag_key,
-            )
-
             error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
             return FlagEvaluationDetails(
