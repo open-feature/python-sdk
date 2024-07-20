@@ -23,7 +23,7 @@ class HookType(Enum):
 
 
 class HookContext:
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         flag_key: str,
         flag_type: FlagType,
