@@ -24,7 +24,7 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{secrets.RELEASE_PLEASE_ACTION_TOKEN}}
           target-branch: main
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
