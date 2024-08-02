@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.7.1](https://github.com/open-feature/python-sdk/compare/v0.7.0...v0.7.1) (2024-08-02)
+
+
+### 🐛 Bug Fixes
+
+* event handler methods are not thread-safe ([#329](https://github.com/open-feature/python-sdk/issues/329)) ([3217575](https://github.com/open-feature/python-sdk/commit/3217575f4f87587751e47707384c344c185b684c)), closes [#326](https://github.com/open-feature/python-sdk/issues/326)
+* make global hooks thread safe ([#331](https://github.com/open-feature/python-sdk/issues/331)) ([5abcf3b](https://github.com/open-feature/python-sdk/commit/5abcf3b157f0f1ef6655a64abf1229ab84ad190e))
+* remove exception logging during evaluation ([#347](https://github.com/open-feature/python-sdk/issues/347)) ([0ed625f](https://github.com/open-feature/python-sdk/commit/0ed625f18617472ac0e60a88e727223381d8d735))
+
+
+### 🧹 Chore
+
+* **deps:** update codecov/codecov-action action to v4.3.1 ([#327](https://github.com/open-feature/python-sdk/issues/327)) ([f352045](https://github.com/open-feature/python-sdk/commit/f3520450557c71d8bfd7884c909114c27ba4e2e6))
+* **deps:** update codecov/codecov-action action to v4.4.0 ([#334](https://github.com/open-feature/python-sdk/issues/334)) ([6acbef9](https://github.com/open-feature/python-sdk/commit/6acbef94e67fa1c5da8f764a1d581870d92729aa))
+* **deps:** update codecov/codecov-action action to v4.4.1 ([#335](https://github.com/open-feature/python-sdk/issues/335)) ([fa67709](https://github.com/open-feature/python-sdk/commit/fa677092f894ed0ad00093391b799fb5a2adbab2))
+* **deps:** update codecov/codecov-action action to v4.5.0 ([#341](https://github.com/open-feature/python-sdk/issues/341)) ([e6a353e](https://github.com/open-feature/python-sdk/commit/e6a353e4754aa9443f3042b820bf167b6a66c944))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.10 ([#344](https://github.com/open-feature/python-sdk/issues/344)) ([2a45af8](https://github.com/open-feature/python-sdk/commit/2a45af895cc7dc7e15f94422a9de58d2b82db92b))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.3 ([#330](https://github.com/open-feature/python-sdk/issues/330)) ([f8544ff](https://github.com/open-feature/python-sdk/commit/f8544ffaf6abdee88d38e40c2dc493b36dad2c82))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.4 ([#333](https://github.com/open-feature/python-sdk/issues/333)) ([bd0bc1e](https://github.com/open-feature/python-sdk/commit/bd0bc1e2b7a28b1f1dcd50b63b61214131968925))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.5 ([#336](https://github.com/open-feature/python-sdk/issues/336)) ([2f93524](https://github.com/open-feature/python-sdk/commit/2f9352406301d0dfb804d04bf21039e87eeb01c5))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.6 ([#337](https://github.com/open-feature/python-sdk/issues/337)) ([cf61e5b](https://github.com/open-feature/python-sdk/commit/cf61e5b682481b4350d47af928f330bbbd93d7f1))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.7 ([#338](https://github.com/open-feature/python-sdk/issues/338)) ([1bf4682](https://github.com/open-feature/python-sdk/commit/1bf4682b466b998106fb94c7bbafdaa4a5e32289))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.8 ([#339](https://github.com/open-feature/python-sdk/issues/339)) ([44b0787](https://github.com/open-feature/python-sdk/commit/44b07879b08030c1356192ad4f69bc8b58c59914))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.4.9 ([#342](https://github.com/open-feature/python-sdk/issues/342)) ([f3982dc](https://github.com/open-feature/python-sdk/commit/f3982dc8c6faf5de6b86a406f8ecf2056d15026b))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.5.0 ([#346](https://github.com/open-feature/python-sdk/issues/346)) ([5c7bd14](https://github.com/open-feature/python-sdk/commit/5c7bd14b415336e990aced2bf2b12f6d2dd64b84))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.5.1 ([#348](https://github.com/open-feature/python-sdk/issues/348)) ([5dff1e8](https://github.com/open-feature/python-sdk/commit/5dff1e89b21542a16d602a541f76a52f8a0dbc4f))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.5.2 ([#349](https://github.com/open-feature/python-sdk/issues/349)) ([299a4f4](https://github.com/open-feature/python-sdk/commit/299a4f4630c18c8fc5a5bb1a55a1bcaa9a19fd8c))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.5.3 ([#350](https://github.com/open-feature/python-sdk/issues/350)) ([fe63b64](https://github.com/open-feature/python-sdk/commit/fe63b64d8fe90efc1433971aa7b1701ef8ae93c9))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.5.4 ([#352](https://github.com/open-feature/python-sdk/issues/352)) ([c294689](https://github.com/open-feature/python-sdk/commit/c29468941b946d6b8e355c3d60bc2e1f14faa959))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.5.5 ([#353](https://github.com/open-feature/python-sdk/issues/353)) ([6d46d95](https://github.com/open-feature/python-sdk/commit/6d46d957bdd8dd58bf11ab47689dbc8e19e80cf6))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.5.6 ([#356](https://github.com/open-feature/python-sdk/issues/356)) ([261aa41](https://github.com/open-feature/python-sdk/commit/261aa4168ef7aab4d8613af4f45df1a495018f2e))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.10.1 ([#345](https://github.com/open-feature/python-sdk/issues/345)) ([b553dfa](https://github.com/open-feature/python-sdk/commit/b553dfa607ce3c22d1369180c7b8a20291895ac0))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.11.0 ([#351](https://github.com/open-feature/python-sdk/issues/351)) ([931e0cb](https://github.com/open-feature/python-sdk/commit/931e0cb3a8515dcb46c37c3eb9fa2bc08d88eed6))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.11.1 ([#355](https://github.com/open-feature/python-sdk/issues/355)) ([62c4b67](https://github.com/open-feature/python-sdk/commit/62c4b672f67f2d8c9e98c5fab902542e5d2092b2))
+
+
+### 🔄 Refactoring
+
+* bind providers explicitly to a registry with attach/detach ([#324](https://github.com/open-feature/python-sdk/issues/324)) ([c3ad697](https://github.com/open-feature/python-sdk/commit/c3ad697a80ade72fb5cdee147ac5c11c38e6533f))
+
 ## [0.7.0](https://github.com/open-feature/python-sdk/compare/v0.6.1...v0.7.0) (2024-04-25)
 
 
