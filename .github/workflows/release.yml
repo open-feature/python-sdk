@@ -39,7 +39,7 @@ jobs:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
     container:
-      image: "python:3.12"
+      image: "python:3.13"
 
     steps:
       - uses: actions/checkout@v4
