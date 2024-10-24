@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.7.2](https://github.com/open-feature/python-sdk/compare/v0.7.1...v0.7.2) (2024-10-24)
+
+
+### 🧹 Chore
+
+* add Python 3.13 ([#364](https://github.com/open-feature/python-sdk/issues/364)) ([ca4d589](https://github.com/open-feature/python-sdk/commit/ca4d589456a7c3ca1a8ba448592687c7909bf75d))
+* **deps:** update codecov/codecov-action action to v4.6.0 ([#371](https://github.com/open-feature/python-sdk/issues/371)) ([45d2a6d](https://github.com/open-feature/python-sdk/commit/45d2a6daca1ed6073fa9510a047085230b9d99c1))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.5.7 ([#357](https://github.com/open-feature/python-sdk/issues/357)) ([a691480](https://github.com/open-feature/python-sdk/commit/a6914808b8ed4338d332b333a734fb441b09d3d8))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.6.0 ([#359](https://github.com/open-feature/python-sdk/issues/359)) ([e538f86](https://github.com/open-feature/python-sdk/commit/e538f86e76958a40400e41838ee3fd81a4f11dd9))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.6.1 ([#360](https://github.com/open-feature/python-sdk/issues/360)) ([90d417d](https://github.com/open-feature/python-sdk/commit/90d417dbd3940b99dc5d9fe945f351f0296a4058))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.6.2 ([#361](https://github.com/open-feature/python-sdk/issues/361)) ([8e6a530](https://github.com/open-feature/python-sdk/commit/8e6a530040f122cdd1861dce883aebb725542932))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.6.3 ([#363](https://github.com/open-feature/python-sdk/issues/363)) ([6e316a2](https://github.com/open-feature/python-sdk/commit/6e316a216a50848959154f25bfcac17953910fcd))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.6.4 ([#365](https://github.com/open-feature/python-sdk/issues/365)) ([e57ff78](https://github.com/open-feature/python-sdk/commit/e57ff783064f1097609e807d9b781b252792b922))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.6.5 ([#366](https://github.com/open-feature/python-sdk/issues/366)) ([4959144](https://github.com/open-feature/python-sdk/commit/4959144a5016f60c13791154ef8a43108a8d8568))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.6.6 ([#367](https://github.com/open-feature/python-sdk/issues/367)) ([a334f20](https://github.com/open-feature/python-sdk/commit/a334f202515949f29ea4a47912881f84cbfc9a93))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.6.7 ([#369](https://github.com/open-feature/python-sdk/issues/369)) ([65b0f1a](https://github.com/open-feature/python-sdk/commit/65b0f1a374b692a1a55635b78355776524c2ac1a))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.6.8 ([#370](https://github.com/open-feature/python-sdk/issues/370)) ([dcdb56c](https://github.com/open-feature/python-sdk/commit/dcdb56c43f493aa3fd6c0e69d82b65c74b598a6f))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.6.9 ([#372](https://github.com/open-feature/python-sdk/issues/372)) ([d2c6b40](https://github.com/open-feature/python-sdk/commit/d2c6b401cd69cd1fb17aadfd00b4c37ff9e9e57d))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.7.0 ([#377](https://github.com/open-feature/python-sdk/issues/377)) ([157e1ba](https://github.com/open-feature/python-sdk/commit/157e1baddb69a51bd49f1f55ac381cffc50f4081))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.7.1 ([#380](https://github.com/open-feature/python-sdk/issues/380)) ([c3d70ec](https://github.com/open-feature/python-sdk/commit/c3d70ec4579d1af7556ae7cb903337de66131697))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.11.2 ([#362](https://github.com/open-feature/python-sdk/issues/362)) ([f38ff91](https://github.com/open-feature/python-sdk/commit/f38ff919bde09fa76b50992b8fb05ae3f2397936))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.12.0 ([#376](https://github.com/open-feature/python-sdk/issues/376)) ([00f026d](https://github.com/open-feature/python-sdk/commit/00f026d4f17b3062c992bd03b1e714447601b406))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.12.1 ([#378](https://github.com/open-feature/python-sdk/issues/378)) ([091656b](https://github.com/open-feature/python-sdk/commit/091656b6539a3fcb7746c8fd26de7eab6f988cb3))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.13.0 ([#379](https://github.com/open-feature/python-sdk/issues/379)) ([f5aaac0](https://github.com/open-feature/python-sdk/commit/f5aaac0525587d533bb15f3641e15411f978cf00))
+* **deps:** update pre-commit hook pre-commit/pre-commit-hooks to v5 ([#373](https://github.com/open-feature/python-sdk/issues/373)) ([7a6b3c7](https://github.com/open-feature/python-sdk/commit/7a6b3c78cc86e2704441c4d64974f4348e63234d))
+* **deps:** update python docker tag to v3.13 ([#375](https://github.com/open-feature/python-sdk/issues/375)) ([977cd6d](https://github.com/open-feature/python-sdk/commit/977cd6d4b7c7b44755409242db1e430758b5b955))
+
 ## [0.7.1](https://github.com/open-feature/python-sdk/compare/v0.7.0...v0.7.1) (2024-08-02)
 
 
