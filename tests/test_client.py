@@ -384,3 +384,95 @@ def test_client_handlers_thread_safety():
         f2 = executor.submit(emit_events_task)
         f1.result()
         f2.result()
+
+@pytest.mark.asyncio
+async def test_evaluate_boolean_flag_details_async():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    provider.resolve_boolean_details_async.return_value = FlagResolutionDetails(
+        value=True,
+        reason=Reason.TARGETING_MATCH,
+    )
+    set_provider(provider)
+    client = get_client()
+    # When
+    flag = await client.evaluate_flag_details_async(
+        flag_type=bool, flag_key="Key", default_value=True
+    )
+
+    # Then
+    assert flag is not None
+    assert flag.value == True
+
+@pytest.mark.asyncio
+async def test_evaluate_string_flag_details_async():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    provider.resolve_string_details_async.return_value = FlagResolutionDetails(
+        value="String",
+        reason=Reason.TARGETING_MATCH,
+    )
+    set_provider(provider)
+    client = get_client()
+    # When
+    flag = await client.evaluate_flag_details_async(
+        flag_type=str, flag_key="Key", default_value="String"
+    )
+
+    # Then
+    assert flag is not None
+    assert flag.value == "String"
+
+@pytest.mark.asyncio
+async def test_evaluate_integer_flag_details_async():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    provider.resolve_integer_details_async.return_value = FlagResolutionDetails(
+        value=100,
+        reason=Reason.TARGETING_MATCH,
+    )
+    set_provider(provider)
+    client = get_client()
+    # When
+    flag = await client.evaluate_flag_details_async(
+        flag_type=int, flag_key="Key", default_value=100
+    )
+
+    # Then
+    assert flag is not None
+    assert flag.value == 100
+
+@pytest.mark.asyncio
+async def test_evaluate_float_flag_details_async():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    provider.resolve_float_details_async.return_value = FlagResolutionDetails(
+        value=10.23,
+        reason=Reason.TARGETING_MATCH,
+    )
+    set_provider(provider)
+    client = get_client()
+    # When
+    flag = await client.evaluate_flag_details_async(
+        flag_type=float, flag_key="Key", default_value=10.23
+    )
+
+    # Then
+    assert flag is not None
+    assert flag.value == 10.23
+
+
+@pytest.mark.asyncio
+async def test_allow_not_implemented_async_functions():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+    # When
+    with pytest.raises(NotImplementedError) as exc_info:
+        flag = await provider.resolve_boolean_details_async(
+            flag_key="Key", default_value=True
+        )
+        raise Exception(flag)
+
+    # Then
+    assert "does not support async operations" in str(exc_info.value)
