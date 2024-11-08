@@ -190,7 +190,7 @@ class OpenFeatureClient:
             evaluation_context,
             flag_evaluation_options,
         )
-    
+
     def get_float_value(
         self,
         flag_key: str,
@@ -204,7 +204,7 @@ class OpenFeatureClient:
             evaluation_context,
             flag_evaluation_options,
         ).value
-    
+
     def get_float_details(
         self,
         flag_key: str,
@@ -448,7 +448,6 @@ class OpenFeatureClient:
             error_message=resolution.error_message,
         )
 
-
     def add_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
         _event_support.add_client_handler(self, event, handler)
 
@@ -469,6 +468,7 @@ def _typecheck_flag_value(value: typing.Any, flag_type: FlagType) -> None:
         raise GeneralError(error_message="Unknown flag type")
     if not isinstance(value, _type):
         raise TypeMismatchError(f"Expected type {_type} but got {type(value)}")
+
 
 class AsyncOpenFeatureClient:
     def __init__(
@@ -611,7 +611,7 @@ class AsyncOpenFeatureClient:
             evaluation_context,
             flag_evaluation_options,
         )
-    
+
     async def get_object_value(
         self,
         flag_key: str,
@@ -625,7 +625,7 @@ class AsyncOpenFeatureClient:
             evaluation_context,
             flag_evaluation_options,
         ).value
-    
+
     async def get_object_details(
         self,
         flag_key: str,
@@ -757,7 +757,9 @@ class AsyncOpenFeatureClient:
             return flag_evaluation
 
         except OpenFeatureError as err:
-            await error_hooks_async(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
+            await error_hooks_async(
+                flag_type, hook_context, err, reversed_merged_hooks, hook_hints
+            )
 
             return FlagEvaluationDetails(
                 flag_key=flag_key,
@@ -773,7 +775,9 @@ class AsyncOpenFeatureClient:
                 "Unable to correctly evaluate flag with key: '%s'", flag_key
             )
 
-            await error_hooks_async(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
+            await error_hooks_async(
+                flag_type, hook_context, err, reversed_merged_hooks, hook_hints
+            )
 
             error_message = getattr(err, "error_message", str(err))
             return FlagEvaluationDetails(
@@ -785,8 +789,9 @@ class AsyncOpenFeatureClient:
             )
 
         finally:
-            await after_all_hooks_async(flag_type, hook_context, reversed_merged_hooks, hook_hints)
-        
+            await after_all_hooks_async(
+                flag_type, hook_context, reversed_merged_hooks, hook_hints
+            )
 
     async def _create_provider_evaluation(
         self,
@@ -839,7 +844,6 @@ class AsyncOpenFeatureClient:
             error_code=resolution.error_code,
             error_message=resolution.error_message,
         )
-
 
     def add_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
         _event_support.add_client_handler(self, event, handler)
