@@ -111,14 +111,6 @@ class AbstractProvider(FeatureProvider):
     ) -> FlagResolutionDetails[bool]:
         pass
 
-    async def resolve_boolean_details_async(
-        self,
-        flag_key: str,
-        default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[bool]:
-        raise NotImplementedError(f"{self.__class__.__name__} does not support async operations")
-
     @abstractmethod
     def resolve_string_details(
         self,
@@ -127,14 +119,6 @@ class AbstractProvider(FeatureProvider):
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[str]:
         pass
-
-    async def resolve_string_details_async(
-        self,
-        flag_key: str,
-        default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[str]:
-        raise NotImplementedError(f"{self.__class__.__name__} does not support async operations")
 
     @abstractmethod
     def resolve_integer_details(
@@ -145,14 +129,6 @@ class AbstractProvider(FeatureProvider):
     ) -> FlagResolutionDetails[int]:
         pass
 
-    async def resolve_integer_details_async(
-        self,
-        flag_key: str,
-        default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[int]:
-        raise NotImplementedError(f"{self.__class__.__name__} does not support async operations")
-
     @abstractmethod
     def resolve_float_details(
         self,
@@ -162,14 +138,6 @@ class AbstractProvider(FeatureProvider):
     ) -> FlagResolutionDetails[float]:
         pass
 
-    async def resolve_float_details_async(
-        self,
-        flag_key: str,
-        default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[float]:
-        raise NotImplementedError(f"{self.__class__.__name__} does not support async operations")
-
     @abstractmethod
     def resolve_object_details(
         self,
@@ -178,14 +146,6 @@ class AbstractProvider(FeatureProvider):
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[typing.Union[dict, list]]:
         pass
-
-    async def resolve_object_details_async(
-        self,
-        flag_key: str,
-        default_value: typing.Union[dict, list],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
-        raise NotImplementedError(f"{self.__class__.__name__} does not support async operations")
 
     def emit_provider_ready(self, details: ProviderEventDetails) -> None:
         self.emit(ProviderEvent.PROVIDER_READY, details)
