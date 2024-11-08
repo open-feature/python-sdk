@@ -47,21 +47,7 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[bool]: ...
 
-    async def resolve_boolean_details_async(
-        self,
-        flag_key: str,
-        default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[bool]: ...
-
     def resolve_string_details(
-        self,
-        flag_key: str,
-        default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[str]: ...
-
-    async def resolve_string_details_async(
         self,
         flag_key: str,
         default_value: str,
@@ -75,13 +61,6 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[int]: ...
 
-    async def resolve_integer_details_async(
-        self,
-        flag_key: str,
-        default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[int]: ...
-
     def resolve_float_details(
         self,
         flag_key: str,
@@ -89,21 +68,7 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[float]: ...
 
-    async def resolve_float_details_async(
-        self,
-        flag_key: str,
-        default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[float]: ...
-
     def resolve_object_details(
-        self,
-        flag_key: str,
-        default_value: typing.Union[dict, list],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]: ...
-
-    async def resolve_object_details_async(
         self,
         flag_key: str,
         default_value: typing.Union[dict, list],
@@ -237,5 +202,95 @@ class AbstractProvider(FeatureProvider):
         self.emit(ProviderEvent.PROVIDER_STALE, details)
 
     def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
+        if hasattr(self, "_on_emit"):
+            self._on_emit(self, event, details)
+
+
+class AsyncFeatureProvider(FeatureProvider):
+    async def attach(
+        self,
+        on_emit: typing.Callable[
+            [FeatureProvider, ProviderEvent, ProviderEventDetails], None
+        ],
+    ) -> None:
+        self._on_emit = on_emit
+
+    async def detach(self) -> None:
+        if hasattr(self, "_on_emit"):
+            del self._on_emit
+
+    async def initialize(self, evaluation_context: EvaluationContext) -> None:
+        pass
+
+    async def shutdown(self) -> None:
+        pass
+
+    @abstractmethod
+    async def get_metadata(self) -> Metadata:
+        pass
+
+    async def get_provider_hooks(self) -> typing.List[Hook]:
+        return []
+
+    @abstractmethod
+    async def resolve_boolean_details(
+        self,
+        flag_key: str,
+        default_value: bool,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[bool]:
+        pass
+
+    @abstractmethod
+    async def resolve_string_details(
+        self,
+        flag_key: str,
+        default_value: str,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[str]:
+        pass
+
+    @abstractmethod
+    async def resolve_integer_details(
+        self,
+        flag_key: str,
+        default_value: int,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[int]:
+        pass
+
+    @abstractmethod
+    async def resolve_float_details(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[float]:
+        pass
+
+    @abstractmethod
+    def resolve_object_details(
+        self,
+        flag_key: str,
+        default_value: typing.Union[dict, list],
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+        pass
+
+    async def emit_provider_ready(self, details: ProviderEventDetails) -> None:
+        self.emit(ProviderEvent.PROVIDER_READY, details)
+
+    async def emit_provider_configuration_changed(
+        self, details: ProviderEventDetails
+    ) -> None:
+        self.emit(ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, details)
+
+    async def emit_provider_error(self, details: ProviderEventDetails) -> None:
+        self.emit(ProviderEvent.PROVIDER_ERROR, details)
+
+    async def emit_provider_stale(self, details: ProviderEventDetails) -> None:
+        self.emit(ProviderEvent.PROVIDER_STALE, details)
+
+    async def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
         if hasattr(self, "_on_emit"):
             self._on_emit(self, event, details)
