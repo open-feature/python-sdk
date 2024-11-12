@@ -470,32 +470,7 @@ def _typecheck_flag_value(value: typing.Any, flag_type: FlagType) -> None:
         raise TypeMismatchError(f"Expected type {_type} but got {type(value)}")
 
 
-class AsyncOpenFeatureClient:
-    def __init__(
-        self,
-        domain: typing.Optional[str],
-        version: typing.Optional[str],
-        context: typing.Optional[EvaluationContext] = None,
-        hooks: typing.Optional[typing.List[Hook]] = None,
-    ) -> None:
-        self.domain = domain
-        self.version = version
-        self.context = context or EvaluationContext()
-        self.hooks = hooks or []
-
-    @property
-    def provider(self) -> FeatureProvider:
-        return provider_registry.get_provider(self.domain)
-
-    def get_provider_status(self) -> ProviderStatus:
-        return provider_registry.get_provider_status(self.provider)
-
-    def get_metadata(self) -> ClientMetadata:
-        return ClientMetadata(domain=self.domain)
-
-    def add_hooks(self, hooks: typing.List[Hook]) -> None:
-        self.hooks = self.hooks + hooks
-
+class AsyncOpenFeatureClient(OpenFeatureClient):
     async def get_boolean_value(
         self,
         flag_key: str,
@@ -503,12 +478,13 @@ class AsyncOpenFeatureClient:
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> bool:
-        return await self.get_boolean_value(
+        details = await self.get_boolean_details(
             flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
         )
+        return details.value
 
     async def get_boolean_details(
         self,
@@ -532,12 +508,13 @@ class AsyncOpenFeatureClient:
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> str:
-        return await self.get_string_details(
+        details = await self.get_string_details(
             flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
-        ).value
+        )
+        return details.value
 
     async def get_string_details(
         self,
@@ -561,12 +538,13 @@ class AsyncOpenFeatureClient:
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> int:
-        return await self.get_integer_details(
+        details = await self.get_integer_details(
             flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
-        ).value
+        )
+        return details.value
 
     async def get_integer_details(
         self,
@@ -590,12 +568,13 @@ class AsyncOpenFeatureClient:
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> float:
-        return await self.get_float_details(
+        details = await self.get_float_details(
             flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
-        ).value
+        )
+        return details.value
 
     async def get_float_details(
         self,
@@ -619,12 +598,13 @@ class AsyncOpenFeatureClient:
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> typing.Union[dict, list]:
-        return await self.get_object_details(
+        details = await self.get_object_details(
             flag_key,
             default_value,
             evaluation_context,
             flag_evaluation_options,
-        ).value
+        )
+        return details.value
 
     async def get_object_details(
         self,
@@ -844,9 +824,3 @@ class AsyncOpenFeatureClient:
             error_code=resolution.error_code,
             error_message=resolution.error_message,
         )
-
-    def add_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
-        _event_support.add_client_handler(self, event, handler)
-
-    def remove_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
-        _event_support.remove_client_handler(self, event, handler)

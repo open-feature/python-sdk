@@ -75,3 +75,65 @@ class NoOpProvider(AbstractProvider):
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
         )
+
+
+class AsyncNoOpProvider(NoOpProvider):
+    async def resolve_boolean_details(
+        self,
+        flag_key: str,
+        default_value: bool,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[bool]:
+        return FlagResolutionDetails(
+            value=default_value,
+            reason=Reason.DEFAULT,
+            variant=PASSED_IN_DEFAULT,
+        )
+
+    async def resolve_string_details(
+        self,
+        flag_key: str,
+        default_value: str,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[str]:
+        return FlagResolutionDetails(
+            value=default_value,
+            reason=Reason.DEFAULT,
+            variant=PASSED_IN_DEFAULT,
+        )
+
+    async def resolve_integer_details(
+        self,
+        flag_key: str,
+        default_value: int,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[int]:
+        return FlagResolutionDetails(
+            value=default_value,
+            reason=Reason.DEFAULT,
+            variant=PASSED_IN_DEFAULT,
+        )
+
+    async def resolve_float_details(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[float]:
+        return FlagResolutionDetails(
+            value=default_value,
+            reason=Reason.DEFAULT,
+            variant=PASSED_IN_DEFAULT,
+        )
+
+    async def resolve_object_details(
+        self,
+        flag_key: str,
+        default_value: typing.Union[dict, list],
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+        return FlagResolutionDetails(
+            value=default_value,
+            reason=Reason.DEFAULT,
+            variant=PASSED_IN_DEFAULT,
+        )
