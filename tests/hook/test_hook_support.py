@@ -1,16 +1,20 @@
-from unittest.mock import ANY, MagicMock
+from unittest.mock import ANY, AsyncMock, MagicMock
 
 import pytest
 
 from openfeature.client import ClientMetadata
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
-from openfeature.hook import Hook, HookContext
+from openfeature.hook import AsyncHook, Hook, HookContext
 from openfeature.hook._hook_support import (
     after_all_hooks,
+    after_all_hooks_async,
     after_hooks,
+    after_hooks_async,
     before_hooks,
+    before_hooks_async,
     error_hooks,
+    error_hooks_async,
 )
 from openfeature.immutable_dict.mapping_proxy_type import MappingProxyType
 from openfeature.provider.metadata import Metadata
@@ -86,6 +90,23 @@ def test_error_hooks_run_error_method(mock_hook):
     )
 
 
+@pytest.mark.asyncio
+async def test_error_hooks_run_error_method_async(mock_hook_async):
+    # Given
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_hints = MappingProxyType({})
+    # When
+    await error_hooks_async(
+        FlagType.BOOLEAN, hook_context, Exception, [mock_hook_async], hook_hints
+    )
+    # Then
+    mock_hook_async.supports_flag_value_type.assert_called_once()
+    mock_hook_async.error.assert_called_once()
+    mock_hook_async.error.assert_called_with(
+        hook_context=hook_context, exception=ANY, hints=hook_hints
+    )
+
+
 def test_before_hooks_run_before_method(mock_hook):
     # Given
     hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
@@ -96,6 +117,23 @@ def test_before_hooks_run_before_method(mock_hook):
     mock_hook.supports_flag_value_type.assert_called_once()
     mock_hook.before.assert_called_once()
     mock_hook.before.assert_called_with(hook_context=hook_context, hints=hook_hints)
+
+
+@pytest.mark.asyncio
+async def test_before_hooks_run_before_method_async(mock_hook_async):
+    # Given
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_hints = MappingProxyType({})
+    # When
+    await before_hooks_async(
+        FlagType.BOOLEAN, hook_context, [mock_hook_async], hook_hints
+    )
+    # Then
+    mock_hook_async.supports_flag_value_type.assert_called_once()
+    mock_hook_async.before.assert_called_once()
+    mock_hook_async.before.assert_called_with(
+        hook_context=hook_context, hints=hook_hints
+    )
 
 
 def test_before_hooks_merges_evaluation_contexts():
@@ -110,6 +148,25 @@ def test_before_hooks_merges_evaluation_contexts():
 
     # When
     context = before_hooks(FlagType.BOOLEAN, hook_context, [hook_1, hook_2, hook_3])
+
+    # Then
+    assert context == EvaluationContext("bar", {"key_1": "val_1", "key_2": "val_2"})
+
+
+@pytest.mark.asyncio
+async def test_before_hooks_async_merges_evaluation_contexts():
+    # Given
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_1 = AsyncHook()
+    hook_1.before = AsyncMock(return_value=EvaluationContext("foo", {"key_1": "val_1"}))
+    hook_2 = AsyncHook()
+    hook_2.before = AsyncMock(return_value=EvaluationContext("bar", {"key_2": "val_2"}))
+    hook_3 = AsyncHook()
+    hook_3.before = AsyncMock(return_value=None)
+    # When
+    context = await before_hooks_async(
+        FlagType.BOOLEAN, hook_context, [hook_1, hook_2, hook_3]
+    )
 
     # Then
     assert context == EvaluationContext("bar", {"key_1": "val_1", "key_2": "val_2"})
@@ -134,6 +191,30 @@ def test_after_hooks_run_after_method(mock_hook):
     )
 
 
+@pytest.mark.asyncio
+async def test_after_hooks_run_after_method_async(mock_hook_async):
+    # Given
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    flag_evaluation_details = FlagEvaluationDetails(
+        hook_context.flag_key, "val", "unknown"
+    )
+    hook_hints = MappingProxyType({})
+    # When
+    await after_hooks_async(
+        FlagType.BOOLEAN,
+        hook_context,
+        flag_evaluation_details,
+        [mock_hook_async],
+        hook_hints,
+    )
+    # Then
+    mock_hook_async.supports_flag_value_type.assert_called_once()
+    mock_hook_async.after.assert_called_once()
+    mock_hook_async.after.assert_called_with(
+        hook_context=hook_context, details=flag_evaluation_details, hints=hook_hints
+    )
+
+
 def test_finally_after_hooks_run_finally_after_method(mock_hook):
     # Given
     hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
@@ -144,5 +225,22 @@ def test_finally_after_hooks_run_finally_after_method(mock_hook):
     mock_hook.supports_flag_value_type.assert_called_once()
     mock_hook.finally_after.assert_called_once()
     mock_hook.finally_after.assert_called_with(
+        hook_context=hook_context, hints=hook_hints
+    )
+
+
+@pytest.mark.asyncio
+async def test_finally_after_hooks_run_finally_after_method_async(mock_hook_async):
+    # Given
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_hints = MappingProxyType({})
+    # When
+    await after_all_hooks_async(
+        FlagType.BOOLEAN, hook_context, [mock_hook_async], hook_hints
+    )
+    # Then
+    mock_hook_async.supports_flag_value_type.assert_called_once()
+    mock_hook_async.finally_after.assert_called_once()
+    mock_hook_async.finally_after.assert_called_with(
         hook_context=hook_context, hints=hook_hints
     )

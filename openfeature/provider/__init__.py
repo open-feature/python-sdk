@@ -166,32 +166,7 @@ class AbstractProvider(FeatureProvider):
             self._on_emit(self, event, details)
 
 
-class AsyncFeatureProvider(FeatureProvider):
-    async def attach(
-        self,
-        on_emit: typing.Callable[
-            [FeatureProvider, ProviderEvent, ProviderEventDetails], None
-        ],
-    ) -> None:
-        self._on_emit = on_emit
-
-    async def detach(self) -> None:
-        if hasattr(self, "_on_emit"):
-            del self._on_emit
-
-    async def initialize(self, evaluation_context: EvaluationContext) -> None:
-        pass
-
-    async def shutdown(self) -> None:
-        pass
-
-    @abstractmethod
-    async def get_metadata(self) -> Metadata:
-        pass
-
-    async def get_provider_hooks(self) -> typing.List[Hook]:
-        return []
-
+class AsyncAbstractProvider(AbstractProvider):
     @abstractmethod
     async def resolve_boolean_details(
         self,
@@ -236,21 +211,3 @@ class AsyncFeatureProvider(FeatureProvider):
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[typing.Union[dict, list]]:
         pass
-
-    async def emit_provider_ready(self, details: ProviderEventDetails) -> None:
-        self.emit(ProviderEvent.PROVIDER_READY, details)
-
-    async def emit_provider_configuration_changed(
-        self, details: ProviderEventDetails
-    ) -> None:
-        self.emit(ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, details)
-
-    async def emit_provider_error(self, details: ProviderEventDetails) -> None:
-        self.emit(ProviderEvent.PROVIDER_ERROR, details)
-
-    async def emit_provider_stale(self, details: ProviderEventDetails) -> None:
-        self.emit(ProviderEvent.PROVIDER_STALE, details)
-
-    async def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
-        if hasattr(self, "_on_emit"):
-            self._on_emit(self, event, details)

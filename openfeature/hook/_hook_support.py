@@ -21,6 +21,7 @@ def error_hooks(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.ERROR, **kwargs
     )
 
+
 async def error_hooks_async(
     flag_type: FlagType,
     hook_context: HookContext,
@@ -33,6 +34,7 @@ async def error_hooks_async(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.ERROR, **kwargs
     )
 
+
 def after_all_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
@@ -43,6 +45,7 @@ def after_all_hooks(
     _execute_hooks(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.FINALLY_AFTER, **kwargs
     )
+
 
 async def after_all_hooks_async(
     flag_type: FlagType,
@@ -67,6 +70,7 @@ def after_hooks(
     _execute_hooks_unchecked(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.AFTER, **kwargs
     )
+
 
 async def after_hooks_async(
     flag_type: FlagType,
@@ -97,6 +101,7 @@ def before_hooks(
         return reduce(lambda a, b: a.merge(b), filtered_hooks)
 
     return EvaluationContext()
+
 
 async def before_hooks_async(
     flag_type: FlagType,
@@ -136,6 +141,7 @@ def _execute_hooks(
         for hook in hooks
         if hook.supports_flag_value_type(flag_type)
     ]
+
 
 async def _execute_hooks_async(
     flag_type: FlagType,
@@ -183,6 +189,7 @@ def _execute_hooks_unchecked(
         if hook.supports_flag_value_type(flag_type)
     ]
 
+
 async def _execute_hooks_async_unchecked(
     flag_type: FlagType,
     hooks: typing.List[Hook],
@@ -227,6 +234,7 @@ def _execute_hook_checked(
     except Exception:  # pragma: no cover
         logger.exception(f"Exception when running {hook_method.value} hooks")
         return None
+
 
 async def _execute_hook_checked_async(
     hook: Hook, hook_method: HookType, **kwargs: typing.Any

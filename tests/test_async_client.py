@@ -1,58 +1,79 @@
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from openfeature.api import add_hooks, clear_hooks, get_client_async, set_provider
+from openfeature.api import add_hooks, get_client_async, set_provider
 from openfeature.client import AsyncOpenFeatureClient
 from openfeature.event import ProviderEvent, ProviderEventDetails
+from openfeature.exception import ErrorCode, OpenFeatureError
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
-from openfeature.provider import FeatureProvider
-from openfeature.provider.in_memory_provider import InMemoryFlag, AsyncInMemoryProvider
-from openfeature.provider.no_op_provider import NoOpProvider
 from openfeature.hook import AsyncHook
-
+from openfeature.provider import FeatureProvider, ProviderStatus
+from openfeature.provider.in_memory_provider import AsyncInMemoryProvider, InMemoryFlag
+from openfeature.provider.no_op_provider import NoOpProvider
 
 async_hook = MagicMock(spec=AsyncHook)
 async_hook.before = AsyncMock(return_value=None)
 async_hook.after = AsyncMock(return_value=None)
 
 
-
+@pytest.mark.parametrize(
+    "default, variants, get_method, expected_value",
+    (
+        ("true", {"true": True, "false": False}, "get_boolean", True),
+        ("String", {"String": "Variant"}, "get_string", "Variant"),
+        ("Number", {"Number": 100}, "get_integer", 100),
+        ("Float", {"Float": 10.23}, "get_float", 10.23),
+        (
+            "Object",
+            {"Object": {"some": "object"}},
+            "get_object",
+            {"some": "object"},
+        ),
+    ),
+)
 @pytest.mark.asyncio
-async def test_should_pass_flag_metadata_from_resolution_to_evaluation_details_async():
+async def test_flag_resolution_to_evaluation_details_async(
+    default, variants, get_method, expected_value, clear_hooks_fixture
+):
     # Given
-    clear_hooks()
     add_hooks([async_hook])
     provider = AsyncInMemoryProvider(
         {
             "Key": InMemoryFlag(
-                "true",
-                {"true": True, "false": False},
+                default,
+                variants,
                 flag_metadata={"foo": "bar"},
             )
         }
     )
     set_provider(provider, "my-async-client")
-
     client = AsyncOpenFeatureClient("my-async-client", None)
-
+    client.add_hooks([async_hook])
     # When
-    details = await client.get_boolean_details(flag_key="Key", default_value=False)
+    details = await getattr(client, f"{get_method}_details")(
+        flag_key="Key", default_value=None
+    )
+    value = await getattr(client, f"{get_method}_value")(
+        flag_key="Key", default_value=None
+    )
     # Then
-    clear_hooks()
     assert details is not None
     assert details.flag_metadata == {"foo": "bar"}
+    assert details.value == expected_value
+    assert details.value == value
 
 
 @pytest.mark.asyncio
-async def test_should_return_client_metadata_with_domain_async():
+async def test_should_return_client_metadata_with_domain_async(
+    no_op_provider_client_async,
+):
     # Given
-    client = AsyncOpenFeatureClient("my-async-client", None, NoOpProvider())
     # When
-    metadata = client.get_metadata()
+    metadata = no_op_provider_client_async.get_metadata()
     # Then
     assert metadata is not None
     assert metadata.domain == "my-async-client"
@@ -62,7 +83,6 @@ def test_add_remove_event_handler_async():
     # Given
     provider = NoOpProvider()
     set_provider(provider)
-
     spy = MagicMock()
 
     client = get_client_async()
@@ -106,78 +126,70 @@ def test_client_handlers_thread_safety_async():
         f1.result()
         f2.result()
 
+
+@pytest.mark.parametrize(
+    "provider_status, error_code",
+    (
+        (ProviderStatus.NOT_READY, ErrorCode.PROVIDER_NOT_READY),
+        (ProviderStatus.FATAL, ErrorCode.PROVIDER_FATAL),
+    ),
+)
 @pytest.mark.asyncio
-async def test_evaluate_boolean_flag_details_async():
+async def test_should_shortcircuit_if_provider_is_not_ready(
+    no_op_provider_client_async, monkeypatch, provider_status, error_code
+):
     # Given
-    provider = MagicMock(spec=FeatureProvider)
-    provider.resolve_boolean_details.return_value = FlagResolutionDetails(
-        value=True,
-        reason=Reason.TARGETING_MATCH,
+    monkeypatch.setattr(
+        no_op_provider_client_async,
+        "get_provider_status",
+        lambda: provider_status,
     )
-    set_provider(provider)
-    client = get_client_async()
+    spy_hook = MagicMock(spec=AsyncHook)
+    spy_hook.before = AsyncMock(return_value=None)
+    no_op_provider_client_async.add_hooks([spy_hook])
     # When
-    flag = await client.evaluate_flag_details(
-        flag_type=bool, flag_key="Key", default_value=True
+    flag_details = await no_op_provider_client_async.get_boolean_details(
+        flag_key="Key", default_value=True
     )
-
     # Then
-    assert flag is not None
-    assert flag.value == True
+    assert flag_details is not None
+    assert flag_details.value
+    assert flag_details.reason == Reason.ERROR
+    assert flag_details.error_code == error_code
+    spy_hook.error.assert_called_once()
 
+
+@pytest.mark.parametrize(
+    "expected_type, get_method, default_value",
+    (
+        (bool, "get_boolean_details", True),
+        (str, "get_string_details", "default"),
+        (int, "get_integer_details", 100),
+        (float, "get_float_details", 10.23),
+        (dict, "get_object_details", {"some": "object"}),
+    ),
+)
 @pytest.mark.asyncio
-async def test_evaluate_string_flag_details_async():
+async def test_handle_an_open_feature_exception_thrown_by_a_provider_async(
+    expected_type,
+    get_method,
+    default_value,
+    no_op_provider_client_async,
+):
     # Given
-    provider = MagicMock(spec=FeatureProvider)
-    provider.resolve_string_details.return_value = FlagResolutionDetails(
-        value="String",
-        reason=Reason.TARGETING_MATCH,
+    exception_hook = AsyncHook()
+    exception_hook.after = AsyncMock(
+        side_effect=OpenFeatureError(ErrorCode.GENERAL, "error_message")
     )
-    set_provider(provider)
-    client = get_client_async()
+    no_op_provider_client_async.add_hooks([exception_hook])
+
     # When
-    flag = await client.evaluate_flag_details(
-        flag_type=str, flag_key="Key", default_value="String"
+    flag_details = await getattr(no_op_provider_client_async, get_method)(
+        flag_key="Key", default_value=default_value
     )
-
     # Then
-    assert flag is not None
-    assert flag.value == "String"
-
-@pytest.mark.asyncio
-async def test_evaluate_integer_flag_details():
-    # Given
-    provider = MagicMock(spec=FeatureProvider)
-    provider.resolve_integer_details.return_value = FlagResolutionDetails(
-        value=100,
-        reason=Reason.TARGETING_MATCH,
-    )
-    set_provider(provider)
-    client = get_client_async()
-    # When
-    flag = await client.evaluate_flag_details(
-        flag_type=int, flag_key="Key", default_value=100
-    )
-
-    # Then
-    assert flag is not None
-    assert flag.value == 100
-
-@pytest.mark.asyncio
-async def test_evaluate_float_flag_details_async():
-    # Given
-    provider = MagicMock(spec=FeatureProvider)
-    provider.resolve_float_details.return_value = FlagResolutionDetails(
-        value=10.23,
-        reason=Reason.TARGETING_MATCH,
-    )
-    set_provider(provider)
-    client = get_client_async()
-    # When
-    flag = await client.evaluate_flag_details(
-        flag_type=float, flag_key="Key", default_value=10.23
-    )
-
-    # Then
-    assert flag is not None
-    assert flag.value == 10.23
+    assert flag_details is not None
+    assert flag_details.value
+    assert isinstance(flag_details.value, expected_type)
+    assert flag_details.reason == Reason.ERROR
+    assert flag_details.error_message == "error_message"
