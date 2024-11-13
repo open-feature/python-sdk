@@ -23,13 +23,9 @@ from openfeature.flag_evaluation import (
 from openfeature.hook import Hook, HookContext
 from openfeature.hook._hook_support import (
     after_all_hooks,
-    after_all_hooks_async,
     after_hooks,
-    after_hooks_async,
     before_hooks,
-    before_hooks_async,
     error_hooks,
-    error_hooks_async,
 )
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider._registry import provider_registry
@@ -673,7 +669,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
 
         status = self.get_provider_status()
         if status == ProviderStatus.NOT_READY:
-            await error_hooks_async(
+            error_hooks(
                 flag_type,
                 hook_context,
                 ProviderNotReadyError(),
@@ -687,7 +683,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
                 error_code=ErrorCode.PROVIDER_NOT_READY,
             )
         if status == ProviderStatus.FATAL:
-            await error_hooks_async(
+            error_hooks(
                 flag_type,
                 hook_context,
                 ProviderFatalError(),
@@ -706,7 +702,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
             # Any resulting evaluation context from a before hook will overwrite
             # duplicate fields defined globally, on the client, or in the invocation.
             # Requirement 3.2.2, 4.3.4: API.context->client.context->invocation.context
-            invocation_context = await before_hooks_async(
+            invocation_context = before_hooks(
                 flag_type, hook_context, merged_hooks, hook_hints
             )
 
@@ -726,7 +722,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
                 merged_context,
             )
 
-            await after_hooks_async(
+            after_hooks(
                 flag_type,
                 hook_context,
                 flag_evaluation,
@@ -737,9 +733,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
             return flag_evaluation
 
         except OpenFeatureError as err:
-            await error_hooks_async(
-                flag_type, hook_context, err, reversed_merged_hooks, hook_hints
-            )
+            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
             return FlagEvaluationDetails(
                 flag_key=flag_key,
@@ -755,9 +749,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
                 "Unable to correctly evaluate flag with key: '%s'", flag_key
             )
 
-            await error_hooks_async(
-                flag_type, hook_context, err, reversed_merged_hooks, hook_hints
-            )
+            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
             error_message = getattr(err, "error_message", str(err))
             return FlagEvaluationDetails(
@@ -769,9 +761,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
             )
 
         finally:
-            await after_all_hooks_async(
-                flag_type, hook_context, reversed_merged_hooks, hook_hints
-            )
+            after_all_hooks(flag_type, hook_context, reversed_merged_hooks, hook_hints)
 
     async def _create_provider_evaluation(
         self,

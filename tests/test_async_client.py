@@ -1,7 +1,7 @@
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -9,15 +9,11 @@ from openfeature.api import add_hooks, get_client_async, set_provider
 from openfeature.client import AsyncOpenFeatureClient
 from openfeature.event import ProviderEvent, ProviderEventDetails
 from openfeature.exception import ErrorCode, OpenFeatureError
-from openfeature.flag_evaluation import FlagResolutionDetails, Reason
-from openfeature.hook import AsyncHook
-from openfeature.provider import FeatureProvider, ProviderStatus
+from openfeature.flag_evaluation import Reason
+from openfeature.hook import Hook
+from openfeature.provider import ProviderStatus
 from openfeature.provider.in_memory_provider import AsyncInMemoryProvider, InMemoryFlag
 from openfeature.provider.no_op_provider import NoOpProvider
-
-async_hook = MagicMock(spec=AsyncHook)
-async_hook.before = AsyncMock(return_value=None)
-async_hook.after = AsyncMock(return_value=None)
 
 
 @pytest.mark.parametrize(
@@ -40,7 +36,8 @@ async def test_flag_resolution_to_evaluation_details_async(
     default, variants, get_method, expected_value, clear_hooks_fixture
 ):
     # Given
-    add_hooks([async_hook])
+    api_hook = MagicMock(spec=Hook)
+    add_hooks([api_hook])
     provider = AsyncInMemoryProvider(
         {
             "Key": InMemoryFlag(
@@ -52,7 +49,7 @@ async def test_flag_resolution_to_evaluation_details_async(
     )
     set_provider(provider, "my-async-client")
     client = AsyncOpenFeatureClient("my-async-client", None)
-    client.add_hooks([async_hook])
+    client.add_hooks([api_hook])
     # When
     details = await getattr(client, f"{get_method}_details")(
         flag_key="Key", default_value=None
@@ -144,8 +141,8 @@ async def test_should_shortcircuit_if_provider_is_not_ready(
         "get_provider_status",
         lambda: provider_status,
     )
-    spy_hook = MagicMock(spec=AsyncHook)
-    spy_hook.before = AsyncMock(return_value=None)
+    spy_hook = MagicMock(spec=Hook)
+    spy_hook.before.return_value = None
     no_op_provider_client_async.add_hooks([spy_hook])
     # When
     flag_details = await no_op_provider_client_async.get_boolean_details(
@@ -177,9 +174,9 @@ async def test_handle_an_open_feature_exception_thrown_by_a_provider_async(
     no_op_provider_client_async,
 ):
     # Given
-    exception_hook = AsyncHook()
-    exception_hook.after = AsyncMock(
-        side_effect=OpenFeatureError(ErrorCode.GENERAL, "error_message")
+    exception_hook = MagicMock(spec=Hook)
+    exception_hook.after.side_effect = OpenFeatureError(
+        ErrorCode.GENERAL, "error_message"
     )
     no_op_provider_client_async.add_hooks([exception_hook])
 
