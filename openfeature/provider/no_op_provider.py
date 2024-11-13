@@ -3,7 +3,7 @@ import typing
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.hook import Hook
-from openfeature.provider import AbstractProvider, Metadata
+from openfeature.provider import AbstractProvider, AsyncAbstractProvider, Metadata
 from openfeature.provider.no_op_metadata import NoOpMetadata
 
 PASSED_IN_DEFAULT = "Passed in default"
@@ -77,7 +77,10 @@ class NoOpProvider(AbstractProvider):
         )
 
 
-class AsyncNoOpProvider(NoOpProvider):
+class AsyncNoOpProvider(AsyncAbstractProvider):
+    def get_metadata(self) -> Metadata:
+        return NoOpMetadata()
+
     async def resolve_boolean_details(
         self,
         flag_key: str,

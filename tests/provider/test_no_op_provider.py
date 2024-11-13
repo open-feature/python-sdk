@@ -1,5 +1,11 @@
+import typing
 from numbers import Number
 
+import pytest
+
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.flag_evaluation import FlagResolutionDetails
+from openfeature.provider import AsyncAbstractProvider
 from openfeature.provider.no_op_provider import NoOpProvider
 
 
@@ -80,3 +86,66 @@ def test_should_resolve_object_flag_from_no_op():
     assert flag is not None
     assert flag.value == return_value
     assert isinstance(flag.value, dict)
+
+
+class ConcreteAsyncProvider(AsyncAbstractProvider):
+    def get_metadata(self):
+        return super().get_metadata()
+
+    async def resolve_boolean_details(
+        self,
+        flag_key: str,
+        default_value: bool,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[bool]:
+        return await super().resolve_boolean_details(flag_key, default_value)
+
+    async def resolve_string_details(
+        self,
+        flag_key: str,
+        default_value: str,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[str]:
+        return await super().resolve_string_details(flag_key, default_value)
+
+    async def resolve_integer_details(
+        self,
+        flag_key: str,
+        default_value: int,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[int]:
+        return await super().resolve_integer_details(flag_key, default_value)
+
+    async def resolve_float_details(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[float]:
+        return await super().resolve_float_details(flag_key, default_value)
+
+    async def resolve_object_details(
+        self,
+        flag_key: str,
+        default_value: typing.Union[dict, list],
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+        return await super().resolve_object_details(flag_key, default_value)
+
+
+@pytest.mark.parametrize(
+    "get_method, default",
+    (
+        ("resolve_boolean_details", True),
+        ("resolve_string_details", "default"),
+        ("resolve_integer_details", 42),
+        ("resolve_float_details", 3.14),
+        ("resolve_object_details", {"key": "value"}),
+    ),
+)
+@pytest.mark.asyncio
+async def test_abstract_provider_throws_not_implemented(get_method, default):
+    with pytest.raises(NotImplementedError) as exception:
+        provider = ConcreteAsyncProvider()
+        await getattr(provider, get_method)("test_flag", default)
+    assert str(exception.value) == "Method not implemented"

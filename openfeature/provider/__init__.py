@@ -174,7 +174,7 @@ class AsyncAbstractProvider(AbstractProvider):
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[bool]:
-        pass
+        raise NotImplementedError("Method not implemented")
 
     @abstractmethod
     async def resolve_string_details(
@@ -183,7 +183,7 @@ class AsyncAbstractProvider(AbstractProvider):
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[str]:
-        pass
+        raise NotImplementedError("Method not implemented")
 
     @abstractmethod
     async def resolve_integer_details(
@@ -192,7 +192,7 @@ class AsyncAbstractProvider(AbstractProvider):
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[int]:
-        pass
+        raise NotImplementedError("Method not implemented")
 
     @abstractmethod
     async def resolve_float_details(
@@ -201,13 +201,13 @@ class AsyncAbstractProvider(AbstractProvider):
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[float]:
-        pass
+        raise NotImplementedError("Method not implemented")
 
     @abstractmethod
-    def resolve_object_details(
+    async def resolve_object_details(
         self,
         flag_key: str,
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[typing.Union[dict, list]]:
-        pass
+        raise NotImplementedError("Method not implemented")
