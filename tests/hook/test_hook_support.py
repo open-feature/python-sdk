@@ -1,11 +1,11 @@
-from unittest.mock import ANY, AsyncMock, MagicMock
+from unittest.mock import ANY, MagicMock
 
 import pytest
 
 from openfeature.client import ClientMetadata
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
-from openfeature.hook import AsyncHook, Hook, HookContext
+from openfeature.hook import Hook, HookContext
 from openfeature.hook._hook_support import (
     after_all_hooks,
     after_hooks,
@@ -82,23 +82,6 @@ def test_error_hooks_run_error_method(mock_hook):
     mock_hook.supports_flag_value_type.assert_called_once()
     mock_hook.error.assert_called_once()
     mock_hook.error.assert_called_with(
-        hook_context=hook_context, exception=ANY, hints=hook_hints
-    )
-
-
-@pytest.mark.asyncio
-async def test_error_hooks_run_error_method_async(mock_hook_async):
-    # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
-    hook_hints = MappingProxyType({})
-    # When
-    await error_hooks_async(
-        FlagType.BOOLEAN, hook_context, Exception, [mock_hook_async], hook_hints
-    )
-    # Then
-    mock_hook_async.supports_flag_value_type.assert_called_once()
-    mock_hook_async.error.assert_called_once()
-    mock_hook_async.error.assert_called_with(
         hook_context=hook_context, exception=ANY, hints=hook_hints
     )
 
