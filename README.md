@@ -259,7 +259,7 @@ app = Flask(__name__)
 api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
 
 # Middleware to set the transaction context
-# You can call api.set_transaction_context anywhere you have information, 
+# You can call api.set_transaction_context anywhere you have information,
 # you want to have available in the code-paths below the current one.
 @app.before_request
 def set_request_transaction_context():
@@ -269,7 +269,7 @@ def set_request_transaction_context():
   api.set_transaction_context(evaluation_context)
 
 def create_response() -> str:
-  # This method can be anywhere in our code. 
+  # This method can be anywhere in our code.
   # The feature flag evaluation will automatically contain the transaction context merged with other context
   new_response = api.get_client().get_string_value("response-message", "Hello User!")
   return f"Message from server: {new_response}"
