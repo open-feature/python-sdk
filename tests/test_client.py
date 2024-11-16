@@ -1,7 +1,7 @@
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from unittest.mock import MagicMock, Mock
+from unittest.mock import MagicMock
 
 import pytest
 
