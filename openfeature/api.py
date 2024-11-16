@@ -36,7 +36,9 @@ __all__ = [
 ]
 
 _evaluation_context = EvaluationContext()
-_evaluation_transaction_context_propagator = NoOpTransactionContextPropagator()
+_evaluation_transaction_context_propagator: TransactionContextPropagator = (
+    NoOpTransactionContextPropagator()
+)
 
 _hooks: typing.List[Hook] = []
 

@@ -1,12 +1,14 @@
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
 import pytest
 
+from openfeature import api
 from openfeature.api import add_hooks, clear_hooks, get_client, set_provider
 from openfeature.client import OpenFeatureClient
+from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import EventDetails, ProviderEvent, ProviderEventDetails
 from openfeature.exception import ErrorCode, OpenFeatureError
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
@@ -14,6 +16,7 @@ from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 from openfeature.provider.no_op_provider import NoOpProvider
+from openfeature.transaction_context import ContextVarsTransactionContextPropagator
 
 
 @pytest.mark.parametrize(
@@ -384,3 +387,47 @@ def test_client_handlers_thread_safety():
         f2 = executor.submit(emit_events_task)
         f1.result()
         f2.result()
+
+
+def test_client_should_merge_contexts():
+    api.clear_hooks()
+    api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
+
+    provider = NoOpProvider()
+    provider.resolve_boolean_details = MagicMock(wraps=provider.resolve_boolean_details)
+    api.set_provider(provider)
+
+    # Global evaluation context
+    global_context = EvaluationContext(
+        targeting_key="global", attributes={"global_attr": "global_value"}
+    )
+    api.set_evaluation_context(global_context)
+
+    # Transaction context
+    transaction_context = EvaluationContext(
+        targeting_key="transaction",
+        attributes={"transaction_attr": "transaction_value"},
+    )
+    api.set_transaction_context(transaction_context)
+
+    # Client-specific context
+    client_context = EvaluationContext(
+        targeting_key="client", attributes={"client_attr": "client_value"}
+    )
+    client = OpenFeatureClient(domain=None, version=None, context=client_context)
+
+    # Invocation-specific context
+    invocation_context = EvaluationContext(
+        targeting_key="invocation", attributes={"invocation_attr": "invocation_value"}
+    )
+    client.get_boolean_details("flag", False, invocation_context)
+
+    # Retrieve the call arguments
+    args, kwargs = provider.resolve_boolean_details.call_args
+    flag_key, default_value, context = args
+
+    assert context.targeting_key == "invocation"  # Last one in the merge chain
+    assert context.attributes["global_attr"] == "global_value"
+    assert context.attributes["transaction_attr"] == "transaction_value"
+    assert context.attributes["client_attr"] == "client_value"
+    assert context.attributes["invocation_attr"] == "invocation_value"

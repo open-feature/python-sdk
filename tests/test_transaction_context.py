@@ -15,9 +15,6 @@ from openfeature.transaction_context import (
     NoOpTransactionContextPropagator,
     TransactionContextPropagator,
 )
-from openfeature.transaction_context.context_var_transaction_context_propagator import (
-    _transaction_context_var,
-)
 
 
 # Test cases
@@ -97,8 +94,12 @@ def test_should_propagate_event_when_context_set():
     set_transaction_context(evaluation_context)
 
     # Then
-    assert _transaction_context_var.get().targeting_key == "custom_key"
-    assert _transaction_context_var.get().attributes == {"attr1": "val1"}
+    assert (
+        custom_propagator._transaction_context_var.get().targeting_key == "custom_key"
+    )
+    assert custom_propagator._transaction_context_var.get().attributes == {
+        "attr1": "val1"
+    }
 
 
 def test_context_vars_transaction_context_propagator_multiple_threads():
