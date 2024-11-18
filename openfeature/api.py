@@ -39,7 +39,7 @@ def get_client(
     return OpenFeatureClient(domain=domain, version=version)
 
 
-def get_client_async(
+def get_async_client(
     domain: typing.Optional[str] = None, version: typing.Optional[str] = None
 ) -> AsyncOpenFeatureClient:
     return AsyncOpenFeatureClient(domain=domain, version=version)

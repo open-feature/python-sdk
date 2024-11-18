@@ -31,4 +31,4 @@ def no_op_provider_client():
 @pytest.fixture()
 def no_op_provider_client_async():
     api.set_provider(AsyncNoOpProvider())
-    return api.get_client_async("my-async-client")
+    return api.get_async_client("my-async-client")

@@ -86,7 +86,7 @@ class AsyncNoOpProvider(AsyncAbstractProvider):
         flag_key: str,
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[bool]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[bool]]:
         return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,
@@ -98,7 +98,7 @@ class AsyncNoOpProvider(AsyncAbstractProvider):
         flag_key: str,
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[str]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[str]]:
         return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,
@@ -110,7 +110,7 @@ class AsyncNoOpProvider(AsyncAbstractProvider):
         flag_key: str,
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[int]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[int]]:
         return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,
@@ -122,7 +122,7 @@ class AsyncNoOpProvider(AsyncAbstractProvider):
         flag_key: str,
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[float]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[float]]:
         return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,
@@ -134,7 +134,9 @@ class AsyncNoOpProvider(AsyncAbstractProvider):
         flag_key: str,
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+    ) -> typing.Coroutine[
+        typing.Any, typing.Any, FlagResolutionDetails[typing.Union[dict, list]]
+    ]:
         return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,

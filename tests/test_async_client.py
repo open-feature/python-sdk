@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from openfeature.api import add_hooks, get_client_async, set_provider
+from openfeature.api import add_hooks, get_async_client, set_provider
 from openfeature.client import AsyncOpenFeatureClient
 from openfeature.event import ProviderEvent, ProviderEventDetails
 from openfeature.exception import ErrorCode, OpenFeatureError
@@ -82,7 +82,7 @@ def test_add_remove_event_handler_async():
     set_provider(provider)
     spy = MagicMock()
 
-    client = get_client_async()
+    client = get_async_client()
     client.add_handler(
         ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, spy.provider_configuration_changed
     )
@@ -109,7 +109,7 @@ def test_client_handlers_thread_safety_async():
 
         for _ in range(10):
             time.sleep(0.01)
-            client = get_client_async(str(uuid.uuid4()))
+            client = get_async_client(str(uuid.uuid4()))
             client.add_handler(ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, handler)
 
     def emit_events_task():

@@ -173,7 +173,7 @@ class AsyncAbstractProvider(AbstractProvider):
         flag_key: str,
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[bool]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[bool]]:
         raise NotImplementedError("Method not implemented")
 
     @abstractmethod
@@ -182,7 +182,7 @@ class AsyncAbstractProvider(AbstractProvider):
         flag_key: str,
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[str]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[str]]:
         raise NotImplementedError("Method not implemented")
 
     @abstractmethod
@@ -191,7 +191,7 @@ class AsyncAbstractProvider(AbstractProvider):
         flag_key: str,
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[int]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[int]]:
         raise NotImplementedError("Method not implemented")
 
     @abstractmethod
@@ -200,7 +200,7 @@ class AsyncAbstractProvider(AbstractProvider):
         flag_key: str,
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[float]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[float]]:
         raise NotImplementedError("Method not implemented")
 
     @abstractmethod
@@ -209,5 +209,7 @@ class AsyncAbstractProvider(AbstractProvider):
         flag_key: str,
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+    ) -> typing.Coroutine[
+        typing.Any, typing.Any, FlagResolutionDetails[typing.Union[dict, list]]
+    ]:
         raise NotImplementedError("Method not implemented")

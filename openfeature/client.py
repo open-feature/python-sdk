@@ -473,7 +473,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> bool:
+    ) -> typing.Coroutine[typing.Any, typing.Any, bool]:
         details = await self.get_boolean_details(
             flag_key,
             default_value,
@@ -488,7 +488,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[bool]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagEvaluationDetails[bool]]:
         return await self.evaluate_flag_details(
             FlagType.BOOLEAN,
             flag_key,
@@ -503,7 +503,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> str:
+    ) -> typing.Coroutine[typing.Any, typing.Any, str]:
         details = await self.get_string_details(
             flag_key,
             default_value,
@@ -518,7 +518,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[str]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagEvaluationDetails[str]]:
         return await self.evaluate_flag_details(
             FlagType.STRING,
             flag_key,
@@ -533,7 +533,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> int:
+    ) -> typing.Coroutine[typing.Any, typing.Any, int]:
         details = await self.get_integer_details(
             flag_key,
             default_value,
@@ -548,7 +548,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[int]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagEvaluationDetails[int]]:
         return await self.evaluate_flag_details(
             FlagType.INTEGER,
             flag_key,
@@ -563,7 +563,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> float:
+    ) -> typing.Coroutine[typing.Any, typing.Any, float]:
         details = await self.get_float_details(
             flag_key,
             default_value,
@@ -578,7 +578,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[float]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagEvaluationDetails[float]]:
         return await self.evaluate_flag_details(
             FlagType.FLOAT,
             flag_key,
@@ -593,7 +593,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> typing.Union[dict, list]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, typing.Union[dict, list]]:
         details = await self.get_object_details(
             flag_key,
             default_value,
@@ -608,7 +608,9 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[typing.Union[dict, list]]:
+    ) -> typing.Coroutine[
+        typing.Any, typing.Any, FlagEvaluationDetails[typing.Union[dict, list]]
+    ]:
         return await self.evaluate_flag_details(
             FlagType.OBJECT,
             flag_key,
@@ -624,7 +626,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         default_value: typing.Any,
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[typing.Any]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagEvaluationDetails[typing.Any]]:
         """
         Evaluate the flag requested by the user from the clients provider.
 
@@ -770,7 +772,7 @@ class AsyncOpenFeatureClient(OpenFeatureClient):
         flag_key: str,
         default_value: typing.Any,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagEvaluationDetails[typing.Any]:
+    ) -> typing.Coroutine[typing.Any, typing.Any, FlagEvaluationDetails[typing.Any]]:
         """
         Asynchronous encapsulated method to create a FlagEvaluationDetail from a specific provider.
 
