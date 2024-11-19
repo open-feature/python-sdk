@@ -136,7 +136,7 @@ class AsyncInMemoryProvider(InMemoryProvider):
         flag_key: str,
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[bool]]:
+    ) -> FlagResolutionDetails[bool]:
         return self._resolve(flag_key, evaluation_context)
 
     async def resolve_string_details(
@@ -144,7 +144,7 @@ class AsyncInMemoryProvider(InMemoryProvider):
         flag_key: str,
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[str]]:
+    ) -> FlagResolutionDetails[str]:
         return self._resolve(flag_key, evaluation_context)
 
     async def resolve_integer_details(
@@ -152,7 +152,7 @@ class AsyncInMemoryProvider(InMemoryProvider):
         flag_key: str,
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[int]]:
+    ) -> FlagResolutionDetails[int]:
         return self._resolve(flag_key, evaluation_context)
 
     async def resolve_float_details(
@@ -160,7 +160,7 @@ class AsyncInMemoryProvider(InMemoryProvider):
         flag_key: str,
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> typing.Coroutine[typing.Any, typing.Any, FlagResolutionDetails[float]]:
+    ) -> FlagResolutionDetails[float]:
         return self._resolve(flag_key, evaluation_context)
 
     async def resolve_object_details(
@@ -168,7 +168,5 @@ class AsyncInMemoryProvider(InMemoryProvider):
         flag_key: str,
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> typing.Coroutine[
-        typing.Any, typing.Any, FlagResolutionDetails[typing.Union[dict, list]]
-    ]:
+    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
         return self._resolve(flag_key, evaluation_context)
