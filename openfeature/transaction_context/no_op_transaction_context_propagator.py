@@ -10,4 +10,5 @@ class NoOpTransactionContextPropagator(TransactionContextPropagator):
 
     def set_transaction_context(
         self, transaction_context: EvaluationContext
-    ) -> None: ...
+    ) -> None:
+    pass
