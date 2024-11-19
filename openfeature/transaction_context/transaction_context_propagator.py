@@ -1,9 +1,6 @@
 import typing
-from typing import TypeVar
 
 from openfeature.evaluation_context import EvaluationContext
-
-T = TypeVar("T", bound="TransactionContextPropagator")
 
 
 class TransactionContextPropagator(typing.Protocol):

@@ -12,9 +12,9 @@ from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
 from openfeature.provider._registry import provider_registry
 from openfeature.provider.metadata import Metadata
-from openfeature.transaction_context import (
+from openfeature.transaction_context import TransactionContextPropagator
+from openfeature.transaction_context.no_op_transaction_context_propagator import (
     NoOpTransactionContextPropagator,
-    TransactionContextPropagator,
 )
 
 __all__ = [

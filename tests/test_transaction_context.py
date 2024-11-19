@@ -12,8 +12,10 @@ from openfeature.api import (
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.transaction_context import (
     ContextVarsTransactionContextPropagator,
-    NoOpTransactionContextPropagator,
     TransactionContextPropagator,
+)
+from openfeature.transaction_context.no_op_transaction_context_propagator import (
+    NoOpTransactionContextPropagator,
 )
 
 
