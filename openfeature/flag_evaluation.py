@@ -12,12 +12,12 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 
 
 __all__ = [
-    "FlagType",
-    "Reason",
-    "FlagMetadata",
     "FlagEvaluationDetails",
     "FlagEvaluationOptions",
+    "FlagMetadata",
     "FlagResolutionDetails",
+    "FlagType",
+    "Reason",
 ]
 
 

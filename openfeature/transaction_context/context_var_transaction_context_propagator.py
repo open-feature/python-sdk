@@ -1,4 +1,5 @@
 from contextvars import ContextVar
+from typing import Optional
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.transaction_context.transaction_context_propagator import (
@@ -7,12 +8,17 @@ from openfeature.transaction_context.transaction_context_propagator import (
 
 
 class ContextVarsTransactionContextPropagator(TransactionContextPropagator):
-    _transaction_context_var: ContextVar[EvaluationContext] = ContextVar(
-        "transaction_context", default=EvaluationContext()
+    _transaction_context_var: ContextVar[Optional[EvaluationContext]] = ContextVar(
+        "transaction_context", default=None
     )
 
     def get_transaction_context(self) -> EvaluationContext:
-        return self._transaction_context_var.get()
+        context = self._transaction_context_var.get()
+        if context is None:
+            context = EvaluationContext()
+            self._transaction_context_var.set(context)
+
+        return context
 
     def set_transaction_context(self, transaction_context: EvaluationContext) -> None:
         self._transaction_context_var.set(transaction_context)
