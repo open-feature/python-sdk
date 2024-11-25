@@ -19,8 +19,8 @@
 
   <!-- x-release-please-start-version -->
 
-  <a href="https://github.com/open-feature/python-sdk/releases/tag/v0.7.2">
-    <img alt="Latest version" src="https://img.shields.io/static/v1?label=release&message=v0.7.2&color=blue&style=for-the-badge" />
+  <a href="https://github.com/open-feature/python-sdk/releases/tag/v0.7.3">
+    <img alt="Latest version" src="https://img.shields.io/static/v1?label=release&message=v0.7.3&color=blue&style=for-the-badge" />
   </a>
 
   <!-- x-release-please-end -->
@@ -60,13 +60,13 @@
 #### Pip install
 
 ```bash
-pip install openfeature-sdk==0.7.2
+pip install openfeature-sdk==0.7.3
 ```
 
 #### requirements.txt
 
 ```bash
-openfeature-sdk==0.7.2
+openfeature-sdk==0.7.3
 ```
 
 ```python
