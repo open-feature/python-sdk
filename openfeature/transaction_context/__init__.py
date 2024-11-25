@@ -6,6 +6,6 @@ from openfeature.transaction_context.transaction_context_propagator import (
 )
 
 __all__ = [
-    "TransactionContextPropagator",
     "ContextVarsTransactionContextPropagator",
+    "TransactionContextPropagator",
 ]

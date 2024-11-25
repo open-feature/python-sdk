@@ -18,21 +18,21 @@ from openfeature.transaction_context.no_op_transaction_context_propagator import
 )
 
 __all__ = [
-    "get_client",
-    "set_provider",
-    "clear_providers",
-    "get_provider_metadata",
-    "get_evaluation_context",
-    "set_evaluation_context",
-    "set_transaction_context_propagator",
-    "get_transaction_context",
-    "set_transaction_context",
+    "add_handler",
     "add_hooks",
     "clear_hooks",
+    "clear_providers",
+    "get_client",
+    "get_evaluation_context",
     "get_hooks",
-    "shutdown",
-    "add_handler",
+    "get_provider_metadata",
+    "get_transaction_context",
     "remove_handler",
+    "set_evaluation_context",
+    "set_provider",
+    "set_transaction_context",
+    "set_transaction_context_propagator",
+    "shutdown",
 ]
 
 _evaluation_context = EvaluationContext()

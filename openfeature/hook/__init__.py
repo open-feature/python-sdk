@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from openfeature.client import ClientMetadata
     from openfeature.provider.metadata import Metadata
 
-__all__ = ["HookType", "HookContext", "HookHints", "Hook"]
+__all__ = ["Hook", "HookContext", "HookHints", "HookType"]
 
 
 class HookType(Enum):
