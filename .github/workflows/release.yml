@@ -54,4 +54,5 @@ jobs:
         run: hatch build
 
       - name: Publish a Python distribution to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        # pinning till fixed https://github.com/pypa/gh-action-pypi-publish/issues/300
+        uses: pypa/gh-action-pypi-publish@release/v1.11

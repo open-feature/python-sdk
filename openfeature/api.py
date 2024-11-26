@@ -12,23 +12,33 @@ from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
 from openfeature.provider._registry import provider_registry
 from openfeature.provider.metadata import Metadata
+from openfeature.transaction_context import TransactionContextPropagator
+from openfeature.transaction_context.no_op_transaction_context_propagator import (
+    NoOpTransactionContextPropagator,
+)
 
 __all__ = [
-    "get_client",
-    "set_provider",
-    "clear_providers",
-    "get_provider_metadata",
-    "get_evaluation_context",
-    "set_evaluation_context",
+    "add_handler",
     "add_hooks",
     "clear_hooks",
+    "clear_providers",
+    "get_client",
+    "get_evaluation_context",
     "get_hooks",
-    "shutdown",
-    "add_handler",
+    "get_provider_metadata",
+    "get_transaction_context",
     "remove_handler",
+    "set_evaluation_context",
+    "set_provider",
+    "set_transaction_context",
+    "set_transaction_context_propagator",
+    "shutdown",
 ]
 
 _evaluation_context = EvaluationContext()
+_evaluation_transaction_context_propagator: TransactionContextPropagator = (
+    NoOpTransactionContextPropagator()
+)
 
 _hooks: typing.List[Hook] = []
 
@@ -72,6 +82,24 @@ def set_evaluation_context(evaluation_context: EvaluationContext) -> None:
     if evaluation_context is None:
         raise GeneralError(error_message="No api level evaluation context")
     _evaluation_context = evaluation_context
+
+
+def set_transaction_context_propagator(
+    transaction_context_propagator: TransactionContextPropagator,
+) -> None:
+    global _evaluation_transaction_context_propagator
+    _evaluation_transaction_context_propagator = transaction_context_propagator
+
+
+def get_transaction_context() -> EvaluationContext:
+    return _evaluation_transaction_context_propagator.get_transaction_context()
+
+
+def set_transaction_context(evaluation_context: EvaluationContext) -> None:
+    global _evaluation_transaction_context_propagator
+    _evaluation_transaction_context_propagator.set_transaction_context(
+        evaluation_context
+    )
 
 
 def add_hooks(hooks: typing.List[Hook]) -> None:

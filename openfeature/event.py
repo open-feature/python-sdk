@@ -6,7 +6,7 @@ from typing import Callable, Dict, List, Optional, Union
 
 from openfeature.exception import ErrorCode
 
-__all__ = ["ProviderEvent", "ProviderEventDetails", "EventDetails", "EventHandler"]
+__all__ = ["EventDetails", "EventHandler", "ProviderEvent", "ProviderEventDetails"]
 
 
 class ProviderEvent(Enum):

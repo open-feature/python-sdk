@@ -11,7 +11,7 @@ from openfeature.hook import Hook
 
 from .metadata import Metadata
 
-__all__ = ["AbstractProvider", "ProviderStatus", "FeatureProvider", "Metadata"]
+__all__ = ["AbstractProvider", "FeatureProvider", "Metadata", "ProviderStatus"]
 
 
 class ProviderStatus(Enum):
