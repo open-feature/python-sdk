@@ -72,6 +72,7 @@ local_partial_types = true # will become the new default from version 2
 pretty = true
 strict = true
 disallow_any_generics = false
+disable_error_code = ["override"]
 
 [tool.ruff]
 exclude = [

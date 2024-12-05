@@ -1,7 +1,7 @@
 import typing
 
 from openfeature import _event_support
-from openfeature.client import OpenFeatureClient
+from openfeature.client import AsyncOpenFeatureClient, OpenFeatureClient
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import (
     EventHandler,
@@ -47,6 +47,12 @@ def get_client(
     domain: typing.Optional[str] = None, version: typing.Optional[str] = None
 ) -> OpenFeatureClient:
     return OpenFeatureClient(domain=domain, version=version)
+
+
+def get_async_client(
+    domain: typing.Optional[str] = None, version: typing.Optional[str] = None
+) -> AsyncOpenFeatureClient:
+    return AsyncOpenFeatureClient(domain=domain, version=version)
 
 
 def set_provider(
