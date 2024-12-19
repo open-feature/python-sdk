@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.5](https://github.com/open-feature/python-sdk/compare/v0.7.4...v0.7.5) (2024-12-19)
+
+
+### 🧹 Chore
+
+* **deps:** update codecov/codecov-action action to v5.1.0 ([#401](https://github.com/open-feature/python-sdk/issues/401)) ([0459330](https://github.com/open-feature/python-sdk/commit/0459330cb91e9b28a15bdd380aec4c56c3b5d8df))
+* **deps:** update codecov/codecov-action action to v5.1.1 ([#402](https://github.com/open-feature/python-sdk/issues/402)) ([a6907d6](https://github.com/open-feature/python-sdk/commit/a6907d610e6dde1eecef56f25f3cc6a569b6eee4))
+* **deps:** update codecov/codecov-action action to v5.1.2 ([#405](https://github.com/open-feature/python-sdk/issues/405)) ([1c56480](https://github.com/open-feature/python-sdk/commit/1c564804afad474151489d695af7fa0409a768c6))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.8.1 ([#398](https://github.com/open-feature/python-sdk/issues/398)) ([043385a](https://github.com/open-feature/python-sdk/commit/043385a8369e253a5e0ad1e184e980f8e8d7e5c7))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.8.2 ([#400](https://github.com/open-feature/python-sdk/issues/400)) ([2b6e210](https://github.com/open-feature/python-sdk/commit/2b6e210bc9dda72335e646fc60cde79b5bdd76c1))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.8.3 ([#404](https://github.com/open-feature/python-sdk/issues/404)) ([01ec388](https://github.com/open-feature/python-sdk/commit/01ec388d2d93fc87a4f2eca856cf507cbee35785))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.8.4 ([#406](https://github.com/open-feature/python-sdk/issues/406)) ([3296d3b](https://github.com/open-feature/python-sdk/commit/3296d3b229d41c7f879adfb7ab36e19de36617e4))
+
 ## [0.7.4](https://github.com/open-feature/python-sdk/compare/v0.7.3...v0.7.4) (2024-11-25)
 
 
