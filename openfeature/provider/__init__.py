@@ -164,3 +164,50 @@ class AbstractProvider(FeatureProvider):
     def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
         if hasattr(self, "_on_emit"):
             self._on_emit(self, event, details)
+
+
+class AsyncAbstractProvider(AbstractProvider):
+    @abstractmethod
+    async def resolve_boolean_details(
+        self,
+        flag_key: str,
+        default_value: bool,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[bool]:
+        raise NotImplementedError("Method not implemented")
+
+    @abstractmethod
+    async def resolve_string_details(
+        self,
+        flag_key: str,
+        default_value: str,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[str]:
+        raise NotImplementedError("Method not implemented")
+
+    @abstractmethod
+    async def resolve_integer_details(
+        self,
+        flag_key: str,
+        default_value: int,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[int]:
+        raise NotImplementedError("Method not implemented")
+
+    @abstractmethod
+    async def resolve_float_details(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[float]:
+        raise NotImplementedError("Method not implemented")
+
+    @abstractmethod
+    async def resolve_object_details(
+        self,
+        flag_key: str,
+        default_value: typing.Union[dict, list],
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+        raise NotImplementedError("Method not implemented")
