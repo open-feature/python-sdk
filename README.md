@@ -19,8 +19,8 @@
 
   <!-- x-release-please-start-version -->
 
-  <a href="https://github.com/open-feature/python-sdk/releases/tag/v0.7.2">
-    <img alt="Latest version" src="https://img.shields.io/static/v1?label=release&message=v0.7.2&color=blue&style=for-the-badge" />
+  <a href="https://github.com/open-feature/python-sdk/releases/tag/v0.7.4">
+    <img alt="Latest version" src="https://img.shields.io/static/v1?label=release&message=v0.7.4&color=blue&style=for-the-badge" />
   </a>
 
   <!-- x-release-please-end -->
@@ -60,13 +60,13 @@
 #### Pip install
 
 ```bash
-pip install openfeature-sdk==0.7.2
+pip install openfeature-sdk==0.7.4
 ```
 
 #### requirements.txt
 
 ```bash
-openfeature-sdk==0.7.2
+openfeature-sdk==0.7.4
 ```
 
 ```python
@@ -99,16 +99,17 @@ print("Value: " + str(flag_value))
 
 ## 🌟 Features
 
-| Status | Features                        | Description                                                                                                                        |
-| ------ | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| ✅      | [Providers](#providers)         | Integrate with a commercial, open source, or in-house feature management tool.                                                     |
-| ✅      | [Targeting](#targeting)         | Contextually-aware flag evaluation using [evaluation context](https://openfeature.dev/docs/reference/concepts/evaluation-context). |
-| ✅      | [Hooks](#hooks)                 | Add functionality to various stages of the flag evaluation life-cycle.                                                             |
-| ✅      | [Logging](#logging)             | Integrate with popular logging packages.                                                                                           |
-| ✅      | [Domains](#domains)             | Logically bind clients with providers.                                                                                             |
-| ✅      | [Eventing](#eventing)           | React to state changes in the provider or flag management system.                                                                  |
-| ✅      | [Shutdown](#shutdown)           | Gracefully clean up a provider during application shutdown.                                                                        |
-| ✅      | [Extending](#extending)         | Extend OpenFeature with custom providers and hooks.                                                                                |
+| Status | Features                                                            | Description                                                                                                                           |
+|--------|---------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| ✅      | [Providers](#providers)                                             | Integrate with a commercial, open source, or in-house feature management tool.                                                        |
+| ✅      | [Targeting](#targeting)                                             | Contextually-aware flag evaluation using [evaluation context](https://openfeature.dev/docs/reference/concepts/evaluation-context).    |
+| ✅      | [Hooks](#hooks)                                                     | Add functionality to various stages of the flag evaluation life-cycle.                                                                |
+| ✅      | [Logging](#logging)                                                 | Integrate with popular logging packages.                                                                                              |
+| ✅      | [Domains](#domains)                                                 | Logically bind clients with providers.                                                                                                |
+| ✅      | [Eventing](#eventing)                                               | React to state changes in the provider or flag management system.                                                                     |
+| ✅      | [Shutdown](#shutdown)                                               | Gracefully clean up a provider during application shutdown.                                                                           |
+| ✅      | [Transaction Context Propagation](#transaction-context-propagation) | Set a specific [evaluation context](/docs/reference/concepts/evaluation-context) for a transaction (e.g. an HTTP request or a thread) |
+| ✅      | [Extending](#extending)                                             | Extend OpenFeature with custom providers and hooks.                                                                                   |
 
 <sub>Implemented: ✅ | In-progress: ⚠️ | Not implemented yet: ❌</sub>
 
@@ -233,6 +234,86 @@ def on_provider_ready(event_details: EventDetails):
     print(f"Provider {event_details.provider_name} is ready")
 
 client.add_handler(ProviderEvent.PROVIDER_READY, on_provider_ready)
+```
+
+### Transaction Context Propagation
+
+Transaction context is a container for transaction-specific evaluation context (e.g. user id, user agent, IP).
+Transaction context can be set where specific data is available (e.g. an auth service or request handler) and by using the transaction context propagator it will automatically be applied to all flag evaluations within a transaction (e.g. a request or thread).
+
+You can implement a different transaction context propagator by implementing the `TransactionContextPropagator` class exported by the OpenFeature SDK.
+In most cases you can use `ContextVarsTransactionContextPropagator` as it works for `threads` and `asyncio` using [Context Variables](https://peps.python.org/pep-0567/).
+
+The following example shows a **multithreaded** Flask application using transaction context propagation to propagate the request ip and user id into request scoped transaction context.
+
+```python
+from flask import Flask, request
+from openfeature import api
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.transaction_context import ContextVarsTransactionContextPropagator
+
+# Initialize the Flask app
+app = Flask(__name__)
+
+# Set the transaction context propagator
+api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
+
+# Middleware to set the transaction context
+# You can call api.set_transaction_context anywhere you have information,
+# you want to have available in the code-paths below the current one.
+@app.before_request
+def set_request_transaction_context():
+  ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+  user_id = request.headers.get("User-Id")  # Assuming we're getting the user ID from a header
+  evaluation_context = EvaluationContext(targeting_key=user_id, attributes={"ipAddress": ip})
+  api.set_transaction_context(evaluation_context)
+
+def create_response() -> str:
+  # This method can be anywhere in our code.
+  # The feature flag evaluation will automatically contain the transaction context merged with other context
+  new_response = api.get_client().get_string_value("response-message", "Hello User!")
+  return f"Message from server: {new_response}"
+
+# Example route where we use the transaction context
+@app.route('/greeting')
+def some_endpoint():
+  return create_response()
+```
+
+This also works for asyncio based implementations e.g. FastApi as seen in the following example:
+
+```python
+from fastapi import FastAPI, Request
+from openfeature import api
+from openfeature.evaluation_context import EvaluationContext
+from openfeature.transaction_context import ContextVarsTransactionContextPropagator
+
+# Initialize the FastAPI app
+app = FastAPI()
+
+# Set the transaction context propagator
+api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
+
+# Middleware to set the transaction context
+@app.middleware("http")
+async def set_request_transaction_context(request: Request, call_next):
+    ip = request.headers.get("X-Forwarded-For", request.client.host)
+    user_id = request.headers.get("User-Id")  # Assuming we're getting the user ID from a header
+    evaluation_context = EvaluationContext(targeting_key=user_id, attributes={"ipAddress": ip})
+    api.set_transaction_context(evaluation_context)
+    response = await call_next(request)
+    return response
+
+def create_response() -> str:
+    # This method can be located anywhere in our code.
+    # The feature flag evaluation will automatically include the transaction context merged with other context.
+    new_response = api.get_client().get_string_value("response-message", "Hello User!")
+    return f"Message from server: {new_response}"
+
+# Example route where we use the transaction context
+@app.get('/greeting')
+async def some_endpoint():
+    return create_response()
 ```
 
 ### Shutdown
