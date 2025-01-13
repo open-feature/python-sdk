@@ -25,10 +25,11 @@ def error_hooks(
 def after_all_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
+    details: FlagEvaluationDetails[typing.Any],
     hooks: typing.List[Hook],
     hints: typing.Optional[HookHints] = None,
 ) -> None:
-    kwargs = {"hook_context": hook_context, "hints": hints}
+    kwargs = {"hook_context": hook_context, "details": details, "hints": hints}
     _execute_hooks(
         flag_type=flag_type, hooks=hooks, hook_method=HookType.FINALLY_AFTER, **kwargs
     )

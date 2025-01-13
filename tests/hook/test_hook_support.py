@@ -137,12 +137,15 @@ def test_after_hooks_run_after_method(mock_hook):
 def test_finally_after_hooks_run_finally_after_method(mock_hook):
     # Given
     hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    flag_evaluation_details = FlagEvaluationDetails(
+        hook_context.flag_key, "val", "unknown"
+    )
     hook_hints = MappingProxyType({})
     # When
-    after_all_hooks(FlagType.BOOLEAN, hook_context, [mock_hook], hook_hints)
+    after_all_hooks(FlagType.BOOLEAN, hook_context, flag_evaluation_details, [mock_hook], hook_hints)
     # Then
     mock_hook.supports_flag_value_type.assert_called_once()
     mock_hook.finally_after.assert_called_once()
     mock_hook.finally_after.assert_called_with(
-        hook_context=hook_context, hints=hook_hints
+        hook_context=hook_context, details=flag_evaluation_details, hints=hook_hints
     )
