@@ -69,4 +69,11 @@ IN_MEMORY_FLAGS = {
         variants={"one": "uno", "two": "dos"},
         default_variant="one",
     ),
+    "metadata-flag": InMemoryFlag(
+        state=InMemoryFlag.State.ENABLED,
+        default_variant="on",
+        variants={"on": True, "off": False},
+        context_evaluator=None,
+        flag_metadata={"version": "1.0.2", "flagSetId": 2}
+    ),
 }

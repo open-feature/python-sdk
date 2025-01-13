@@ -1,4 +1,5 @@
 # flake8: noqa: F811
+import typing
 
 from behave import given, then, when
 
@@ -9,6 +10,7 @@ from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import FlagEvaluationDetails, Reason
 from openfeature.provider.in_memory_provider import InMemoryProvider
 from tests.features.data import IN_MEMORY_FLAGS
+
 
 # Common step definitions
 
@@ -341,3 +343,4 @@ def parse_any(value):
     if value.isdigit():
         return int(value)
     return value
+
