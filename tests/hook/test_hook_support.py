@@ -147,5 +147,7 @@ def test_finally_after_hooks_run_finally_after_method(mock_hook):
     mock_hook.supports_flag_value_type.assert_called_once()
     mock_hook.finally_after.assert_called_once()
     mock_hook.finally_after.assert_called_with(
-        hook_context=hook_context, details=flag_evaluation_details, hints=hook_hints
+        hook_context=hook_context,
+        details=flag_evaluation_details,
+        hints=hook_hints
     )
