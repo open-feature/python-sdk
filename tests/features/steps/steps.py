@@ -35,7 +35,8 @@ def step_impl(context):
     '"{default_value}"'
 )
 def step_impl(context, flag_type, key, default_value):
-    context.client = get_client()
+    if context.client is None:
+        context.client = get_client()
     if flag_type == "boolean":
         context.boolean_flag_details = context.client.get_boolean_details(
             key, default_value
