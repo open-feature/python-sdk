@@ -117,3 +117,56 @@ class InMemoryProvider(AbstractProvider):
         if flag is None:
             raise FlagNotFoundError(f"Flag '{flag_key}' not found")
         return flag.resolve(evaluation_context)
+
+
+class AsyncInMemoryProvider(InMemoryProvider):
+    _flags: FlagStorage
+
+    def __init__(self, flags: FlagStorage) -> None:
+        self._flags = flags.copy()
+
+    def get_metadata(self) -> Metadata:
+        return InMemoryMetadata()
+
+    def get_provider_hooks(self) -> typing.List[Hook]:
+        return []
+
+    async def resolve_boolean_details(
+        self,
+        flag_key: str,
+        default_value: bool,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[bool]:
+        return self._resolve(flag_key, evaluation_context)
+
+    async def resolve_string_details(
+        self,
+        flag_key: str,
+        default_value: str,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[str]:
+        return self._resolve(flag_key, evaluation_context)
+
+    async def resolve_integer_details(
+        self,
+        flag_key: str,
+        default_value: int,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[int]:
+        return self._resolve(flag_key, evaluation_context)
+
+    async def resolve_float_details(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[float]:
+        return self._resolve(flag_key, evaluation_context)
+
+    async def resolve_object_details(
+        self,
+        flag_key: str,
+        default_value: typing.Union[dict, list],
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+        return self._resolve(flag_key, evaluation_context)
