@@ -1,3 +1,4 @@
+import asyncio
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -60,9 +61,13 @@ def test_should_get_flag_value_based_on_method_type(
     "flag_type, default_value, get_method",
     (
         (bool, True, "get_boolean_details"),
+        (bool, True, "get_boolean_details_async"),
         (str, "String", "get_string_details"),
+        (str, "String", "get_string_details_async"),
         (int, 100, "get_integer_details"),
+        (int, 100, "get_integer_details_async"),
         (float, 10.23, "get_float_details"),
+        (float, 10.23, "get_float_details_async"),
         (
             dict,
             {
@@ -73,27 +78,46 @@ def test_should_get_flag_value_based_on_method_type(
             "get_object_details",
         ),
         (
+            dict,
+            {
+                "String": "string",
+                "Number": 2,
+                "Boolean": True,
+            },
+            "get_object_details_async",
+        ),
+        (
             list,
             ["string1", "string2"],
             "get_object_details",
         ),
+        (
+            list,
+            ["string1", "string2"],
+            "get_object_details_async",
+        ),
     ),
 )
-def test_should_get_flag_detail_based_on_method_type(
+@pytest.mark.asyncio
+async def test_should_get_flag_detail_based_on_method_type(
     flag_type, default_value, get_method, no_op_provider_client
 ):
     # Given
     # When
-    flag = getattr(no_op_provider_client, get_method)(
-        flag_key="Key", default_value=default_value
-    )
+    method = getattr(no_op_provider_client, get_method)
+    if asyncio.iscoroutinefunction(method):
+        flag = await method(flag_key="Key", default_value=default_value)
+    else:
+        flag = method(flag_key="Key", default_value=default_value)
     # Then
     assert flag is not None
     assert flag.value == default_value
     assert isinstance(flag.value, flag_type)
 
 
-def test_should_raise_exception_when_invalid_flag_type_provided(no_op_provider_client):
+def test_should_raise_exception_when_invalid_flag_type_provided(
+    no_op_provider_client,
+):
     # Given
     # When
     flag = no_op_provider_client.evaluate_flag_details(
