@@ -79,6 +79,6 @@ IN_MEMORY_FLAGS = {
             "integer": 2,
             "float": 0.1,
             "boolean": True,
-        }
+        },
     ),
 }
