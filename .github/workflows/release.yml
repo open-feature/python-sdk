@@ -37,12 +37,14 @@ jobs:
       # IMPORTANT: this permission is mandatory for trusted publishing to pypi
       id-token: write
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created }}
-    container:
-      image: "python:3.13"
+    if: ${{ fromJSON(needs.release-please.outputs.release_created || false) }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5
+        with:
+          python-version: '3.13'
 
       - name: Upgrade pip
         run: pip install --upgrade pip
@@ -54,5 +56,4 @@ jobs:
         run: hatch build
 
       - name: Publish a Python distribution to PyPI
-        # pinning till fixed https://github.com/pypa/gh-action-pypi-publish/issues/300
-        uses: pypa/gh-action-pypi-publish@release/v1.11
+        uses: pypa/gh-action-pypi-publish@release/v1
