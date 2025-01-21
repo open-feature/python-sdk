@@ -1,4 +1,4 @@
-from behave import given, then, when
+from behave import given, when
 
 
 @given('a {flag_type}-flag with key "{flag_key}" and a default value "{default_value}"')

@@ -74,6 +74,11 @@ IN_MEMORY_FLAGS = {
         default_variant="on",
         variants={"on": True, "off": False},
         context_evaluator=None,
-        flag_metadata={"version": "1.0.2", "flagSetId": 2}
+        flag_metadata={
+            "string": "1.0.2",
+            "integer": 2,
+            "float": 0.1,
+            "boolean": True,
+        }
     ),
 }
