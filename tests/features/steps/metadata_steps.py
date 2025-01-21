@@ -27,8 +27,8 @@ def step_impl_metadata_contains(context):
         key, metadata_type, value = row
 
         assert context.evaluation.flag_metadata[
-                   key
-               ] == convert_value_from_metadata_type(value, metadata_type)
+           key
+       ] == convert_value_from_metadata_type(value, metadata_type)
 
 
 def convert_value_from_metadata_type(value, metadata_type):
