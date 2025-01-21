@@ -20,13 +20,3 @@ def step_impl(context):
         context.evaluation = client.get_float_details(key, default_value)
     elif flag_type.lower() == "integer":
         context.evaluation = client.get_integer_details(key, default_value)
-
-
-@then('the resolved metadata value "{key}" should be "{value}"')
-def step_impl(context, key, value):
-    assert context.evaluation.metadata[key] == value
-
-
-@then("the resolved metadata is empty")
-def step_impl(context):
-    assert context.evaluation.metadata
