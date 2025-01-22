@@ -154,7 +154,9 @@ async def test_should_resolve_list_flag_from_in_memory():
     )
     # When
     flag_sync = provider.resolve_object_details(flag_key="Key", default_value=[])
-    flag_async = provider.resolve_object_details(flag_key="Key", default_value=[])
+    flag_async = await provider.resolve_object_details_async(
+        flag_key="Key", default_value=[]
+    )
     # Then
     assert flag_sync == flag_async
     for flag in [flag_sync, flag_async]:
