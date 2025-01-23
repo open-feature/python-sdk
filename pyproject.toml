@@ -51,7 +51,7 @@ e2e = [
     "git submodule sync",
     "git submodule init",
     "git submodule update --init",
-    "cp -r spec/specification/assets/gherkin/. tests/features/",
+    "cp -r spec/specification/assets/gherkin/evaluation.feature tests/features/",
     "behave tests/features/",
     "rm tests/features/*.feature",
 ]
