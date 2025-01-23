@@ -12,7 +12,6 @@ from openfeature.flag_evaluation import FlagEvaluationDetails, Reason
 from openfeature.provider.in_memory_provider import InMemoryProvider
 from tests.features.data import IN_MEMORY_FLAGS
 
-
 # Common step definitions
 
 
@@ -59,7 +58,9 @@ def step_impl_evaluated_with_details(context, flag_type, key, default_value):
     'a boolean flag with key "{key}" is evaluated with {eval_details} and default '
     'value "{default_value}"'
 )
-def step_impl_bool_evaluated_with_details_and_default(context, key, eval_details, default_value):
+def step_impl_bool_evaluated_with_details_and_default(
+    context, key, eval_details, default_value
+):
     client: OpenFeatureClient = context.client
 
     context.boolean_flag_details = client.get_boolean_details(key, default_value)
@@ -140,7 +141,9 @@ def step_impl_resolved_bool_should_be(context, expected_value):
     'the resolved boolean details value should be "{expected_value}", the variant '
     'should be "{variant}", and the reason should be "{reason}"'
 )
-def step_impl_resolved_bool_should_be_with_reason(context, expected_value, variant, reason):
+def step_impl_resolved_bool_should_be_with_reason(
+    context, expected_value, variant, reason
+):
     assert parse_boolean(expected_value) == context.boolean_flag_details.value
     assert variant == context.boolean_flag_details.variant
     assert reason == context.boolean_flag_details.reason
@@ -150,7 +153,9 @@ def step_impl_resolved_bool_should_be_with_reason(context, expected_value, varia
     'the resolved string details value should be "{expected_value}", the variant '
     'should be "{variant}", and the reason should be "{reason}"'
 )
-def step_impl_resolved_string_should_be_with_reason(context, expected_value, variant, reason):
+def step_impl_resolved_string_should_be_with_reason(
+    context, expected_value, variant, reason
+):
     assert expected_value == context.string_flag_details.value
     assert variant == context.string_flag_details.variant
     assert reason == context.string_flag_details.reason
@@ -160,7 +165,9 @@ def step_impl_resolved_string_should_be_with_reason(context, expected_value, var
     'the resolved object value should be contain fields "{field1}", "{field2}", and '
     '"{field3}", with values "{val1}", "{val2}" and {val3}, respectively'
 )
-def step_impl_resolved_obj_should_contain(context, field1, field2, field3, val1, val2, val3):
+def step_impl_resolved_obj_should_contain(
+    context, field1, field2, field3, val1, val2, val3
+):
     value = context.object_flag_details.value
     assert field1 in value
     assert field2 in value
@@ -314,7 +321,7 @@ def step_impl_config_update(context, key, variant):
 
 @given("sleep for {duration} milliseconds")
 def step_impl_sleep(context, duration):
-    sleep(float(duration) * .001)
+    sleep(float(duration) * 0.001)
 
 
 @then('the resolved string details reason should be "{reason}"')
