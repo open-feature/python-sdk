@@ -10,6 +10,7 @@ from openfeature.flag_evaluation import FlagEvaluationDetails, Reason
 from openfeature.provider.in_memory_provider import InMemoryProvider
 from tests.features.data import IN_MEMORY_FLAGS
 
+
 # Common step definitions
 
 
@@ -25,6 +26,12 @@ def step_impl(context, flag_type, key, expected_reason):
 
 
 @given("a provider is registered with cache disabled")
+def step_impl(context):
+    set_provider(InMemoryProvider(IN_MEMORY_FLAGS))
+    context.client = get_client()
+
+
+@given("a provider is registered")
 def step_impl(context):
     set_provider(InMemoryProvider(IN_MEMORY_FLAGS))
     context.client = get_client()
