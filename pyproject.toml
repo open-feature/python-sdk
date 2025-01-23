@@ -48,9 +48,7 @@ cov = [
     "cov-report",
 ]
 e2e = [
-    "git submodule sync",
-    "git submodule init",
-    "git submodule update --init",
+    "git submodule add --force https://github.com/open-feature/spec.git spec",
     "cp -r spec/specification/assets/gherkin/evaluation.feature tests/features/",
     "behave tests/features/",
     "rm tests/features/*.feature",
