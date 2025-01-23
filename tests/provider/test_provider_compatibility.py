@@ -1,9 +1,8 @@
-import asyncio
 from typing import Optional, Union
 
 import pytest
 
-from openfeature.api import OpenFeatureClient, get_client, set_provider
+from openfeature.api import get_client, set_provider
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.provider import AbstractProvider, Metadata
@@ -127,9 +126,9 @@ def test_sync_methods_enforced_for_async_providers():
 
     # Then
     # assert
-    assert str(exception.value).startswith(
-        "Can't instantiate abstract class AsyncProvider with abstract methods resolve_boolean_details"
-    )
+    exception_message = str(exception.value)
+    assert exception_message.startswith("Can't instantiate abstract class AsyncProvider")
+    assert exception_message.__contains__("resolve_boolean_details")
 
 
 @pytest.mark.asyncio
