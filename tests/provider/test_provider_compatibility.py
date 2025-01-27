@@ -127,7 +127,9 @@ def test_sync_methods_enforced_for_async_providers():
     # Then
     # assert
     exception_message = str(exception.value)
-    assert exception_message.startswith("Can't instantiate abstract class AsyncProvider")
+    assert exception_message.startswith(
+        "Can't instantiate abstract class AsyncProvider"
+    )
     assert exception_message.__contains__("resolve_boolean_details")
 
 
