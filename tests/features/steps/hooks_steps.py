@@ -55,6 +55,7 @@ def convert_value_from_flag_type(value, flag_type):
         return float(value)
     return value
 
+
 @then('"{hook_names}" hooks should have evaluation details')
 def step_impl_should_have_eval_details(context, hook_names):
     for hook_name in hook_names.split(", "):
