@@ -109,7 +109,12 @@ class Hook:
         """
         pass
 
-    def finally_after(self, hook_context: HookContext, details: FlagEvaluationDetails[typing.Any], hints: HookHints) -> None:
+    def finally_after(
+        self,
+        hook_context: HookContext,
+        details: FlagEvaluationDetails[typing.Any],
+        hints: HookHints
+    ) -> None:
         """
         Run after flag evaluation, including any error processing.
         This will always run. Errors will be swallowed.
