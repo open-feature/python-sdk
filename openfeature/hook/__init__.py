@@ -113,7 +113,7 @@ class Hook:
         self,
         hook_context: HookContext,
         details: FlagEvaluationDetails[typing.Any],
-        hints: HookHints
+        hints: HookHints,
     ) -> None:
         """
         Run after flag evaluation, including any error processing.

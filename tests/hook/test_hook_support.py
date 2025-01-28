@@ -136,7 +136,7 @@ def test_after_hooks_run_after_method(mock_hook):
 
 def test_finally_after_hooks_run_finally_after_method(mock_hook):
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, '')
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
     flag_evaluation_details = FlagEvaluationDetails(
         hook_context.flag_key, "val", "unknown"
     )

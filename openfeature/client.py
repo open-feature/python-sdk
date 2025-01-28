@@ -398,7 +398,7 @@ class OpenFeatureClient:
                 hook_context,
                 flag_evaluation,
                 reversed_merged_hooks,
-                hook_hints
+                hook_hints,
             )
 
     def _create_provider_evaluation(
