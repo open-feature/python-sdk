@@ -393,7 +393,8 @@ class OpenFeatureClient:
             return flag_evaluation
 
         finally:
-            if flag_evaluation is None: # should never happen, but keeps the linter happy
+            if flag_evaluation is None:
+                # should never happen, but keeps the linter happy
                 flag_evaluation = FlagEvaluationDetails(
                     flag_key=flag_key,
                     value=default_value,
