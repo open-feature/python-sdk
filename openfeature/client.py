@@ -295,37 +295,39 @@ class OpenFeatureClient:
         reversed_merged_hooks = merged_hooks[:]
         reversed_merged_hooks.reverse()
 
-        status = self.get_provider_status()
-        if status == ProviderStatus.NOT_READY:
-            error_hooks(
-                flag_type,
-                hook_context,
-                ProviderNotReadyError(),
-                reversed_merged_hooks,
-                hook_hints,
-            )
-            return FlagEvaluationDetails(
-                flag_key=flag_key,
-                value=default_value,
-                reason=Reason.ERROR,
-                error_code=ErrorCode.PROVIDER_NOT_READY,
-            )
-        if status == ProviderStatus.FATAL:
-            error_hooks(
-                flag_type,
-                hook_context,
-                ProviderFatalError(),
-                reversed_merged_hooks,
-                hook_hints,
-            )
-            return FlagEvaluationDetails(
-                flag_key=flag_key,
-                value=default_value,
-                reason=Reason.ERROR,
-                error_code=ErrorCode.PROVIDER_FATAL,
-            )
-
         try:
+            status = self.get_provider_status()
+            if status == ProviderStatus.NOT_READY:
+                error_hooks(
+                    flag_type,
+                    hook_context,
+                    ProviderNotReadyError(),
+                    reversed_merged_hooks,
+                    hook_hints,
+                )
+                flag_evaluation = FlagEvaluationDetails(
+                    flag_key=flag_key,
+                    value=default_value,
+                    reason=Reason.ERROR,
+                    error_code=ErrorCode.PROVIDER_NOT_READY,
+                )
+                return flag_evaluation
+            if status == ProviderStatus.FATAL:
+                error_hooks(
+                    flag_type,
+                    hook_context,
+                    ProviderFatalError(),
+                    reversed_merged_hooks,
+                    hook_hints,
+                )
+                flag_evaluation = FlagEvaluationDetails(
+                    flag_key=flag_key,
+                    value=default_value,
+                    reason=Reason.ERROR,
+                    error_code=ErrorCode.PROVIDER_FATAL,
+                )
+                return flag_evaluation
+
             # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
             # Any resulting evaluation context from a before hook will overwrite
             # duplicate fields defined globally, on the client, or in the invocation.
