@@ -325,7 +325,6 @@ class OpenFeatureClient:
                 error_code=ErrorCode.PROVIDER_FATAL,
             )
 
-        flag_evaluation = None
         try:
             # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
             # Any resulting evaluation context from a before hook will overwrite
@@ -393,16 +392,6 @@ class OpenFeatureClient:
             return flag_evaluation
 
         finally:
-            if flag_evaluation is None:
-                # should never happen, but keeps the linter happy
-                flag_evaluation = FlagEvaluationDetails(
-                    flag_key=flag_key,
-                    value=default_value,
-                    reason=Reason.ERROR,
-                    error_code=ErrorCode.GENERAL,
-                    error_message="Unknown error",
-                )
-
             after_all_hooks(
                 flag_type,
                 hook_context,
