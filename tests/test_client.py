@@ -223,6 +223,7 @@ def test_should_shortcircuit_if_provider_is_not_ready(
     spy_hook.error.assert_called_once()
     spy_hook.finally_after.assert_called_once()
 
+
 # Requirement 1.7.7
 def test_should_shortcircuit_if_provider_is_in_irrecoverable_error_state(
     no_op_provider_client, monkeypatch
@@ -244,6 +245,7 @@ def test_should_shortcircuit_if_provider_is_in_irrecoverable_error_state(
     assert flag_details.error_code == ErrorCode.PROVIDER_FATAL
     spy_hook.error.assert_called_once()
     spy_hook.finally_after.assert_called_once()
+
 
 def test_should_run_error_hooks_if_provider_returns_resolution_with_error_code():
     # Given
