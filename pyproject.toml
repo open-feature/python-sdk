@@ -49,7 +49,7 @@ cov = [
 ]
 e2e = [
     "git submodule add --force https://github.com/open-feature/spec.git spec",
-    "cp -r spec/specification/assets/gherkin/evaluation.feature tests/features/",
+    "cp spec/specification/assets/gherkin/* tests/features/",
     "behave tests/features/",
     "rm tests/features/*.feature",
 ]
