@@ -3,6 +3,13 @@
 ## [0.7.5](https://github.com/open-feature/python-sdk/compare/v0.7.4...v0.7.5) (2025-01-31)
 
 
+### ⚠ BREAKING CHANGES
+
+The signature of the `finally` hook stage has been changed. The signature now includes the `evaluation details`, as per the [OpenFeature specification](https://openfeature.dev/specification/sections/hooks#requirement-438). To migrate, update any hook that implements the `finally` stage to accept `evaluation details` as the second argument.
+
+* Add evaluation details to finally hook stage [#403](https://github.com/open-feature/python-sdk/issues/403) ([#423](https://github.com/open-feature/python-sdk/issues/423)) ([9e9bb5c](https://github.com/open-feature/python-sdk/commit/9e9bb5c6269cfa5d9c9ffc7141c6dc63e399cdca))
+
+
 ### 🐛 Bug Fixes
 
 * Finally hooks do not get called when the provider is not ready [#424](https://github.com/open-feature/python-sdk/issues/424) ([#425](https://github.com/open-feature/python-sdk/issues/425)) ([8f2caba](https://github.com/open-feature/python-sdk/commit/8f2cabaa32f595304ecd6964b6ae21909672ef4a))
