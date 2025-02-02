@@ -24,8 +24,10 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
+          command: manifest
           token: ${{secrets.RELEASE_PLEASE_ACTION_TOKEN}}
-          target-branch: main
+          default-branch: main
+          signoff: "OpenFeature Bot <109696520+openfeaturebot@users.noreply.github.com>"
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       release_tag_name: ${{ steps.release.outputs.tag_name }}
@@ -37,12 +39,14 @@ jobs:
       # IMPORTANT: this permission is mandatory for trusted publishing to pypi
       id-token: write
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created }}
-    container:
-      image: "python:3.13"
+    if: ${{ fromJSON(needs.release-please.outputs.release_created || false) }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5
+        with:
+          python-version: '3.13'
 
       - name: Upgrade pip
         run: pip install --upgrade pip
@@ -54,5 +58,4 @@ jobs:
         run: hatch build
 
       - name: Publish a Python distribution to PyPI
-        # pinning till fixed https://github.com/pypa/gh-action-pypi-publish/issues/300
-        uses: pypa/gh-action-pypi-publish@release/v1.11
+        uses: pypa/gh-action-pypi-publish@release/v1

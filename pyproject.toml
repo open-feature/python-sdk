@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "openfeature_sdk"
-version = "0.7.4"
+version = "0.7.5"
 description = "Standardizing Feature Flagging for Everyone"
 readme = "README.md"
 authors = [{ name = "OpenFeature", email = "openfeature-core@groups.io" }]
@@ -48,8 +48,8 @@ cov = [
     "cov-report",
 ]
 e2e = [
-    "git submodule update --init",
-    "cp test-harness/features/evaluation.feature tests/features/",
+    "git submodule add --force https://github.com/open-feature/spec.git spec",
+    "cp spec/specification/assets/gherkin/* tests/features/",
     "behave tests/features/",
     "rm tests/features/*.feature",
 ]
