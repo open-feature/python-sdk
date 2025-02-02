@@ -556,12 +556,13 @@ class OpenFeatureClient:
                 hook_hints,
             )
             if error_code:
-                return FlagEvaluationDetails(
+                flag_evaluation = FlagEvaluationDetails(
                     flag_key=flag_key,
                     value=default_value,
                     reason=Reason.ERROR,
                     error_code=error_code,
                 )
+                return flag_evaluation
 
             merged_context = self._before_hooks_and_merge_context(
                 flag_type,
@@ -591,14 +592,14 @@ class OpenFeatureClient:
 
         except OpenFeatureError as err:
             error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
-
-            return FlagEvaluationDetails(
+            flag_evaluation = FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
                 reason=Reason.ERROR,
                 error_code=err.error_code,
                 error_message=err.error_message,
             )
+            return flag_evaluation
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
         except Exception as err:  # pragma: no cover
@@ -609,16 +610,23 @@ class OpenFeatureClient:
             error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
             error_message = getattr(err, "error_message", str(err))
-            return FlagEvaluationDetails(
+            flag_evaluation = FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
                 reason=Reason.ERROR,
                 error_code=ErrorCode.GENERAL,
                 error_message=error_message,
             )
+            return flag_evaluation
 
         finally:
-            after_all_hooks(flag_type, hook_context, reversed_merged_hooks, hook_hints)
+            after_all_hooks(
+                flag_type,
+                hook_context,
+                flag_evaluation,
+                reversed_merged_hooks,
+                hook_hints,
+            )
 
     def evaluate_flag_details(
         self,
@@ -657,12 +665,13 @@ class OpenFeatureClient:
                 hook_hints,
             )
             if error_code:
-                return FlagEvaluationDetails(
+                flag_evaluation = FlagEvaluationDetails(
                     flag_key=flag_key,
                     value=default_value,
                     reason=Reason.ERROR,
                     error_code=error_code,
                 )
+                return flag_evaluation
 
             merged_context = self._before_hooks_and_merge_context(
                 flag_type,
