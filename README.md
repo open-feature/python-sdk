@@ -336,7 +336,6 @@ print("Value: " + str(flag_value))
 
 See the [develop a provider](#develop-a-provider) for how to support asynchronous functionality in providers.
 
-
 ### Shutdown
 
 The OpenFeature API provides a shutdown function to perform a cleanup of all registered providers. This should only be called when your application is in the process of shutting down.
@@ -460,7 +459,6 @@ class MyProvider(AbstractProvider):
         ...
 
 ```
-
 
 > Built a new provider? [Let us know](https://github.com/open-feature/openfeature.dev/issues/new?assignees=&labels=provider&projects=&template=document-provider.yaml&title=%5BProvider%5D%3A+) so we can add it to the docs!
 
