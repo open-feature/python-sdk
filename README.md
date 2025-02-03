@@ -317,9 +317,9 @@ async def some_endpoint():
     return create_response()
 ```
 
-### Asynchronous Feature Retrieval 
+### Asynchronous Feature Retrieval
 
-The OpenFeature API supports asynchronous calls, enabling non-blocking feature evaluations for improved performance, especially useful in concurrent or latency-sensitive scenarios. If a provider *hasn't* implemented asynchronous calls, the client can still be used asynchronously, but calls will be blocking (synchronous). 
+The OpenFeature API supports asynchronous calls, enabling non-blocking feature evaluations for improved performance, especially useful in concurrent or latency-sensitive scenarios. If a provider *hasn't* implemented asynchronous calls, the client can still be used asynchronously, but calls will be blocking (synchronous).
 
 ```python
 import asyncio
