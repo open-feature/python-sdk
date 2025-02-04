@@ -465,7 +465,7 @@ class OpenFeatureClient:
 
     def _assert_provider_status(
         self,
-    ) -> typing.Union[None, ErrorCode]:
+    ) -> None:
         status = self.get_provider_status()
         if status == ProviderStatus.NOT_READY:
             raise ProviderNotReadyError()
