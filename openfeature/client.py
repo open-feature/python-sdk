@@ -465,31 +465,12 @@ class OpenFeatureClient:
 
     def _assert_provider_status(
         self,
-        flag_type: FlagType,
-        hook_context: HookContext,
-        reversed_merged_hooks: typing.List[Hook],
-        hook_hints: HookHints,
     ) -> typing.Union[None, ErrorCode]:
         status = self.get_provider_status()
-
         if status == ProviderStatus.NOT_READY:
-            error_hooks(
-                flag_type,
-                hook_context,
-                ProviderNotReadyError(),
-                reversed_merged_hooks,
-                hook_hints,
-            )
-            return ErrorCode.PROVIDER_NOT_READY
+            raise ProviderNotReadyError()
         if status == ProviderStatus.FATAL:
-            error_hooks(
-                flag_type,
-                hook_context,
-                ProviderFatalError(),
-                reversed_merged_hooks,
-                hook_hints,
-            )
-            return ErrorCode.PROVIDER_FATAL
+            raise ProviderFatalError()
         return None
 
     def _before_hooks_and_merge_context(
@@ -549,20 +530,7 @@ class OpenFeatureClient:
         )
 
         try:
-            error_code = self._assert_provider_status(
-                flag_type,
-                hook_context,
-                reversed_merged_hooks,
-                hook_hints,
-            )
-            if error_code:
-                flag_evaluation = FlagEvaluationDetails(
-                    flag_key=flag_key,
-                    value=default_value,
-                    reason=Reason.ERROR,
-                    error_code=error_code,
-                )
-                return flag_evaluation
+            self._assert_provider_status()
 
             merged_context = self._before_hooks_and_merge_context(
                 flag_type,
@@ -658,20 +626,7 @@ class OpenFeatureClient:
         )
 
         try:
-            error_code = self._assert_provider_status(
-                flag_type,
-                hook_context,
-                reversed_merged_hooks,
-                hook_hints,
-            )
-            if error_code:
-                flag_evaluation = FlagEvaluationDetails(
-                    flag_key=flag_key,
-                    value=default_value,
-                    reason=Reason.ERROR,
-                    error_code=error_code,
-                )
-                return flag_evaluation
+            self._assert_provider_status()
 
             merged_context = self._before_hooks_and_merge_context(
                 flag_type,
