@@ -76,6 +76,14 @@ class InMemoryProvider(AbstractProvider):
     ) -> FlagResolutionDetails[bool]:
         return self._resolve(flag_key, evaluation_context)
 
+    async def resolve_boolean_details_async(
+        self,
+        flag_key: str,
+        default_value: bool,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[bool]:
+        return await self._resolve_async(flag_key, evaluation_context)
+
     def resolve_string_details(
         self,
         flag_key: str,
@@ -83,6 +91,14 @@ class InMemoryProvider(AbstractProvider):
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[str]:
         return self._resolve(flag_key, evaluation_context)
+
+    async def resolve_string_details_async(
+        self,
+        flag_key: str,
+        default_value: str,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[str]:
+        return await self._resolve_async(flag_key, evaluation_context)
 
     def resolve_integer_details(
         self,
@@ -92,6 +108,14 @@ class InMemoryProvider(AbstractProvider):
     ) -> FlagResolutionDetails[int]:
         return self._resolve(flag_key, evaluation_context)
 
+    async def resolve_integer_details_async(
+        self,
+        flag_key: str,
+        default_value: int,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[int]:
+        return await self._resolve_async(flag_key, evaluation_context)
+
     def resolve_float_details(
         self,
         flag_key: str,
@@ -100,6 +124,14 @@ class InMemoryProvider(AbstractProvider):
     ) -> FlagResolutionDetails[float]:
         return self._resolve(flag_key, evaluation_context)
 
+    async def resolve_float_details_async(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[float]:
+        return await self._resolve_async(flag_key, evaluation_context)
+
     def resolve_object_details(
         self,
         flag_key: str,
@@ -107,6 +139,14 @@ class InMemoryProvider(AbstractProvider):
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[typing.Union[dict, list]]:
         return self._resolve(flag_key, evaluation_context)
+
+    async def resolve_object_details_async(
+        self,
+        flag_key: str,
+        default_value: typing.Union[dict, list],
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+        return await self._resolve_async(flag_key, evaluation_context)
 
     def _resolve(
         self,
@@ -117,3 +157,10 @@ class InMemoryProvider(AbstractProvider):
         if flag is None:
             raise FlagNotFoundError(f"Flag '{flag_key}' not found")
         return flag.resolve(evaluation_context)
+
+    async def _resolve_async(
+        self,
+        flag_key: str,
+        evaluation_context: typing.Optional[EvaluationContext],
+    ) -> FlagResolutionDetails[V]:
+        return self._resolve(flag_key, evaluation_context)

@@ -17,16 +17,20 @@ def test_should_return_in_memory_provider_metadata():
     assert metadata.name == "In-Memory Provider"
 
 
-def test_should_handle_unknown_flags_correctly():
+@pytest.mark.asyncio
+async def test_should_handle_unknown_flags_correctly():
     # Given
     provider = InMemoryProvider({})
     # When
     with pytest.raises(FlagNotFoundError):
         provider.resolve_boolean_details(flag_key="Key", default_value=True)
+    with pytest.raises(FlagNotFoundError):
+        await provider.resolve_integer_details_async(flag_key="Key", default_value=1)
     # Then
 
 
-def test_calls_context_evaluator_if_present():
+@pytest.mark.asyncio
+async def test_calls_context_evaluator_if_present():
     # Given
     def context_evaluator(flag: InMemoryFlag, evaluation_context: dict):
         return FlagResolutionDetails(
@@ -44,57 +48,81 @@ def test_calls_context_evaluator_if_present():
         }
     )
     # When
-    flag = provider.resolve_boolean_details(flag_key="Key", default_value=False)
+    flag_sync = provider.resolve_boolean_details(flag_key="Key", default_value=False)
+    flag_async = await provider.resolve_boolean_details_async(
+        flag_key="Key", default_value=False
+    )
     # Then
-    assert flag is not None
-    assert flag.value is False
-    assert isinstance(flag.value, bool)
-    assert flag.reason == Reason.TARGETING_MATCH
+    assert flag_sync == flag_async
+    for flag in [flag_sync, flag_async]:
+        assert flag is not None
+        assert flag.value is False
+        assert isinstance(flag.value, bool)
+        assert flag.reason == Reason.TARGETING_MATCH
 
 
-def test_should_resolve_boolean_flag_from_in_memory():
+@pytest.mark.asyncio
+async def test_should_resolve_boolean_flag_from_in_memory():
     # Given
     provider = InMemoryProvider(
         {"Key": InMemoryFlag("true", {"true": True, "false": False})}
     )
     # When
-    flag = provider.resolve_boolean_details(flag_key="Key", default_value=False)
+    flag_sync = provider.resolve_boolean_details(flag_key="Key", default_value=False)
+    flag_async = await provider.resolve_boolean_details_async(
+        flag_key="Key", default_value=False
+    )
     # Then
-    assert flag is not None
-    assert flag.value is True
-    assert isinstance(flag.value, bool)
-    assert flag.variant == "true"
+    assert flag_sync == flag_async
+    for flag in [flag_sync, flag_async]:
+        assert flag is not None
+        assert flag.value is True
+        assert isinstance(flag.value, bool)
+        assert flag.variant == "true"
 
 
-def test_should_resolve_integer_flag_from_in_memory():
+@pytest.mark.asyncio
+async def test_should_resolve_integer_flag_from_in_memory():
     # Given
     provider = InMemoryProvider(
         {"Key": InMemoryFlag("hundred", {"zero": 0, "hundred": 100})}
     )
     # When
-    flag = provider.resolve_integer_details(flag_key="Key", default_value=0)
+    flag_sync = provider.resolve_integer_details(flag_key="Key", default_value=0)
+    flag_async = await provider.resolve_integer_details_async(
+        flag_key="Key", default_value=0
+    )
     # Then
-    assert flag is not None
-    assert flag.value == 100
-    assert isinstance(flag.value, Number)
-    assert flag.variant == "hundred"
+    assert flag_sync == flag_async
+    for flag in [flag_sync, flag_async]:
+        assert flag is not None
+        assert flag.value == 100
+        assert isinstance(flag.value, Number)
+        assert flag.variant == "hundred"
 
 
-def test_should_resolve_float_flag_from_in_memory():
+@pytest.mark.asyncio
+async def test_should_resolve_float_flag_from_in_memory():
     # Given
     provider = InMemoryProvider(
         {"Key": InMemoryFlag("ten", {"zero": 0.0, "ten": 10.23})}
     )
     # When
-    flag = provider.resolve_float_details(flag_key="Key", default_value=0.0)
+    flag_sync = provider.resolve_float_details(flag_key="Key", default_value=0.0)
+    flag_async = await provider.resolve_float_details_async(
+        flag_key="Key", default_value=0.0
+    )
     # Then
-    assert flag is not None
-    assert flag.value == 10.23
-    assert isinstance(flag.value, Number)
-    assert flag.variant == "ten"
+    assert flag_sync == flag_async
+    for flag in [flag_sync, flag_async]:
+        assert flag is not None
+        assert flag.value == 10.23
+        assert isinstance(flag.value, Number)
+        assert flag.variant == "ten"
 
 
-def test_should_resolve_string_flag_from_in_memory():
+@pytest.mark.asyncio
+async def test_should_resolve_string_flag_from_in_memory():
     # Given
     provider = InMemoryProvider(
         {
@@ -105,29 +133,41 @@ def test_should_resolve_string_flag_from_in_memory():
         }
     )
     # When
-    flag = provider.resolve_string_details(flag_key="Key", default_value="Default")
+    flag_sync = provider.resolve_string_details(flag_key="Key", default_value="Default")
+    flag_async = await provider.resolve_string_details_async(
+        flag_key="Key", default_value="Default"
+    )
     # Then
-    assert flag is not None
-    assert flag.value == "String"
-    assert isinstance(flag.value, str)
-    assert flag.variant == "stringVariant"
+    assert flag_sync == flag_async
+    for flag in [flag_sync, flag_async]:
+        assert flag is not None
+        assert flag.value == "String"
+        assert isinstance(flag.value, str)
+        assert flag.variant == "stringVariant"
 
 
-def test_should_resolve_list_flag_from_in_memory():
+@pytest.mark.asyncio
+async def test_should_resolve_list_flag_from_in_memory():
     # Given
     provider = InMemoryProvider(
         {"Key": InMemoryFlag("twoItems", {"empty": [], "twoItems": ["item1", "item2"]})}
     )
     # When
-    flag = provider.resolve_object_details(flag_key="Key", default_value=[])
+    flag_sync = provider.resolve_object_details(flag_key="Key", default_value=[])
+    flag_async = await provider.resolve_object_details_async(
+        flag_key="Key", default_value=[]
+    )
     # Then
-    assert flag is not None
-    assert flag.value == ["item1", "item2"]
-    assert isinstance(flag.value, list)
-    assert flag.variant == "twoItems"
+    assert flag_sync == flag_async
+    for flag in [flag_sync, flag_async]:
+        assert flag is not None
+        assert flag.value == ["item1", "item2"]
+        assert isinstance(flag.value, list)
+        assert flag.variant == "twoItems"
 
 
-def test_should_resolve_object_flag_from_in_memory():
+@pytest.mark.asyncio
+async def test_should_resolve_object_flag_from_in_memory():
     # Given
     return_value = {
         "String": "string",
@@ -138,9 +178,12 @@ def test_should_resolve_object_flag_from_in_memory():
         {"Key": InMemoryFlag("obj", {"obj": return_value, "empty": {}})}
     )
     # When
-    flag = provider.resolve_object_details(flag_key="Key", default_value={})
+    flag_sync = provider.resolve_object_details(flag_key="Key", default_value={})
+    flag_async = provider.resolve_object_details(flag_key="Key", default_value={})
     # Then
-    assert flag is not None
-    assert flag.value == return_value
-    assert isinstance(flag.value, dict)
-    assert flag.variant == "obj"
+    assert flag_sync == flag_async
+    for flag in [flag_sync, flag_async]:
+        assert flag is not None
+        assert flag.value == return_value
+        assert isinstance(flag.value, dict)
+        assert flag.variant == "obj"

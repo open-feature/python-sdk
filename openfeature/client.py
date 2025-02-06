@@ -20,7 +20,7 @@ from openfeature.flag_evaluation import (
     FlagType,
     Reason,
 )
-from openfeature.hook import Hook, HookContext
+from openfeature.hook import Hook, HookContext, HookHints
 from openfeature.hook._hook_support import (
     after_all_hooks,
     after_hooks,
@@ -53,6 +53,28 @@ GetDetailCallable = typing.Union[
     typing.Callable[
         [str, typing.Union[dict, list], typing.Optional[EvaluationContext]],
         FlagResolutionDetails[typing.Union[dict, list]],
+    ],
+]
+GetDetailCallableAsync = typing.Union[
+    typing.Callable[
+        [str, bool, typing.Optional[EvaluationContext]],
+        typing.Awaitable[FlagResolutionDetails[bool]],
+    ],
+    typing.Callable[
+        [str, int, typing.Optional[EvaluationContext]],
+        typing.Awaitable[FlagResolutionDetails[int]],
+    ],
+    typing.Callable[
+        [str, float, typing.Optional[EvaluationContext]],
+        typing.Awaitable[FlagResolutionDetails[float]],
+    ],
+    typing.Callable[
+        [str, str, typing.Optional[EvaluationContext]],
+        typing.Awaitable[FlagResolutionDetails[str]],
+    ],
+    typing.Callable[
+        [str, typing.Union[dict, list], typing.Optional[EvaluationContext]],
+        typing.Awaitable[FlagResolutionDetails[typing.Union[dict, list]]],
     ],
 ]
 TypeMap = typing.Dict[
@@ -113,6 +135,21 @@ class OpenFeatureClient:
             flag_evaluation_options,
         ).value
 
+    async def get_boolean_value_async(
+        self,
+        flag_key: str,
+        default_value: bool,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> bool:
+        details = await self.get_boolean_details_async(
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+        return details.value
+
     def get_boolean_details(
         self,
         flag_key: str,
@@ -121,6 +158,21 @@ class OpenFeatureClient:
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails[bool]:
         return self.evaluate_flag_details(
+            FlagType.BOOLEAN,
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+
+    async def get_boolean_details_async(
+        self,
+        flag_key: str,
+        default_value: bool,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> FlagEvaluationDetails[bool]:
+        return await self.evaluate_flag_details_async(
             FlagType.BOOLEAN,
             flag_key,
             default_value,
@@ -142,6 +194,21 @@ class OpenFeatureClient:
             flag_evaluation_options,
         ).value
 
+    async def get_string_value_async(
+        self,
+        flag_key: str,
+        default_value: str,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> str:
+        details = await self.get_string_details_async(
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+        return details.value
+
     def get_string_details(
         self,
         flag_key: str,
@@ -150,6 +217,21 @@ class OpenFeatureClient:
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails[str]:
         return self.evaluate_flag_details(
+            FlagType.STRING,
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+
+    async def get_string_details_async(
+        self,
+        flag_key: str,
+        default_value: str,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> FlagEvaluationDetails[str]:
+        return await self.evaluate_flag_details_async(
             FlagType.STRING,
             flag_key,
             default_value,
@@ -171,6 +253,21 @@ class OpenFeatureClient:
             flag_evaluation_options,
         ).value
 
+    async def get_integer_value_async(
+        self,
+        flag_key: str,
+        default_value: int,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> int:
+        details = await self.get_integer_details_async(
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+        return details.value
+
     def get_integer_details(
         self,
         flag_key: str,
@@ -179,6 +276,21 @@ class OpenFeatureClient:
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails[int]:
         return self.evaluate_flag_details(
+            FlagType.INTEGER,
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+
+    async def get_integer_details_async(
+        self,
+        flag_key: str,
+        default_value: int,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> FlagEvaluationDetails[int]:
+        return await self.evaluate_flag_details_async(
             FlagType.INTEGER,
             flag_key,
             default_value,
@@ -200,6 +312,21 @@ class OpenFeatureClient:
             flag_evaluation_options,
         ).value
 
+    async def get_float_value_async(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> float:
+        details = await self.get_float_details_async(
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+        return details.value
+
     def get_float_details(
         self,
         flag_key: str,
@@ -208,6 +335,21 @@ class OpenFeatureClient:
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails[float]:
         return self.evaluate_flag_details(
+            FlagType.FLOAT,
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+
+    async def get_float_details_async(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> FlagEvaluationDetails[float]:
+        return await self.evaluate_flag_details_async(
             FlagType.FLOAT,
             flag_key,
             default_value,
@@ -229,6 +371,21 @@ class OpenFeatureClient:
             flag_evaluation_options,
         ).value
 
+    async def get_object_value_async(
+        self,
+        flag_key: str,
+        default_value: typing.Union[dict, list],
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> typing.Union[dict, list]:
+        details = await self.get_object_details_async(
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+        return details.value
+
     def get_object_details(
         self,
         flag_key: str,
@@ -244,26 +401,35 @@ class OpenFeatureClient:
             flag_evaluation_options,
         )
 
-    def evaluate_flag_details(  # noqa: PLR0915
+    async def get_object_details_async(
+        self,
+        flag_key: str,
+        default_value: typing.Union[dict, list],
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> FlagEvaluationDetails[typing.Union[dict, list]]:
+        return await self.evaluate_flag_details_async(
+            FlagType.OBJECT,
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
+        )
+
+    def _establish_hooks_and_provider(
         self,
         flag_type: FlagType,
         flag_key: str,
         default_value: typing.Any,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[typing.Any]:
-        """
-        Evaluate the flag requested by the user from the clients provider.
-
-        :param flag_type: the type of the flag being returned
-        :param flag_key: the string key of the selected flag
-        :param default_value: backup value returned if no result found by the provider
-        :param evaluation_context: Information for the purposes of flag evaluation
-        :param flag_evaluation_options: Additional flag evaluation information
-        :return: a FlagEvaluationDetails object with the fully evaluated flag from a
-        provider
-        """
-
+        evaluation_context: typing.Optional[EvaluationContext],
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions],
+    ) -> typing.Tuple[
+        FeatureProvider,
+        HookContext,
+        HookHints,
+        typing.List[Hook],
+        typing.List[Hook],
+    ]:
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
 
@@ -295,54 +461,179 @@ class OpenFeatureClient:
         reversed_merged_hooks = merged_hooks[:]
         reversed_merged_hooks.reverse()
 
-        try:
-            status = self.get_provider_status()
-            if status == ProviderStatus.NOT_READY:
-                error_hooks(
-                    flag_type,
-                    hook_context,
-                    ProviderNotReadyError(),
-                    reversed_merged_hooks,
-                    hook_hints,
-                )
-                flag_evaluation = FlagEvaluationDetails(
-                    flag_key=flag_key,
-                    value=default_value,
-                    reason=Reason.ERROR,
-                    error_code=ErrorCode.PROVIDER_NOT_READY,
-                )
-                return flag_evaluation
-            if status == ProviderStatus.FATAL:
-                error_hooks(
-                    flag_type,
-                    hook_context,
-                    ProviderFatalError(),
-                    reversed_merged_hooks,
-                    hook_hints,
-                )
-                flag_evaluation = FlagEvaluationDetails(
-                    flag_key=flag_key,
-                    value=default_value,
-                    reason=Reason.ERROR,
-                    error_code=ErrorCode.PROVIDER_FATAL,
-                )
-                return flag_evaluation
+        return provider, hook_context, hook_hints, merged_hooks, reversed_merged_hooks
 
-            # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
-            # Any resulting evaluation context from a before hook will overwrite
-            # duplicate fields defined globally, on the client, or in the invocation.
-            # Requirement 3.2.2, 4.3.4: API.context->client.context->invocation.context
-            invocation_context = before_hooks(
-                flag_type, hook_context, merged_hooks, hook_hints
-            )
+    def _assert_provider_status(
+        self,
+    ) -> None:
+        status = self.get_provider_status()
+        if status == ProviderStatus.NOT_READY:
+            raise ProviderNotReadyError()
+        if status == ProviderStatus.FATAL:
+            raise ProviderFatalError()
+        return None
+
+    def _before_hooks_and_merge_context(
+        self,
+        flag_type: FlagType,
+        hook_context: HookContext,
+        merged_hooks: typing.List[Hook],
+        hook_hints: HookHints,
+        evaluation_context: typing.Optional[EvaluationContext],
+    ) -> EvaluationContext:
+        # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
+        # Any resulting evaluation context from a before hook will overwrite
+        # duplicate fields defined globally, on the client, or in the invocation.
+        # Requirement 3.2.2, 4.3.4: API.context->client.context->invocation.context
+        invocation_context = before_hooks(
+            flag_type, hook_context, merged_hooks, hook_hints
+        )
+        if evaluation_context:
             invocation_context = invocation_context.merge(ctx2=evaluation_context)
 
-            # Requirement 3.2.2 merge: API.context->transaction.context->client.context->invocation.context
-            merged_context = (
-                api.get_evaluation_context()
-                .merge(api.get_transaction_context())
-                .merge(self.context)
-                .merge(invocation_context)
+        # Requirement 3.2.2 merge: API.context->transaction.context->client.context->invocation.context
+        merged_context = (
+            api.get_evaluation_context()
+            .merge(api.get_transaction_context())
+            .merge(self.context)
+            .merge(invocation_context)
+        )
+        return merged_context
+
+    async def evaluate_flag_details_async(
+        self,
+        flag_type: FlagType,
+        flag_key: str,
+        default_value: typing.Any,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> FlagEvaluationDetails[typing.Any]:
+        """
+        Evaluate the flag requested by the user from the clients provider.
+
+        :param flag_type: the type of the flag being returned
+        :param flag_key: the string key of the selected flag
+        :param default_value: backup value returned if no result found by the provider
+        :param evaluation_context: Information for the purposes of flag evaluation
+        :param flag_evaluation_options: Additional flag evaluation information
+        :return: a typing.Awaitable[FlagEvaluationDetails] object with the fully evaluated flag from a
+        provider
+        """
+        provider, hook_context, hook_hints, merged_hooks, reversed_merged_hooks = (
+            self._establish_hooks_and_provider(
+                flag_type,
+                flag_key,
+                default_value,
+                evaluation_context,
+                flag_evaluation_options,
+            )
+        )
+
+        try:
+            self._assert_provider_status()
+
+            merged_context = self._before_hooks_and_merge_context(
+                flag_type,
+                hook_context,
+                merged_hooks,
+                hook_hints,
+                evaluation_context,
+            )
+
+            flag_evaluation = await self._create_provider_evaluation_async(
+                provider,
+                flag_type,
+                flag_key,
+                default_value,
+                merged_context,
+            )
+
+            after_hooks(
+                flag_type,
+                hook_context,
+                flag_evaluation,
+                reversed_merged_hooks,
+                hook_hints,
+            )
+
+            return flag_evaluation
+
+        except OpenFeatureError as err:
+            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
+            flag_evaluation = FlagEvaluationDetails(
+                flag_key=flag_key,
+                value=default_value,
+                reason=Reason.ERROR,
+                error_code=err.error_code,
+                error_message=err.error_message,
+            )
+            return flag_evaluation
+        # Catch any type of exception here since the user can provide any exception
+        # in the error hooks
+        except Exception as err:  # pragma: no cover
+            logger.exception(
+                "Unable to correctly evaluate flag with key: '%s'", flag_key
+            )
+
+            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
+
+            error_message = getattr(err, "error_message", str(err))
+            flag_evaluation = FlagEvaluationDetails(
+                flag_key=flag_key,
+                value=default_value,
+                reason=Reason.ERROR,
+                error_code=ErrorCode.GENERAL,
+                error_message=error_message,
+            )
+            return flag_evaluation
+
+        finally:
+            after_all_hooks(
+                flag_type,
+                hook_context,
+                flag_evaluation,
+                reversed_merged_hooks,
+                hook_hints,
+            )
+
+    def evaluate_flag_details(
+        self,
+        flag_type: FlagType,
+        flag_key: str,
+        default_value: typing.Any,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+    ) -> FlagEvaluationDetails[typing.Any]:
+        """
+        Evaluate the flag requested by the user from the clients provider.
+
+        :param flag_type: the type of the flag being returned
+        :param flag_key: the string key of the selected flag
+        :param default_value: backup value returned if no result found by the provider
+        :param evaluation_context: Information for the purposes of flag evaluation
+        :param flag_evaluation_options: Additional flag evaluation information
+        :return: a FlagEvaluationDetails object with the fully evaluated flag from a
+        provider
+        """
+        provider, hook_context, hook_hints, merged_hooks, reversed_merged_hooks = (
+            self._establish_hooks_and_provider(
+                flag_type,
+                flag_key,
+                default_value,
+                evaluation_context,
+                flag_evaluation_options,
+            )
+        )
+
+        try:
+            self._assert_provider_status()
+
+            merged_context = self._before_hooks_and_merge_context(
+                flag_type,
+                hook_context,
+                merged_hooks,
+                hook_hints,
+                evaluation_context,
             )
 
             flag_evaluation = self._create_provider_evaluation(
@@ -401,6 +692,48 @@ class OpenFeatureClient:
                 reversed_merged_hooks,
                 hook_hints,
             )
+
+    async def _create_provider_evaluation_async(
+        self,
+        provider: FeatureProvider,
+        flag_type: FlagType,
+        flag_key: str,
+        default_value: typing.Any,
+        evaluation_context: typing.Optional[EvaluationContext] = None,
+    ) -> FlagEvaluationDetails[typing.Any]:
+        args = (
+            flag_key,
+            default_value,
+            evaluation_context,
+        )
+        get_details_callables_async: typing.Mapping[
+            FlagType, GetDetailCallableAsync
+        ] = {
+            FlagType.BOOLEAN: provider.resolve_boolean_details_async,
+            FlagType.INTEGER: provider.resolve_integer_details_async,
+            FlagType.FLOAT: provider.resolve_float_details_async,
+            FlagType.OBJECT: provider.resolve_object_details_async,
+            FlagType.STRING: provider.resolve_string_details_async,
+        }
+        get_details_callable = get_details_callables_async.get(flag_type)
+        if not get_details_callable:
+            raise GeneralError(error_message="Unknown flag type")
+
+        resolution = await get_details_callable(*args)
+        resolution.raise_for_error()
+
+        # we need to check the get_args to be compatible with union types.
+        _typecheck_flag_value(resolution.value, flag_type)
+
+        return FlagEvaluationDetails(
+            flag_key=flag_key,
+            value=resolution.value,
+            variant=resolution.variant,
+            flag_metadata=resolution.flag_metadata or {},
+            reason=resolution.reason,
+            error_code=resolution.error_code,
+            error_message=resolution.error_message,
+        )
 
     def _create_provider_evaluation(
         self,

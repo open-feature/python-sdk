@@ -316,6 +316,25 @@ async def some_endpoint():
     return create_response()
 ```
 
+### Asynchronous Feature Retrieval
+
+The OpenFeature API supports asynchronous calls, enabling non-blocking feature evaluations for improved performance, especially useful in concurrent or latency-sensitive scenarios. If a provider *hasn't* implemented asynchronous calls, the client can still be used asynchronously, but calls will be blocking (synchronous).
+
+```python
+import asyncio
+from openfeature import api
+from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
+
+my_flags = { "v2_enabled": InMemoryFlag("on", {"on": True, "off": False}) }
+api.set_provider(InMemoryProvider(my_flags))
+client = api.get_client()
+flag_value = await client.get_boolean_value_async("v2_enabled", False) # API calls are suffixed by _async
+
+print("Value: " + str(flag_value))
+```
+
+See the [develop a provider](#develop-a-provider) for how to support asynchronous functionality in providers.
+
 ### Shutdown
 
 The OpenFeature API provides a shutdown function to perform a cleanup of all registered providers. This should only be called when your application is in the process of shutting down.
@@ -388,6 +407,56 @@ class MyProvider(AbstractProvider):
         evaluation_context: Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[Union[dict, list]]:
         ...
+```
+
+Providers can also be extended to support async functionality.
+To support add asynchronous calls to a provider:
+* Implement the `AbstractProvider` as shown above.
+* Define asynchronous calls for each data type.
+
+```python
+class MyProvider(AbstractProvider):
+    ...
+    async def resolve_boolean_details_async(
+        self,
+        flag_key: str,
+        default_value: bool,
+        evaluation_context: Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[bool]:
+        ...
+
+    async def resolve_string_details_async(
+        self,
+        flag_key: str,
+        default_value: str,
+        evaluation_context: Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[str]:
+        ...
+
+    async def resolve_integer_details_async(
+        self,
+        flag_key: str,
+        default_value: int,
+        evaluation_context: Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[int]:
+        ...
+
+    async def resolve_float_details_async(
+        self,
+        flag_key: str,
+        default_value: float,
+        evaluation_context: Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[float]:
+        ...
+
+    async def resolve_object_details_async(
+        self,
+        flag_key: str,
+        default_value: Union[dict, list],
+        evaluation_context: Optional[EvaluationContext] = None,
+    ) -> FlagResolutionDetails[Union[dict, list]]:
+        ...
+
 ```
 
 > Built a new provider? [Let us know](https://github.com/open-feature/openfeature.dev/issues/new?assignees=&labels=provider&projects=&template=document-provider.yaml&title=%5BProvider%5D%3A+) so we can add it to the docs!
