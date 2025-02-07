@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import threading
 from collections import defaultdict
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING
 
 from openfeature.event import (
     EventDetails,
@@ -17,10 +17,10 @@ if TYPE_CHECKING:
 
 
 _global_lock = threading.RLock()
-_global_handlers: Dict[ProviderEvent, List[EventHandler]] = defaultdict(list)
+_global_handlers: dict[ProviderEvent, list[EventHandler]] = defaultdict(list)
 
 _client_lock = threading.RLock()
-_client_handlers: Dict[OpenFeatureClient, Dict[ProviderEvent, List[EventHandler]]] = (
+_client_handlers: dict[OpenFeatureClient, dict[ProviderEvent, list[EventHandler]]] = (
     defaultdict(lambda: defaultdict(list))
 )
 

@@ -13,8 +13,8 @@ from openfeature.provider.no_op_provider import NoOpProvider
 
 class ProviderRegistry:
     _default_provider: FeatureProvider
-    _providers: typing.Dict[str, FeatureProvider]
-    _provider_status: typing.Dict[FeatureProvider, ProviderStatus]
+    _providers: dict[str, FeatureProvider]
+    _provider_status: dict[FeatureProvider, ProviderStatus]
 
     def __init__(self) -> None:
         self._default_provider = NoOpProvider()

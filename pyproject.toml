@@ -22,7 +22,7 @@ keywords = [
     "toggles",
 ]
 dependencies = []
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 
 [project.urls]
 Homepage = "https://github.com/open-feature/python-sdk"
@@ -73,6 +73,9 @@ pretty = true
 strict = true
 disallow_any_generics = false
 
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
+
 [tool.ruff]
 exclude = [
     ".git",
@@ -80,7 +83,7 @@ exclude = [
     "__pycache__",
     "venv",
 ]
-target-version = "py38"
+target-version = "py39"
 
 [tool.ruff.lint]
 select = [

@@ -40,7 +40,7 @@ _evaluation_transaction_context_propagator: TransactionContextPropagator = (
     NoOpTransactionContextPropagator()
 )
 
-_hooks: typing.List[Hook] = []
+_hooks: list[Hook] = []
 
 
 def get_client(
@@ -96,7 +96,7 @@ def set_transaction_context(evaluation_context: EvaluationContext) -> None:
     )
 
 
-def add_hooks(hooks: typing.List[Hook]) -> None:
+def add_hooks(hooks: list[Hook]) -> None:
     global _hooks
     _hooks = _hooks + hooks
 
@@ -106,7 +106,7 @@ def clear_hooks() -> None:
     _hooks = []
 
 
-def get_hooks() -> typing.List[Hook]:
+def get_hooks() -> list[Hook]:
     return _hooks
 
 

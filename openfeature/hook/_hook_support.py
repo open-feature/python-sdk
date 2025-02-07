@@ -13,7 +13,7 @@ def error_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
     exception: Exception,
-    hooks: typing.List[Hook],
+    hooks: list[Hook],
     hints: typing.Optional[HookHints] = None,
 ) -> None:
     kwargs = {"hook_context": hook_context, "exception": exception, "hints": hints}
@@ -26,7 +26,7 @@ def after_all_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
     details: FlagEvaluationDetails[typing.Any],
-    hooks: typing.List[Hook],
+    hooks: list[Hook],
     hints: typing.Optional[HookHints] = None,
 ) -> None:
     kwargs = {"hook_context": hook_context, "details": details, "hints": hints}
@@ -39,7 +39,7 @@ def after_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
     details: FlagEvaluationDetails[typing.Any],
-    hooks: typing.List[Hook],
+    hooks: list[Hook],
     hints: typing.Optional[HookHints] = None,
 ) -> None:
     kwargs = {"hook_context": hook_context, "details": details, "hints": hints}
@@ -51,7 +51,7 @@ def after_hooks(
 def before_hooks(
     flag_type: FlagType,
     hook_context: HookContext,
-    hooks: typing.List[Hook],
+    hooks: list[Hook],
     hints: typing.Optional[HookHints] = None,
 ) -> EvaluationContext:
     kwargs = {"hook_context": hook_context, "hints": hints}
@@ -68,7 +68,7 @@ def before_hooks(
 
 def _execute_hooks(
     flag_type: FlagType,
-    hooks: typing.List[Hook],
+    hooks: list[Hook],
     hook_method: HookType,
     **kwargs: typing.Any,
 ) -> list:
@@ -91,10 +91,10 @@ def _execute_hooks(
 
 def _execute_hooks_unchecked(
     flag_type: FlagType,
-    hooks: typing.List[Hook],
+    hooks: list[Hook],
     hook_method: HookType,
     **kwargs: typing.Any,
-) -> typing.List[typing.Optional[EvaluationContext]]:
+) -> list[typing.Optional[EvaluationContext]]:
     """
     Execute a single hook without checking whether an exception is thrown. This is
     used in the before and after hooks since any exception will be caught in the

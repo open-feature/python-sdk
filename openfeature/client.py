@@ -77,14 +77,14 @@ GetDetailCallableAsync = typing.Union[
         typing.Awaitable[FlagResolutionDetails[typing.Union[dict, list]]],
     ],
 ]
-TypeMap = typing.Dict[
+TypeMap = dict[
     FlagType,
     typing.Union[
-        typing.Type[bool],
-        typing.Type[int],
-        typing.Type[float],
-        typing.Type[str],
-        typing.Tuple[typing.Type[dict], typing.Type[list]],
+        type[bool],
+        type[int],
+        type[float],
+        type[str],
+        tuple[type[dict], type[list]],
     ],
 ]
 
@@ -101,7 +101,7 @@ class OpenFeatureClient:
         domain: typing.Optional[str],
         version: typing.Optional[str],
         context: typing.Optional[EvaluationContext] = None,
-        hooks: typing.Optional[typing.List[Hook]] = None,
+        hooks: typing.Optional[list[Hook]] = None,
     ) -> None:
         self.domain = domain
         self.version = version
@@ -118,7 +118,7 @@ class OpenFeatureClient:
     def get_metadata(self) -> ClientMetadata:
         return ClientMetadata(domain=self.domain)
 
-    def add_hooks(self, hooks: typing.List[Hook]) -> None:
+    def add_hooks(self, hooks: list[Hook]) -> None:
         self.hooks = self.hooks + hooks
 
     def get_boolean_value(
@@ -423,12 +423,12 @@ class OpenFeatureClient:
         default_value: typing.Any,
         evaluation_context: typing.Optional[EvaluationContext],
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions],
-    ) -> typing.Tuple[
+    ) -> tuple[
         FeatureProvider,
         HookContext,
         HookHints,
-        typing.List[Hook],
-        typing.List[Hook],
+        list[Hook],
+        list[Hook],
     ]:
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
@@ -477,7 +477,7 @@ class OpenFeatureClient:
         self,
         flag_type: FlagType,
         hook_context: HookContext,
-        merged_hooks: typing.List[Hook],
+        merged_hooks: list[Hook],
         hook_hints: HookHints,
         evaluation_context: typing.Optional[EvaluationContext],
     ) -> EvaluationContext:

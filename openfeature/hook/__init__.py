@@ -60,8 +60,8 @@ HookHints = typing.Mapping[
         float,
         str,
         datetime,
-        typing.List[typing.Any],
-        typing.Dict[str, typing.Any],
+        list[typing.Any],
+        dict[str, typing.Any],
     ],
 ]
 

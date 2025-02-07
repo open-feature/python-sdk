@@ -38,7 +38,7 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
 
     def get_metadata(self) -> Metadata: ...
 
-    def get_provider_hooks(self) -> typing.List[Hook]: ...
+    def get_provider_hooks(self) -> list[Hook]: ...
 
     def resolve_boolean_details(
         self,
@@ -134,7 +134,7 @@ class AbstractProvider(FeatureProvider):
     def get_metadata(self) -> Metadata:
         pass
 
-    def get_provider_hooks(self) -> typing.List[Hook]:
+    def get_provider_hooks(self) -> list[Hook]:
         return []
 
     @abstractmethod
