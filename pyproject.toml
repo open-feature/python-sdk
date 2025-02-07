@@ -66,6 +66,8 @@ packages = ["openfeature"]
 
 [tool.mypy]
 files = "openfeature"
+
+python_version = "3.9" # should be identical to the minimum supported version
 namespace_packages = true
 explicit_package_bases = true
 local_partial_types = true # will become the new default from version 2
