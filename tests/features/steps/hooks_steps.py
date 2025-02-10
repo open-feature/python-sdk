@@ -37,6 +37,8 @@ def step_impl_should_have_eval_details(context, hook_names):
             if isinstance(actual, ErrorCode) or isinstance(actual, Reason):
                 actual = str(actual)
 
+            print("expected", value, "actual", actual)
+            print("expected type", type(value), "actual type", type(actual))
             assert actual == value
 
 
