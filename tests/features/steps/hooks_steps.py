@@ -1,12 +1,13 @@
 from unittest.mock import MagicMock
 
-from behave import then, when
+from behave import then, given
 
 from openfeature.exception import ErrorCode
+from openfeature.flag_evaluation import Reason
 from openfeature.hook import Hook
 
 
-@when("a hook is added to the client")
+@given("a client with added hook")
 def step_impl_add_hook(context):
     hook = MagicMock(spec=Hook)
     hook.before = MagicMock()
@@ -17,18 +18,26 @@ def step_impl_add_hook(context):
     context.client.add_hooks([hook])
 
 
-@then("error hooks should be called")
-def step_impl_call_error(context):
-    assert context.hook.before.called
-    assert context.hook.error.called
-    assert context.hook.finally_after.called
+@then('the "{hook_name}" hook should have been executed')
+def step_impl_should_called(context, hook_name):
+    hook = get_hook_from_name(context, hook_name)
+    assert hook.called
 
 
-@then("non-error hooks should be called")
-def step_impl_call_non_error(context):
-    assert context.hook.before.called
-    assert context.hook.after.called
-    assert context.hook.finally_after.called
+@then('the "{hook_names}" hooks should be called with evaluation details')
+def step_impl_should_have_eval_details(context, hook_names):
+    for hook_name in hook_names.split(", "):
+        hook = get_hook_from_name(context, hook_name)
+        for row in context.table:
+            flag_type, key, value = row
+
+            value = convert_value_from_flag_type(value, flag_type)
+
+            actual = hook.call_args[1]["details"].__dict__[key]
+            if isinstance(actual, ErrorCode) or isinstance(actual, Reason):
+                actual = str(actual)
+
+            assert actual == value
 
 
 def get_hook_from_name(context, hook_name):
@@ -45,7 +54,7 @@ def get_hook_from_name(context, hook_name):
 
 
 def convert_value_from_flag_type(value, flag_type):
-    if value == "None":
+    if value == "None" or value == "null":
         return None
     if flag_type.lower() == "boolean":
         return bool(value)
@@ -54,19 +63,3 @@ def convert_value_from_flag_type(value, flag_type):
     elif flag_type.lower() == "float":
         return float(value)
     return value
-
-
-@then('"{hook_names}" hooks should have evaluation details')
-def step_impl_should_have_eval_details(context, hook_names):
-    for hook_name in hook_names.split(", "):
-        hook = get_hook_from_name(context, hook_name)
-        for row in context.table:
-            flag_type, key, value = row
-
-            value = convert_value_from_flag_type(value, flag_type)
-
-            actual = hook.call_args[1]["details"].__dict__[key]
-            if isinstance(actual, ErrorCode):
-                actual = str(actual)
-
-            assert actual == value
