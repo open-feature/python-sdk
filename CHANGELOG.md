@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.8.0](https://github.com/open-feature/python-sdk/compare/v0.7.5...v0.8.0) (2025-02-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop Python 3.8 support ([#441](https://github.com/open-feature/python-sdk/issues/441))
+
+### ✨ New Features
+
+* Add async functionality to providers ([#413](https://github.com/open-feature/python-sdk/issues/413)) ([86e7c07](https://github.com/open-feature/python-sdk/commit/86e7c07112cfa9fa6bec15cb7a47f8a675034b8b))
+
+
+### 🧹 Chore
+
+* **deps:** pin dependencies ([#435](https://github.com/open-feature/python-sdk/issues/435)) ([38d13fa](https://github.com/open-feature/python-sdk/commit/38d13fa454e8b7d5a55a8e4e12dcbe4c37f70706))
+* **deps:** update github/codeql-action digest to 9e8d078 ([#440](https://github.com/open-feature/python-sdk/issues/440)) ([ba0213e](https://github.com/open-feature/python-sdk/commit/ba0213e701958a9962676646bec267a5c530184c))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.9.5 ([#439](https://github.com/open-feature/python-sdk/issues/439)) ([75b41dd](https://github.com/open-feature/python-sdk/commit/75b41dd0202e9651801d2144ceec2c16ebe4989f))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.9.6 ([#443](https://github.com/open-feature/python-sdk/issues/443)) ([37296dc](https://github.com/open-feature/python-sdk/commit/37296dc0b5b7450815b3b63d7877968fe07f06be))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.15.0 ([#430](https://github.com/open-feature/python-sdk/issues/430)) ([fe0fea1](https://github.com/open-feature/python-sdk/commit/fe0fea1f7328bb97c6985628be2f5c11bae13f22))
+* drop Python 3.8 support ([#441](https://github.com/open-feature/python-sdk/issues/441)) ([bcd1a38](https://github.com/open-feature/python-sdk/commit/bcd1a3807e635dcd80a7894859ae14d54a3dc485))
+* fix renovate syntax issue ([e705af4](https://github.com/open-feature/python-sdk/commit/e705af47b1b44705f0f0cca1846ccb97e820f042))
+* use centralized renovate config, downgrade release please ([#433](https://github.com/open-feature/python-sdk/issues/433)) ([ff52163](https://github.com/open-feature/python-sdk/commit/ff521630a1962f73a1d3f8e3fc65c8cdc691f54b))
+
+
+### 📚 Documentation
+
+* fix eval context link ([#438](https://github.com/open-feature/python-sdk/issues/438)) ([154d834](https://github.com/open-feature/python-sdk/commit/154d8345e7a65f3409c168a87d157df583fc8aa8))
+* fix links to the openfeature ecosystem page ([#432](https://github.com/open-feature/python-sdk/issues/432)) ([49edce2](https://github.com/open-feature/python-sdk/commit/49edce226996d7d27a6dd64a1ae45e0def9e9b29))
+
 ## [0.7.5](https://github.com/open-feature/python-sdk/compare/v0.7.4...v0.7.5) (2025-01-31)
 
 
