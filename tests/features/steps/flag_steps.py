@@ -1,8 +1,17 @@
+import contextlib
+
 from behave import given, when
 
 
 @given('a {flag_type}-flag with key "{flag_key}" and a default value "{default_value}"')
 def step_impl_flag(context, flag_type: str, flag_key, default_value):
+    if default_value.lower() == "true" or default_value.lower() == "false":
+        default_value = bool(default_value)
+    try:
+        default_value = int(default_value)
+    except ValueError:
+        with contextlib.suppress(ValueError):
+            default_value = float(default_value)
     context.flag = (flag_type, flag_key, default_value)
 
 
