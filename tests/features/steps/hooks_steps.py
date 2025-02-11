@@ -34,8 +34,6 @@ def step_impl_should_have_eval_details(context, hook_names):
             value = convert_value_from_key_and_flag_type(value, key, flag_type)
             actual = hook.call_args[1]["details"].__dict__[key]
 
-            print("expected", value, "actual", actual)
-            print("expected type", type(value), "actual type", type(actual))
             assert actual == value
 
 

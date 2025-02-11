@@ -1,3 +1,5 @@
+import contextlib
+
 from behave import given, when
 
 
@@ -8,10 +10,8 @@ def step_impl_flag(context, flag_type: str, flag_key, default_value):
     try:
         default_value = int(default_value)
     except ValueError:
-        try:
+        with contextlib.suppress(ValueError):
             default_value = float(default_value)
-        except ValueError:
-            pass
     context.flag = (flag_type, flag_key, default_value)
 
 
