@@ -34,7 +34,7 @@
   </a>
 
   <a href="https://www.python.org/downloads/">
-    <img alt="Min python version" src="https://img.shields.io/badge/python->=3.8-blue.svg" />
+    <img alt="Min python version" src="https://img.shields.io/badge/python->=3.9-blue.svg" />
   </a>
 
   <a href="https://www.repostatus.org/#wip">
@@ -51,7 +51,7 @@
 
 ### Requirements
 
-- Python 3.8+
+- Python 3.9+
 
 ### Install
 

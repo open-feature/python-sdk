@@ -58,7 +58,7 @@ class FlagEvaluationDetails(typing.Generic[T_co]):
 
 @dataclass
 class FlagEvaluationOptions:
-    hooks: typing.List[Hook] = field(default_factory=list)
+    hooks: list[Hook] = field(default_factory=list)
     hook_hints: HookHints = field(default_factory=dict)
 
 

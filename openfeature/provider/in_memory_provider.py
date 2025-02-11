@@ -26,7 +26,7 @@ class InMemoryFlag(typing.Generic[T_co]):
         DISABLED = "DISABLED"
 
     default_variant: str
-    variants: typing.Dict[str, T_co]
+    variants: dict[str, T_co]
     flag_metadata: FlagMetadata = field(default_factory=dict)
     state: State = State.ENABLED
     context_evaluator: typing.Optional[
@@ -51,7 +51,7 @@ class InMemoryFlag(typing.Generic[T_co]):
         )
 
 
-FlagStorage = typing.Dict[str, InMemoryFlag[typing.Any]]
+FlagStorage = dict[str, InMemoryFlag[typing.Any]]
 
 V = typing.TypeVar("V")
 
@@ -65,7 +65,7 @@ class InMemoryProvider(AbstractProvider):
     def get_metadata(self) -> Metadata:
         return InMemoryMetadata()
 
-    def get_provider_hooks(self) -> typing.List[Hook]:
+    def get_provider_hooks(self) -> list[Hook]:
         return []
 
     def resolve_boolean_details(

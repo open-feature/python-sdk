@@ -13,7 +13,7 @@ class NoOpProvider(AbstractProvider):
     def get_metadata(self) -> Metadata:
         return NoOpMetadata()
 
-    def get_provider_hooks(self) -> typing.List[Hook]:
+    def get_provider_hooks(self) -> list[Hook]:
         return []
 
     def resolve_boolean_details(

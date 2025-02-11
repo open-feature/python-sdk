@@ -4,11 +4,11 @@
 
 ### System Requirements
 
-Python 3.8 and above are required.
+Python 3.9 and above are required.
 
 ### Target version(s)
 
-Python 3.8 and above are supported by the SDK.
+Python 3.9 and above are supported by the SDK.
 
 ### Installation and Dependencies
 
