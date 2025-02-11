@@ -190,6 +190,3 @@ class ErrorCode(Enum):
     ) -> OpenFeatureError:
         exc = cls.__exceptions__.get(error_code.value, GeneralError)
         return exc(error_message)
-
-    def __str__(self):
-        return self.value

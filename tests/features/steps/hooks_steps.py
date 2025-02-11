@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from behave import then, given
+from behave import given, then
 
 from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import Reason
@@ -31,11 +31,8 @@ def step_impl_should_have_eval_details(context, hook_names):
         for row in context.table:
             flag_type, key, value = row
 
-            value = convert_value_from_flag_type(value, flag_type)
-
+            value = convert_value_from_key_and_flag_type(value, key, flag_type)
             actual = hook.call_args[1]["details"].__dict__[key]
-            if isinstance(actual, ErrorCode) or isinstance(actual, Reason):
-                actual = str(actual)
 
             print("expected", value, "actual", actual)
             print("expected type", type(value), "actual type", type(actual))
@@ -55,8 +52,8 @@ def get_hook_from_name(context, hook_name):
         raise ValueError(str(hook_name) + " is not a valid hook name")
 
 
-def convert_value_from_flag_type(value, flag_type):
-    if value == "None" or value == "null":
+def convert_value_from_key_and_flag_type(value, key, flag_type):
+    if value in ("None", "null"):
         return None
     if flag_type.lower() == "boolean":
         return bool(value)
@@ -64,4 +61,8 @@ def convert_value_from_flag_type(value, flag_type):
         return int(value)
     elif flag_type.lower() == "float":
         return float(value)
+    elif key == "reason":
+        return Reason(value)
+    elif key == "error_code":
+        return ErrorCode(value)
     return value
