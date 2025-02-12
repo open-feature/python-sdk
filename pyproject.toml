@@ -48,7 +48,7 @@ cov = [
     "cov-report",
 ]
 e2e = [
-    "git submodule add --force https://github.com/open-feature/spec.git spec",
+    "git submodule update --init --recursive",
     "cp spec/specification/assets/gherkin/* tests/features/",
     "behave tests/features/",
     "rm tests/features/*.feature",
