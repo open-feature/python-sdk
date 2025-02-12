@@ -701,11 +701,6 @@ class OpenFeatureClient:
         default_value: typing.Any,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagEvaluationDetails[typing.Any]:
-        args = (
-            flag_key,
-            default_value,
-            evaluation_context,
-        )
         get_details_callables_async: typing.Mapping[
             FlagType, GetDetailCallableAsync
         ] = {
@@ -719,7 +714,11 @@ class OpenFeatureClient:
         if not get_details_callable:
             raise GeneralError(error_message="Unknown flag type")
 
-        resolution = await get_details_callable(*args)
+        resolution = await get_details_callable(  # type: ignore[call-arg]
+            flag_key=flag_key,
+            default_value=default_value,
+            evaluation_context=evaluation_context,
+        )
         resolution.raise_for_error()
 
         # we need to check the get_args to be compatible with union types.
@@ -753,12 +752,6 @@ class OpenFeatureClient:
         :return: a FlagEvaluationDetails object with the fully evaluated flag from a
         provider
         """
-        args = (
-            flag_key,
-            default_value,
-            evaluation_context,
-        )
-
         get_details_callables: typing.Mapping[FlagType, GetDetailCallable] = {
             FlagType.BOOLEAN: provider.resolve_boolean_details,
             FlagType.INTEGER: provider.resolve_integer_details,
@@ -771,7 +764,11 @@ class OpenFeatureClient:
         if not get_details_callable:
             raise GeneralError(error_message="Unknown flag type")
 
-        resolution = get_details_callable(*args)
+        resolution = get_details_callable(  # type: ignore[call-arg]
+            flag_key=flag_key,
+            default_value=default_value,
+            evaluation_context=evaluation_context,
+        )
         resolution.raise_for_error()
 
         # we need to check the get_args to be compatible with union types.
