@@ -526,12 +526,20 @@ def test_client_should_merge_contexts():
     invocation_context = EvaluationContext(
         targeting_key="invocation", attributes={"invocation_attr": "invocation_value"}
     )
-    client.get_boolean_details("flag", False, invocation_context)
+    flag_input = "flag"
+    flag_default = False
+    client.get_boolean_details(flag_input, flag_default, invocation_context)
 
     # Retrieve the call arguments
     args, kwargs = provider.resolve_boolean_details.call_args
-    flag_key, default_value, context = args
+    flag_key, default_value, context = (
+        kwargs["flag_key"],
+        kwargs["default_value"],
+        kwargs["evaluation_context"],
+    )
 
+    assert flag_key == flag_input
+    assert default_value is flag_default
     assert context.targeting_key == "invocation"  # Last one in the merge chain
     assert context.attributes["global_attr"] == "global_value"
     assert context.attributes["transaction_attr"] == "transaction_value"
