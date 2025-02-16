@@ -34,8 +34,9 @@ class Reason(StrEnum):
     DEFAULT = "DEFAULT"
     DISABLED = "DISABLED"
     ERROR = "ERROR"
-    STATIC = "STATIC"
     SPLIT = "SPLIT"
+    STATIC = "STATIC"
+    STALE = "STALE"
     TARGETING_MATCH = "TARGETING_MATCH"
     UNKNOWN = "UNKNOWN"
 
