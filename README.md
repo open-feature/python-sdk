@@ -411,8 +411,9 @@ class MyProvider(AbstractProvider):
 
 Providers can also be extended to support async functionality.
 To support add asynchronous calls to a provider:
-* Implement the `AbstractProvider` as shown above.
-* Define asynchronous calls for each data type.
+
+- Implement the `AbstractProvider` as shown above.
+- Define asynchronous calls for each data type.
 
 ```python
 class MyProvider(AbstractProvider):
