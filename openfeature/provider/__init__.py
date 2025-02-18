@@ -112,6 +112,10 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
 
 
 class AbstractProvider(FeatureProvider):
+    def __init__(self, *args: typing.Any, **kwargs: typing.Any) -> None:
+        # this makes sure to invoke the parent of `FeatureProvider` -> `object`
+        super(FeatureProvider, self).__init__(*args, **kwargs)
+
     def attach(
         self,
         on_emit: typing.Callable[
