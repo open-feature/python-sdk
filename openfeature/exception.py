@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import typing
 from collections.abc import Mapping
-from enum import Enum
+
+from openfeature._backports.strenum import StrEnum
 
 __all__ = [
     "ErrorCode",
@@ -163,7 +164,7 @@ class InvalidContextError(OpenFeatureError):
         super().__init__(ErrorCode.INVALID_CONTEXT, error_message)
 
 
-class ErrorCode(Enum):
+class ErrorCode(StrEnum):
     PROVIDER_NOT_READY = "PROVIDER_NOT_READY"
     PROVIDER_FATAL = "PROVIDER_FATAL"
     FLAG_NOT_FOUND = "FLAG_NOT_FOUND"
