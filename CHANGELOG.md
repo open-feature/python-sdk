@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.8.1](https://github.com/open-feature/python-sdk/compare/v0.8.0...v0.8.1) (2025-02-22)
+
+
+### 🐛 Bug Fixes
+
+* add passthrough init to abstract provider ([#450](https://github.com/open-feature/python-sdk/issues/450)) ([088409e](https://github.com/open-feature/python-sdk/commit/088409ea5cdefef33f28fc4f45026fabac52377a))
+
+
+### ✨ New Features
+
+* add OTel utility function ([#451](https://github.com/open-feature/python-sdk/issues/451)) ([2d1ba85](https://github.com/open-feature/python-sdk/commit/2d1ba85c93cdd954f539d2872783b21683bd8b07))
+
+
+### 🧹 Chore
+
+* **deps:** update github/codeql-action digest to b56ba49 ([#454](https://github.com/open-feature/python-sdk/issues/454)) ([613388d](https://github.com/open-feature/python-sdk/commit/613388ddde33b6ce5ff3a39760970297dfa83255))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.9.7 ([#453](https://github.com/open-feature/python-sdk/issues/453)) ([a5cb27b](https://github.com/open-feature/python-sdk/commit/a5cb27b67839d60ea631001759478b2e74b75f28))
+* **deps:** update spec digest to 54952f3 ([#447](https://github.com/open-feature/python-sdk/issues/447)) ([f907855](https://github.com/open-feature/python-sdk/commit/f907855966cf788a3522e7626c76bd050de59a7e))
+* **deps:** update spec digest to a69f748 ([#452](https://github.com/open-feature/python-sdk/issues/452)) ([95b33b3](https://github.com/open-feature/python-sdk/commit/95b33b39e6ef472264002322162e83665054d71b))
+* improve resolve details callable type hints ([#449](https://github.com/open-feature/python-sdk/issues/449)) ([31afa64](https://github.com/open-feature/python-sdk/commit/31afa6490f7c2fc7a553b69c56840d494a520836))
+* use existing submodule version for e2e tests ([#444](https://github.com/open-feature/python-sdk/issues/444)) ([5ae8571](https://github.com/open-feature/python-sdk/commit/5ae8571ccd5f30c0aef87b0bc7f1a08a65254df0))
+* use keyword arguments, validate test ([#446](https://github.com/open-feature/python-sdk/issues/446)) ([f29c450](https://github.com/open-feature/python-sdk/commit/f29c4506a6a13307ba95a9b450a1b19c328975b3))
+
+
+### 📚 Documentation
+
+* fix linting issue on the readme ([1198728](https://github.com/open-feature/python-sdk/commit/11987280ba53ba087b1792316acc920a81434630))
+
 ## [0.8.0](https://github.com/open-feature/python-sdk/compare/v0.7.5...v0.8.0) (2025-02-11)
 
 
