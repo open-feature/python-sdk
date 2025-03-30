@@ -519,14 +519,14 @@ class OpenFeatureClient:
                     reversed_merged_hooks,
                     hook_hints,
                 )
-                details = FlagEvaluationDetails(
+                flag_evaluation = FlagEvaluationDetails(
                     flag_key=flag_key,
                     value=default_value,
                     reason=Reason.ERROR,
                     error_code=provider_err.error_code,
                     error_message=provider_err.error_message,
                 )
-                return details
+                return flag_evaluation
 
             merged_context = self._before_hooks_and_merge_context(
                 flag_type,
@@ -536,39 +536,39 @@ class OpenFeatureClient:
                 evaluation_context,
             )
 
-            details = await self._create_provider_evaluation_async(
+            flag_evaluation = await self._create_provider_evaluation_async(
                 provider,
                 flag_type,
                 flag_key,
                 default_value,
                 merged_context,
             )
-            if err := details.get_exception():
+            if err := flag_evaluation.get_exception():
                 error_hooks(
                     flag_type, hook_context, err, reversed_merged_hooks, hook_hints
                 )
-                return details
+                return flag_evaluation
 
             after_hooks(
                 flag_type,
                 hook_context,
-                details,
+                flag_evaluation,
                 reversed_merged_hooks,
                 hook_hints,
             )
 
-            return details
+            return flag_evaluation
 
         except OpenFeatureError as err:
             error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
-            details = FlagEvaluationDetails(
+            flag_evaluation = FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
                 reason=Reason.ERROR,
                 error_code=err.error_code,
                 error_message=err.error_message,
             )
-            return details
+            return flag_evaluation
         # Catch any type of exception here since the user can provide any exception
         # in the error hooks
         except Exception as err:  # pragma: no cover
@@ -579,20 +579,20 @@ class OpenFeatureClient:
             error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
 
             error_message = getattr(err, "error_message", str(err))
-            details = FlagEvaluationDetails(
+            flag_evaluation = FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
                 reason=Reason.ERROR,
                 error_code=ErrorCode.GENERAL,
                 error_message=error_message,
             )
-            return details
+            return flag_evaluation
 
         finally:
             after_all_hooks(
                 flag_type,
                 hook_context,
-                details,
+                flag_evaluation,
                 reversed_merged_hooks,
                 hook_hints,
             )
@@ -663,6 +663,7 @@ class OpenFeatureClient:
                 error_hooks(
                     flag_type, hook_context, err, reversed_merged_hooks, hook_hints
                 )
+                flag_evaluation.value = default_value
                 return flag_evaluation
 
             after_hooks(
