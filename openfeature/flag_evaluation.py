@@ -4,7 +4,7 @@ import typing
 from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
-from openfeature.exception import ErrorCode
+from openfeature.exception import ErrorCode, OpenFeatureError
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     # resolves a circular dependency in type annotations
@@ -56,6 +56,11 @@ class FlagEvaluationDetails(typing.Generic[T_co]):
     error_code: typing.Optional[ErrorCode] = None
     error_message: typing.Optional[str] = None
 
+    def get_exception(self) -> typing.Optional[OpenFeatureError]:
+        if self.error_code:
+            return ErrorCode.to_exception(self.error_code, self.error_message or "")
+        return None
+
 
 @dataclass
 class FlagEvaluationOptions:
@@ -79,3 +84,14 @@ class FlagResolutionDetails(typing.Generic[U_co]):
         if self.error_code:
             raise ErrorCode.to_exception(self.error_code, self.error_message or "")
         return None
+
+    def to_flag_evaluation_details(self, flag_key: str) -> FlagEvaluationDetails[U_co]:
+        return FlagEvaluationDetails(
+            flag_key=flag_key,
+            value=self.value,
+            variant=self.variant,
+            flag_metadata=self.flag_metadata,
+            reason=self.reason,
+            error_code=self.error_code,
+            error_message=self.error_message,
+        )

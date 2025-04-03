@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
 from openfeature.evaluation_context import EvaluationContext
-from openfeature.exception import FlagNotFoundError
+from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import FlagMetadata, FlagResolutionDetails, Reason
 from openfeature.hook import Hook
 from openfeature.provider import AbstractProvider, Metadata
@@ -74,7 +74,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[bool]:
-        return self._resolve(flag_key, evaluation_context)
+        return self._resolve(flag_key, default_value, evaluation_context)
 
     async def resolve_boolean_details_async(
         self,
@@ -82,7 +82,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: bool,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[bool]:
-        return await self._resolve_async(flag_key, evaluation_context)
+        return await self._resolve_async(flag_key, default_value, evaluation_context)
 
     def resolve_string_details(
         self,
@@ -90,7 +90,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[str]:
-        return self._resolve(flag_key, evaluation_context)
+        return self._resolve(flag_key, default_value, evaluation_context)
 
     async def resolve_string_details_async(
         self,
@@ -98,7 +98,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: str,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[str]:
-        return await self._resolve_async(flag_key, evaluation_context)
+        return await self._resolve_async(flag_key, default_value, evaluation_context)
 
     def resolve_integer_details(
         self,
@@ -106,7 +106,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[int]:
-        return self._resolve(flag_key, evaluation_context)
+        return self._resolve(flag_key, default_value, evaluation_context)
 
     async def resolve_integer_details_async(
         self,
@@ -114,7 +114,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: int,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[int]:
-        return await self._resolve_async(flag_key, evaluation_context)
+        return await self._resolve_async(flag_key, default_value, evaluation_context)
 
     def resolve_float_details(
         self,
@@ -122,7 +122,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[float]:
-        return self._resolve(flag_key, evaluation_context)
+        return self._resolve(flag_key, default_value, evaluation_context)
 
     async def resolve_float_details_async(
         self,
@@ -130,7 +130,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: float,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[float]:
-        return await self._resolve_async(flag_key, evaluation_context)
+        return await self._resolve_async(flag_key, default_value, evaluation_context)
 
     def resolve_object_details(
         self,
@@ -138,7 +138,7 @@ class InMemoryProvider(AbstractProvider):
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[typing.Union[dict, list]]:
-        return self._resolve(flag_key, evaluation_context)
+        return self._resolve(flag_key, default_value, evaluation_context)
 
     async def resolve_object_details_async(
         self,
@@ -146,21 +146,28 @@ class InMemoryProvider(AbstractProvider):
         default_value: typing.Union[dict, list],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[typing.Union[dict, list]]:
-        return await self._resolve_async(flag_key, evaluation_context)
+        return await self._resolve_async(flag_key, default_value, evaluation_context)
 
     def _resolve(
         self,
         flag_key: str,
+        default_value: V,
         evaluation_context: typing.Optional[EvaluationContext],
     ) -> FlagResolutionDetails[V]:
         flag = self._flags.get(flag_key)
         if flag is None:
-            raise FlagNotFoundError(f"Flag '{flag_key}' not found")
+            return FlagResolutionDetails(
+                value=default_value,
+                reason=Reason.ERROR,
+                error_code=ErrorCode.FLAG_NOT_FOUND,
+                error_message=f"Flag '{flag_key}' not found",
+            )
         return flag.resolve(evaluation_context)
 
     async def _resolve_async(
         self,
         flag_key: str,
+        default_value: V,
         evaluation_context: typing.Optional[EvaluationContext],
     ) -> FlagResolutionDetails[V]:
-        return self._resolve(flag_key, evaluation_context)
+        return self._resolve(flag_key, default_value, evaluation_context)

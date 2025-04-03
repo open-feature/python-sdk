@@ -2,7 +2,7 @@ from numbers import Number
 
 import pytest
 
-from openfeature.exception import FlagNotFoundError
+from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 
@@ -22,11 +22,18 @@ async def test_should_handle_unknown_flags_correctly():
     # Given
     provider = InMemoryProvider({})
     # When
-    with pytest.raises(FlagNotFoundError):
-        provider.resolve_boolean_details(flag_key="Key", default_value=True)
-    with pytest.raises(FlagNotFoundError):
-        await provider.resolve_integer_details_async(flag_key="Key", default_value=1)
+    flag_sync = provider.resolve_boolean_details(flag_key="Key", default_value=True)
+    flag_async = await provider.resolve_boolean_details_async(
+        flag_key="Key", default_value=True
+    )
     # Then
+    assert flag_sync == flag_async
+    for flag in [flag_sync, flag_async]:
+        assert flag is not None
+        assert flag.value is True
+        assert flag.reason == Reason.ERROR
+        assert flag.error_code == ErrorCode.FLAG_NOT_FOUND
+        assert flag.error_message == "Flag 'Key' not found"
 
 
 @pytest.mark.asyncio
