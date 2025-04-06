@@ -1,7 +1,7 @@
 import typing
 
 from openfeature._event_support import run_handlers_for_provider
-from openfeature.evaluation_context import EvaluationContext
+from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
 from openfeature.event import (
     ProviderEvent,
     ProviderEventDetails,
@@ -66,8 +66,6 @@ class ProviderRegistry:
 
     def _get_evaluation_context(self) -> EvaluationContext:
         # imported here to avoid circular imports
-        from openfeature.api import get_evaluation_context
-
         return get_evaluation_context()
 
     def _initialize_provider(self, provider: FeatureProvider) -> None:
