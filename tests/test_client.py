@@ -8,11 +8,11 @@ import pytest
 
 from openfeature import api
 from openfeature.api import add_hooks, clear_hooks, get_client, set_provider
-from openfeature.client import GeneralError, OpenFeatureClient, _typecheck_flag_value
+from openfeature.client import OpenFeatureClient, _typecheck_flag_value
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import EventDetails, ProviderEvent, ProviderEventDetails
 from openfeature.exception import ErrorCode, OpenFeatureError
-from openfeature.flag_evaluation import FlagResolutionDetails, Reason
+from openfeature.flag_evaluation import FlagResolutionDetails, FlagType, Reason
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
@@ -364,15 +364,27 @@ async def test_client_type_mismatch_exceptions():
 
 
 @pytest.mark.asyncio
-async def test_client_general_exception():
+async def test_typecheck_flag_value_general_error():
     # Given
     flag_value = "A"
     flag_type = None
     # When
-    with pytest.raises(GeneralError) as e:
-        flag_type = _typecheck_flag_value(flag_value, flag_type)
+    err = _typecheck_flag_value(value=flag_value, flag_type=flag_type)
     # Then
-    assert e.value.error_message == "Unknown flag type"
+    assert err.error_code == ErrorCode.GENERAL
+    assert err.error_message == "Unknown flag type"
+
+
+@pytest.mark.asyncio
+async def test_typecheck_flag_value_type_mismatch_error():
+    # Given
+    flag_value = "A"
+    flag_type = FlagType.BOOLEAN
+    # When
+    err = _typecheck_flag_value(value=flag_value, flag_type=flag_type)
+    # Then
+    assert err.error_code == ErrorCode.TYPE_MISMATCH
+    assert err.error_message == "Expected type <class 'bool'> but got <class 'str'>"
 
 
 def test_provider_events():
