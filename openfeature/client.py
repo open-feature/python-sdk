@@ -444,12 +444,12 @@ class OpenFeatureClient:
 
     def _assert_provider_status(
         self,
-    ) -> None:
+    ) -> typing.Optional[OpenFeatureError]:
         status = self.get_provider_status()
         if status == ProviderStatus.NOT_READY:
-            raise ProviderNotReadyError()
+            return ProviderNotReadyError()
         if status == ProviderStatus.FATAL:
-            raise ProviderFatalError()
+            return ProviderFatalError()
         return None
 
     def _before_hooks_and_merge_context(
@@ -509,7 +509,22 @@ class OpenFeatureClient:
         )
 
         try:
-            self._assert_provider_status()
+            if provider_err := self._assert_provider_status():
+                error_hooks(
+                    flag_type,
+                    hook_context,
+                    provider_err,
+                    reversed_merged_hooks,
+                    hook_hints,
+                )
+                flag_evaluation = FlagEvaluationDetails(
+                    flag_key=flag_key,
+                    value=default_value,
+                    reason=Reason.ERROR,
+                    error_code=provider_err.error_code,
+                    error_message=provider_err.error_message,
+                )
+                return flag_evaluation
 
             merged_context = self._before_hooks_and_merge_context(
                 flag_type,
@@ -526,6 +541,11 @@ class OpenFeatureClient:
                 default_value,
                 merged_context,
             )
+            if err := flag_evaluation.get_exception():
+                error_hooks(
+                    flag_type, hook_context, err, reversed_merged_hooks, hook_hints
+                )
+                return flag_evaluation
 
             after_hooks(
                 flag_type,
@@ -605,7 +625,22 @@ class OpenFeatureClient:
         )
 
         try:
-            self._assert_provider_status()
+            if provider_err := self._assert_provider_status():
+                error_hooks(
+                    flag_type,
+                    hook_context,
+                    provider_err,
+                    reversed_merged_hooks,
+                    hook_hints,
+                )
+                flag_evaluation = FlagEvaluationDetails(
+                    flag_key=flag_key,
+                    value=default_value,
+                    reason=Reason.ERROR,
+                    error_code=provider_err.error_code,
+                    error_message=provider_err.error_message,
+                )
+                return flag_evaluation
 
             merged_context = self._before_hooks_and_merge_context(
                 flag_type,
@@ -622,6 +657,12 @@ class OpenFeatureClient:
                 default_value,
                 merged_context,
             )
+            if err := flag_evaluation.get_exception():
+                error_hooks(
+                    flag_type, hook_context, err, reversed_merged_hooks, hook_hints
+                )
+                flag_evaluation.value = default_value
+                return flag_evaluation
 
             after_hooks(
                 flag_type,
@@ -691,27 +732,33 @@ class OpenFeatureClient:
         }
         get_details_callable = get_details_callables_async.get(flag_type)
         if not get_details_callable:
-            raise GeneralError(error_message="Unknown flag type")
+            return FlagEvaluationDetails(
+                flag_key=flag_key,
+                value=default_value,
+                reason=Reason.ERROR,
+                error_code=ErrorCode.GENERAL,
+                error_message="Unknown flag type",
+            )
 
         resolution = await get_details_callable(
             flag_key=flag_key,
             default_value=default_value,
             evaluation_context=evaluation_context,
         )
-        resolution.raise_for_error()
+        if resolution.error_code:
+            return resolution.to_flag_evaluation_details(flag_key)
 
         # we need to check the get_args to be compatible with union types.
-        _typecheck_flag_value(resolution.value, flag_type)
+        if err := _typecheck_flag_value(value=resolution.value, flag_type=flag_type):
+            return FlagEvaluationDetails(
+                flag_key=flag_key,
+                value=resolution.value,
+                reason=Reason.ERROR,
+                error_code=err.error_code,
+                error_message=err.error_message,
+            )
 
-        return FlagEvaluationDetails(
-            flag_key=flag_key,
-            value=resolution.value,
-            variant=resolution.variant,
-            flag_metadata=resolution.flag_metadata or {},
-            reason=resolution.reason,
-            error_code=resolution.error_code,
-            error_message=resolution.error_message,
-        )
+        return resolution.to_flag_evaluation_details(flag_key)
 
     def _create_provider_evaluation(
         self,
@@ -741,27 +788,33 @@ class OpenFeatureClient:
 
         get_details_callable = get_details_callables.get(flag_type)
         if not get_details_callable:
-            raise GeneralError(error_message="Unknown flag type")
+            return FlagEvaluationDetails(
+                flag_key=flag_key,
+                value=default_value,
+                reason=Reason.ERROR,
+                error_code=ErrorCode.GENERAL,
+                error_message="Unknown flag type",
+            )
 
         resolution = get_details_callable(
             flag_key=flag_key,
             default_value=default_value,
             evaluation_context=evaluation_context,
         )
-        resolution.raise_for_error()
+        if resolution.error_code:
+            return resolution.to_flag_evaluation_details(flag_key)
 
         # we need to check the get_args to be compatible with union types.
-        _typecheck_flag_value(resolution.value, flag_type)
+        if err := _typecheck_flag_value(value=resolution.value, flag_type=flag_type):
+            return FlagEvaluationDetails(
+                flag_key=flag_key,
+                value=resolution.value,
+                reason=Reason.ERROR,
+                error_code=err.error_code,
+                error_message=err.error_message,
+            )
 
-        return FlagEvaluationDetails(
-            flag_key=flag_key,
-            value=resolution.value,
-            variant=resolution.variant,
-            flag_metadata=resolution.flag_metadata or {},
-            reason=resolution.reason,
-            error_code=resolution.error_code,
-            error_message=resolution.error_message,
-        )
+        return resolution.to_flag_evaluation_details(flag_key)
 
     def add_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
         _event_support.add_client_handler(self, event, handler)
@@ -770,7 +823,9 @@ class OpenFeatureClient:
         _event_support.remove_client_handler(self, event, handler)
 
 
-def _typecheck_flag_value(value: typing.Any, flag_type: FlagType) -> None:
+def _typecheck_flag_value(
+    value: typing.Any, flag_type: FlagType
+) -> typing.Optional[OpenFeatureError]:
     type_map: TypeMap = {
         FlagType.BOOLEAN: bool,
         FlagType.STRING: str,
@@ -780,6 +835,7 @@ def _typecheck_flag_value(value: typing.Any, flag_type: FlagType) -> None:
     }
     _type = type_map.get(flag_type)
     if not _type:
-        raise GeneralError(error_message="Unknown flag type")
+        return GeneralError(error_message="Unknown flag type")
     if not isinstance(value, _type):
-        raise TypeMismatchError(f"Expected type {_type} but got {type(value)}")
+        return TypeMismatchError(f"Expected type {_type} but got {type(value)}")
+    return None
