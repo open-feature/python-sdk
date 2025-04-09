@@ -65,7 +65,6 @@ class ProviderRegistry:
             self._shutdown_provider(provider)
 
     def _get_evaluation_context(self) -> EvaluationContext:
-        # imported here to avoid circular imports
         return get_evaluation_context()
 
     def _initialize_provider(self, provider: FeatureProvider) -> None:
