@@ -3,8 +3,8 @@ import typing
 from collections.abc import Awaitable
 from dataclasses import dataclass
 
-from openfeature import _event_support, api
-from openfeature.evaluation_context import EvaluationContext
+from openfeature import _event_support
+from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
 from openfeature.event import EventHandler, ProviderEvent
 from openfeature.exception import (
     ErrorCode,
@@ -21,7 +21,7 @@ from openfeature.flag_evaluation import (
     FlagType,
     Reason,
 )
-from openfeature.hook import Hook, HookContext, HookHints
+from openfeature.hook import Hook, HookContext, HookHints, get_hooks
 from openfeature.hook._hook_support import (
     after_all_hooks,
     after_hooks,
@@ -30,6 +30,7 @@ from openfeature.hook._hook_support import (
 )
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider._registry import provider_registry
+from openfeature.transaction_context import get_transaction_context
 
 __all__ = [
     "ClientMetadata",
@@ -433,10 +434,7 @@ class OpenFeatureClient:
         # in the flag evaluation
         # before: API, Client, Invocation, Provider
         merged_hooks = (
-            api.get_hooks()
-            + self.hooks
-            + evaluation_hooks
-            + provider.get_provider_hooks()
+            get_hooks() + self.hooks + evaluation_hooks + provider.get_provider_hooks()
         )
         # after, error, finally: Provider, Invocation, Client, API
         reversed_merged_hooks = merged_hooks[:]
@@ -474,8 +472,8 @@ class OpenFeatureClient:
 
         # Requirement 3.2.2 merge: API.context->transaction.context->client.context->invocation.context
         merged_context = (
-            api.get_evaluation_context()
-            .merge(api.get_transaction_context())
+            get_evaluation_context()
+            .merge(get_transaction_context())
             .merge(self.context)
             .merge(invocation_context)
         )

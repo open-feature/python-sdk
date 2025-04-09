@@ -12,7 +12,17 @@ if TYPE_CHECKING:
     from openfeature.client import ClientMetadata
     from openfeature.provider.metadata import Metadata
 
-__all__ = ["Hook", "HookContext", "HookHints", "HookType"]
+__all__ = [
+    "Hook",
+    "HookContext",
+    "HookHints",
+    "HookType",
+    "add_hooks",
+    "clear_hooks",
+    "get_hooks",
+]
+
+_hooks: list[Hook] = []
 
 
 class HookType(Enum):
@@ -133,3 +143,17 @@ class Hook:
         or not (False)
         """
         return True
+
+
+def add_hooks(hooks: list[Hook]) -> None:
+    global _hooks
+    _hooks = _hooks + hooks
+
+
+def clear_hooks() -> None:
+    global _hooks
+    _hooks = []
+
+
+def get_hooks() -> list[Hook]:
+    return _hooks

@@ -2,19 +2,22 @@ import typing
 
 from openfeature import _event_support
 from openfeature.client import OpenFeatureClient
-from openfeature.evaluation_context import EvaluationContext
+from openfeature.evaluation_context import (
+    get_evaluation_context,
+    set_evaluation_context,
+)
 from openfeature.event import (
     EventHandler,
     ProviderEvent,
 )
-from openfeature.exception import GeneralError
-from openfeature.hook import Hook
+from openfeature.hook import add_hooks, clear_hooks, get_hooks
 from openfeature.provider import FeatureProvider
 from openfeature.provider._registry import provider_registry
 from openfeature.provider.metadata import Metadata
-from openfeature.transaction_context import TransactionContextPropagator
-from openfeature.transaction_context.no_op_transaction_context_propagator import (
-    NoOpTransactionContextPropagator,
+from openfeature.transaction_context import (
+    get_transaction_context,
+    set_transaction_context,
+    set_transaction_context_propagator,
 )
 
 __all__ = [
@@ -34,13 +37,6 @@ __all__ = [
     "set_transaction_context_propagator",
     "shutdown",
 ]
-
-_evaluation_context = EvaluationContext()
-_evaluation_transaction_context_propagator: TransactionContextPropagator = (
-    NoOpTransactionContextPropagator()
-)
-
-_hooks: list[Hook] = []
 
 
 def get_client(
@@ -65,49 +61,6 @@ def clear_providers() -> None:
 
 def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
     return provider_registry.get_provider(domain).get_metadata()
-
-
-def get_evaluation_context() -> EvaluationContext:
-    return _evaluation_context
-
-
-def set_evaluation_context(evaluation_context: EvaluationContext) -> None:
-    global _evaluation_context
-    if evaluation_context is None:
-        raise GeneralError(error_message="No api level evaluation context")
-    _evaluation_context = evaluation_context
-
-
-def set_transaction_context_propagator(
-    transaction_context_propagator: TransactionContextPropagator,
-) -> None:
-    global _evaluation_transaction_context_propagator
-    _evaluation_transaction_context_propagator = transaction_context_propagator
-
-
-def get_transaction_context() -> EvaluationContext:
-    return _evaluation_transaction_context_propagator.get_transaction_context()
-
-
-def set_transaction_context(evaluation_context: EvaluationContext) -> None:
-    global _evaluation_transaction_context_propagator
-    _evaluation_transaction_context_propagator.set_transaction_context(
-        evaluation_context
-    )
-
-
-def add_hooks(hooks: list[Hook]) -> None:
-    global _hooks
-    _hooks = _hooks + hooks
-
-
-def clear_hooks() -> None:
-    global _hooks
-    _hooks = []
-
-
-def get_hooks() -> list[Hook]:
-    return _hooks
 
 
 def shutdown() -> None:
