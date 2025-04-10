@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.2](https://github.com/open-feature/python-sdk/compare/v0.8.1...v0.8.2) (2025-04-10)
+
+
+### 🧹 Chore
+
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.5 ([#484](https://github.com/open-feature/python-sdk/issues/484)) ([95be943](https://github.com/open-feature/python-sdk/commit/95be943d33b9cfca137f94e5a1ad52bc562e4b4a))
+
 ## [0.8.1](https://github.com/open-feature/python-sdk/compare/v0.8.0...v0.8.1) (2025-04-09)
 
 
