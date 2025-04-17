@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.8.2](https://github.com/open-feature/python-sdk/compare/v0.8.1...v0.8.2) (2025-04-17)
+
+
+### 🧹 Chore
+
+* **deps:** update codecov/codecov-action action to v5.4.2 ([#486](https://github.com/open-feature/python-sdk/issues/486)) ([798ac8d](https://github.com/open-feature/python-sdk/commit/798ac8ded00b8509068003367f36e6c04c574cbc))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.5 ([#484](https://github.com/open-feature/python-sdk/issues/484)) ([95be943](https://github.com/open-feature/python-sdk/commit/95be943d33b9cfca137f94e5a1ad52bc562e4b4a))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.6 ([#487](https://github.com/open-feature/python-sdk/issues/487)) ([7fe752d](https://github.com/open-feature/python-sdk/commit/7fe752d8fd6148a38d53e5c7dfc071a6c8121c85))
+* use publish env ([d54d239](https://github.com/open-feature/python-sdk/commit/d54d239a2d55359d9b49aa534a4b53339bf26571))
+
 ## [0.8.1](https://github.com/open-feature/python-sdk/compare/v0.8.0...v0.8.1) (2025-04-09)
 
 
