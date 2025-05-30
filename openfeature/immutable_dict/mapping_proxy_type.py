@@ -26,7 +26,7 @@ class MappingProxyType(dict):
     __setitem__ = _immutable
     __delitem__ = _immutable
     clear = _immutable
-    update = _immutable  # type:ignore[assignment]
-    setdefault = _immutable  # type:ignore[assignment]
-    pop = _immutable  # type:ignore[assignment]
+    update = _immutable
+    setdefault = _immutable
+    pop = _immutable
     popitem = _immutable
