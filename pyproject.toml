@@ -78,6 +78,12 @@ disallow_any_generics = false
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
 
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+]
+
 [tool.ruff]
 exclude = [
     ".git",

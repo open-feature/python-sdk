@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 from abc import abstractmethod
+from collections.abc import Sequence
 from enum import Enum
 
 from openfeature.evaluation_context import EvaluationContext
@@ -10,6 +11,9 @@ from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.hook import Hook
 
 from .metadata import Metadata
+
+if typing.TYPE_CHECKING:
+    from openfeature.flag_evaluation import FlagValueType
 
 __all__ = ["AbstractProvider", "FeatureProvider", "Metadata", "ProviderStatus"]
 
@@ -99,16 +103,24 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
     def resolve_object_details(
         self,
         flag_key: str,
-        default_value: typing.Union[dict, list],
+        default_value: typing.Union[
+            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+        ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]: ...
+    ) -> FlagResolutionDetails[
+        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+    ]: ...
 
     async def resolve_object_details_async(
         self,
         flag_key: str,
-        default_value: typing.Union[dict, list],
+        default_value: typing.Union[
+            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+        ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]: ...
+    ) -> FlagResolutionDetails[
+        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+    ]: ...
 
 
 class AbstractProvider(FeatureProvider):
@@ -213,17 +225,25 @@ class AbstractProvider(FeatureProvider):
     def resolve_object_details(
         self,
         flag_key: str,
-        default_value: typing.Union[dict, list],
+        default_value: typing.Union[
+            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+        ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+    ) -> FlagResolutionDetails[
+        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+    ]:
         pass
 
     async def resolve_object_details_async(
         self,
         flag_key: str,
-        default_value: typing.Union[dict, list],
+        default_value: typing.Union[
+            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+        ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+    ) -> FlagResolutionDetails[
+        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+    ]:
         return self.resolve_object_details(flag_key, default_value, evaluation_context)
 
     def emit_provider_ready(self, details: ProviderEventDetails) -> None:

@@ -1,10 +1,17 @@
-import typing
+from __future__ import annotations
 
-from openfeature.evaluation_context import EvaluationContext
+import typing
+from collections.abc import Sequence
+
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
-from openfeature.hook import Hook
-from openfeature.provider import AbstractProvider, Metadata
+from openfeature.provider import AbstractProvider
 from openfeature.provider.no_op_metadata import NoOpMetadata
+
+if typing.TYPE_CHECKING:
+    from openfeature.evaluation_context import EvaluationContext
+    from openfeature.flag_evaluation import FlagValueType
+    from openfeature.hook import Hook
+    from openfeature.provider import Metadata
 
 PASSED_IN_DEFAULT = "Passed in default"
 
@@ -67,9 +74,13 @@ class NoOpProvider(AbstractProvider):
     def resolve_object_details(
         self,
         flag_key: str,
-        default_value: typing.Union[dict, list],
+        default_value: typing.Union[
+            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+        ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+    ) -> FlagResolutionDetails[
+        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+    ]:
         return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,
