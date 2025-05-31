@@ -49,13 +49,13 @@ def create_evaluation_event(
         TelemetryFlagMetadata.CONTEXT_ID, hook_context.evaluation_context.targeting_key
     )
     if context_id:
-        attributes[TelemetryAttribute.CONTEXT_ID] = context_id
+        attributes[TelemetryAttribute.CONTEXT_ID] = typing.cast("str", context_id)
 
     if set_id := details.flag_metadata.get(TelemetryFlagMetadata.FLAG_SET_ID):
-        attributes[TelemetryAttribute.SET_ID] = set_id
+        attributes[TelemetryAttribute.SET_ID] = typing.cast("str", set_id)
 
     if version := details.flag_metadata.get(TelemetryFlagMetadata.VERSION):
-        attributes[TelemetryAttribute.VERSION] = version
+        attributes[TelemetryAttribute.VERSION] = typing.cast("str", version)
 
     if metadata := hook_context.provider_metadata:
         attributes[TelemetryAttribute.PROVIDER_NAME] = metadata.name

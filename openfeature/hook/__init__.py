@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import typing
+from collections.abc import Sequence
 from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 
 from openfeature.evaluation_context import EvaluationContext
-from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
+from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType, FlagValueType
 
 if TYPE_CHECKING:
     from openfeature.client import ClientMetadata
@@ -37,7 +38,7 @@ class HookContext:
         self,
         flag_key: str,
         flag_type: FlagType,
-        default_value: typing.Any,
+        default_value: FlagValueType,
         evaluation_context: EvaluationContext,
         client_metadata: typing.Optional[ClientMetadata] = None,
         provider_metadata: typing.Optional[Metadata] = None,
@@ -70,8 +71,8 @@ HookHints = typing.Mapping[
         float,
         str,
         datetime,
-        list[typing.Any],
-        dict[str, typing.Any],
+        Sequence["HookHints"],
+        typing.Mapping[str, "HookHints"],
     ],
 ]
 
@@ -94,7 +95,7 @@ class Hook:
     def after(
         self,
         hook_context: HookContext,
-        details: FlagEvaluationDetails[typing.Any],
+        details: FlagEvaluationDetails[FlagValueType],
         hints: HookHints,
     ) -> None:
         """
@@ -122,7 +123,7 @@ class Hook:
     def finally_after(
         self,
         hook_context: HookContext,
-        details: FlagEvaluationDetails[typing.Any],
+        details: FlagEvaluationDetails[FlagValueType],
         hints: HookHints,
     ) -> None:
         """
