@@ -1,12 +1,18 @@
+from __future__ import annotations
+
 import typing
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import ErrorCode
-from openfeature.flag_evaluation import FlagMetadata, FlagResolutionDetails, Reason
-from openfeature.hook import Hook
+from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.provider import AbstractProvider, Metadata
+
+if typing.TYPE_CHECKING:
+    from openfeature.flag_evaluation import FlagMetadata, FlagValueType
+    from openfeature.hook import Hook
 
 PASSED_IN_DEFAULT = "Passed in default"
 
@@ -31,7 +37,7 @@ class InMemoryFlag(typing.Generic[T_co]):
     state: State = State.ENABLED
     context_evaluator: typing.Optional[
         typing.Callable[
-            ["InMemoryFlag[T_co]", EvaluationContext], FlagResolutionDetails[T_co]
+            [InMemoryFlag[T_co], EvaluationContext], FlagResolutionDetails[T_co]
         ]
     ] = None
 
@@ -135,17 +141,25 @@ class InMemoryProvider(AbstractProvider):
     def resolve_object_details(
         self,
         flag_key: str,
-        default_value: typing.Union[dict, list],
+        default_value: typing.Union[
+            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+        ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+    ) -> FlagResolutionDetails[
+        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+    ]:
         return self._resolve(flag_key, default_value, evaluation_context)
 
     async def resolve_object_details_async(
         self,
         flag_key: str,
-        default_value: typing.Union[dict, list],
+        default_value: typing.Union[
+            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+        ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+    ) -> FlagResolutionDetails[
+        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+    ]:
         return await self._resolve_async(flag_key, default_value, evaluation_context)
 
     def _resolve(
