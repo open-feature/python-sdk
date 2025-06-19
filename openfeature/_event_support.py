@@ -61,7 +61,7 @@ def add_global_handler(event: ProviderEvent, handler: EventHandler) -> None:
     with _global_lock:
         _global_handlers[event].append(handler)
 
-    from openfeature.api import get_client
+    from openfeature.api import get_client  # noqa: PLC0415
 
     _run_immediate_handler(get_client(), event, handler)
 
