@@ -40,10 +40,7 @@ jobs:
         run: uv run pytest tests
 
       - name: Run coverage
-        run: uv run coverage run -m pytest tests
-
-      - name: Coverage report
-        run: uv run coverage xml
+        run: uv run coverage run -m pytest tests && uv run coverage xml
 
       - name: Run E2E tests with behave
         run: |
