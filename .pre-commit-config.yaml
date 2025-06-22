@@ -22,6 +22,6 @@ repos:
         files: openfeature
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.7.13  # Use the latest version as appropriate
+    rev: 0.7.13
     hooks:
       - id: uv-lock
