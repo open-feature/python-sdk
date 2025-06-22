@@ -35,7 +35,9 @@ dev = [
     "behave",
     "coverage[toml]>=6.5",
     "pytest",
-    "pytest-asyncio"
+    "pytest-asyncio",
+    "mypy",
+    "pre-commit"
 ]
 
 

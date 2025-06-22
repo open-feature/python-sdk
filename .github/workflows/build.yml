@@ -73,7 +73,7 @@ jobs:
         run: uv sync --extra dev
 
       - name: Run pre-commit
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        run: uv run pre-commit run --all-files
 
   sast:
     runs-on: ubuntu-latest
@@ -87,6 +87,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.13"
+          cache: false
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858 # v3
