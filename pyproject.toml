@@ -27,42 +27,17 @@ requires-python = ">=3.9"
 [project.urls]
 Homepage = "https://github.com/open-feature/python-sdk"
 
-[tool.hatch]
+[tool.hatch.build.targets.wheel]
+packages = ["openfeature"]
 
-[tool.hatch.envs.default]
-dependencies = [
+[project.optional-dependencies]
+dev = [
     "behave",
     "coverage[toml]>=6.5",
     "pytest",
     "pytest-asyncio"
 ]
 
-[tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-    "coverage xml",
-]
-cov = [
-    "test-cov",
-    "cov-report",
-]
-e2e = [
-    "git submodule update --init --recursive",
-    "cp spec/specification/assets/gherkin/* tests/features/",
-    "behave tests/features/",
-    "rm tests/features/*.feature",
-]
-
-[tool.hatch.build.targets.sdist]
-exclude = [
-    ".gitignore",
-    "test-harness",
-    "venv",
-]
-
-[tool.hatch.build.targets.wheel]
-packages = ["openfeature"]
 
 [tool.mypy]
 files = "openfeature"
