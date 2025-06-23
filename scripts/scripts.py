@@ -31,3 +31,8 @@ def e2e():
     )
     subprocess.run("behave tests/features/", shell=True, check=True)
     subprocess.run("rm tests/features/*.feature", shell=True, check=True)
+
+
+def precommit():
+    """Run pre-commit hooks."""
+    subprocess.run("uv run pre-commit run --all-files", shell=True, check=True)

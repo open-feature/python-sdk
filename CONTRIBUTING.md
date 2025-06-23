@@ -16,10 +16,6 @@ We use [uv](https://github.com/astral-sh/uv) for fast Python package management 
 
 To install uv, follow the [installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 
-You will also need to set up the `pre-commit` hooks.
-Run `pre-commit install` in the root directory of the repository.
-If you don't have `pre-commit` installed, you can install it with `uv run pip install pre-commit`.
-
 ### Setup Development Environment
 
 1. **Clone the repository:**
@@ -35,40 +31,30 @@ If you don't have `pre-commit` installed, you can install it with `uv run pip in
 
 ### Testing
 
-Run tests with `uv run pytest tests`.
-
-We use `pytest` for our unit testing, making use of `parametrized` to inject cases at scale.
+Run tests:
+```bash
+uv run test
+```
 
 ### Coverage
 
-Run coverage tests with:
+Run tests with a coverage report:
 ```bash
-uv run coverage run -m pytest tests/
-  # Generate coverage report
+uv run cov
 ```
 
 ### End-to-End Tests
 
 Run e2e tests with behave:
 ```bash
-# Update git submodules and run behave tests
-git submodule update --init --recursive
-cp spec/specification/assets/gherkin/* tests/features/
-uv run behave tests/features/
-rm tests/features/*.feature
+uv run e2e
 ```
 
-### Code Quality
+### Pre-commit
 
-**Linting and Formatting:**
+Run pre-commit hooks
 ```bash
-uv run ruff check .          # Lint code
-uv run ruff format .         # Format code
-```
-
-**Type Checking:**
-```bash
-uv run mypy openfeature/
+uv run precommit
 ```
 
 
@@ -105,7 +91,7 @@ git remote add fork https://github.com/YOUR_GITHUB_USERNAME/python-sdk.git
 Ensure your development environment is all set up by building and testing
 
 ```bash
-uv run pytest tests/
+uv run test
 ```
 
 To start working on a new feature or bugfix, create a new branch and start working on it.
