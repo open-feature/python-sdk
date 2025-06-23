@@ -117,3 +117,11 @@ max-statements = 30
 [tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.
 keep-runtime-typing = true
+
+[project.scripts]
+# workaround while UV doesn't support scripts directly in the pyproject.toml
+test = "scripts.scripts:test"
+test-cov = "scripts.scripts:test_cov"
+cov-report = "scripts.scripts:cov_report"
+cov = "scripts.scripts:cov"
+e2e = "scripts.scripts:e2e"

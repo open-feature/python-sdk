@@ -37,17 +37,10 @@ jobs:
         run: uv sync --extra dev
 
       - name: Test with pytest
-        run: uv run pytest tests
-
-      - name: Run coverage
-        run: uv run coverage run -m pytest tests && uv run coverage xml
+        run: uv run cov
 
       - name: Run E2E tests with behave
-        run: |
-          git submodule update --init --recursive
-          cp spec/specification/assets/gherkin/* tests/features/
-          uv run behave tests/features/
-          rm tests/features/*.feature
+        run: uv run e2e
 
       - if: matrix.python-version == '3.13'
         name: Upload coverage to Codecov
