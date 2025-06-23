@@ -53,7 +53,7 @@ jobs:
         run: uv sync
 
       - name: Build a binary wheel and a source tarball
-        run: uv run python -m build
+        run: uv build
 
       - name: Publish a Python distribution to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
