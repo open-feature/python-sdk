@@ -1,3 +1,4 @@
+# ruff: noqa: S602, S607
 import subprocess
 
 
@@ -25,6 +26,8 @@ def cov():
 def e2e():
     """Run end-to-end tests."""
     subprocess.run("git submodule update --init --recursive", shell=True, check=True)
-    subprocess.run("cp spec/specification/assets/gherkin/* tests/features/", shell=True, check=True)
+    subprocess.run(
+        "cp spec/specification/assets/gherkin/* tests/features/", shell=True, check=True
+    )
     subprocess.run("behave tests/features/", shell=True, check=True)
     subprocess.run("rm tests/features/*.feature", shell=True, check=True)
