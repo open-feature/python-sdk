@@ -26,35 +26,35 @@ To install uv, follow the [installation guide](https://docs.astral.sh/uv/getting
 
 2. **Install dependencies:**
    ```bash
-   uv sync --extra dev
+   uv sync
    ```
 
 ### Testing
 
 Run tests:
 ```bash
-uv run test
+uv run test --frozen
 ```
 
 ### Coverage
 
 Run tests with a coverage report:
 ```bash
-uv run cov
+uv run cov --frozen
 ```
 
 ### End-to-End Tests
 
 Run e2e tests with behave:
 ```bash
-uv run e2e
+uv run e2e --frozen
 ```
 
 ### Pre-commit
 
 Run pre-commit hooks
 ```bash
-uv run precommit
+uv run precommit --frozen
 ```
 
 
@@ -91,7 +91,7 @@ git remote add fork https://github.com/YOUR_GITHUB_USERNAME/python-sdk.git
 Ensure your development environment is all set up by building and testing
 
 ```bash
-uv run test
+uv run test --frozen
 ```
 
 To start working on a new feature or bugfix, create a new branch and start working on it.

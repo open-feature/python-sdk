@@ -29,18 +29,18 @@ jobs:
           submodules: recursive
 
       - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: uv sync --extra dev
+        run: uv sync --frozen
 
       - name: Test with pytest
-        run: uv run cov
+        run: uv run cov --frozen
 
       - name: Run E2E tests with behave
-        run: uv run e2e
+        run: uv run e2e --frozen
 
       - if: matrix.python-version == '3.13'
         name: Upload coverage to Codecov
@@ -58,15 +58,15 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: uv sync --extra dev
+        run: uv sync --frozen
 
       - name: Run pre-commit
-        run: uv run precommit
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
   sast:
     runs-on: ubuntu-latest
@@ -77,7 +77,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.13"
           ignore-nothing-to-cache: true

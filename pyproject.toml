@@ -27,7 +27,7 @@ requires-python = ">=3.9"
 [project.urls]
 Homepage = "https://github.com/open-feature/python-sdk"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "behave",
     "coverage[toml]>=6.5",

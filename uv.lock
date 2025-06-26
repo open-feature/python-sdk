@@ -229,7 +229,7 @@ name = "openfeature-sdk"
 version = "0.8.1"
 source = { editable = "." }
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "behave" },
     { name = "coverage", extra = ["toml"] },
@@ -240,15 +240,16 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "behave", marker = "extra == 'dev'" },
-    { name = "coverage", extras = ["toml"], marker = "extra == 'dev'", specifier = ">=6.5" },
-    { name = "mypy", marker = "extra == 'dev'" },
-    { name = "pre-commit", marker = "extra == 'dev'" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'" },
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "behave" },
+    { name = "coverage", extras = ["toml"], specifier = ">=6.5" },
+    { name = "mypy" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
 ]
-provides-extras = ["dev"]
 
 [[package]]
 name = "packaging"
