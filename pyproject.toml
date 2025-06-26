@@ -120,6 +120,7 @@ keep-runtime-typing = true
 
 [project.scripts]
 # workaround while UV doesn't support scripts directly in the pyproject.toml
+# see: https://github.com/astral-sh/uv/issues/5903
 test = "scripts.scripts:test"
 test-cov = "scripts.scripts:test_cov"
 cov-report = "scripts.scripts:cov_report"
