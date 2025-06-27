@@ -12,19 +12,51 @@ Python 3.9 and above are supported by the SDK.
 
 ### Installation and Dependencies
 
-We use [Hatch](https://hatch.pypa.io/) to manage the project.
+We use [uv](https://github.com/astral-sh/uv) for fast Python package management and dependency resolution.
 
-To install Hatch, just run `pip install hatch`.
+To install uv, follow the [installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 
-You will also need to set up the `pre-commit` hooks.
-Run `pre-commit install` in the root directory of the repository.
-If you don't have `pre-commit` installed, you can install it with `pip install pre-commit`.
+### Setup Development Environment
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/open-feature/python-sdk.git
+   cd python-sdk
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   uv sync
+   ```
 
 ### Testing
 
-Run tests with `hatch run test`.
+Run tests:
+```bash
+uv run test --frozen
+```
 
-We use `pytest` for our unit testing, making use of `parametrized` to inject cases at scale.
+### Coverage
+
+Run tests with a coverage report:
+```bash
+uv run cov --frozen
+```
+
+### End-to-End Tests
+
+Run e2e tests with behave:
+```bash
+uv run e2e --frozen
+```
+
+### Pre-commit
+
+Run pre-commit hooks
+```bash
+uv run precommit --frozen
+```
+
 
 ### Integration tests
 
@@ -59,7 +91,7 @@ git remote add fork https://github.com/YOUR_GITHUB_USERNAME/python-sdk.git
 Ensure your development environment is all set up by building and testing
 
 ```bash
-hatch run test
+uv run test --frozen
 ```
 
 To start working on a new feature or bugfix, create a new branch and start working on it.

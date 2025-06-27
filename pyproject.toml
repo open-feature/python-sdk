@@ -27,31 +27,14 @@ requires-python = ">=3.9"
 [project.urls]
 Homepage = "https://github.com/open-feature/python-sdk"
 
-[tool.hatch]
-
-[tool.hatch.envs.default]
-dependencies = [
+[dependency-groups]
+dev = [
     "behave",
     "coverage[toml]>=6.5",
     "pytest",
-    "pytest-asyncio"
-]
-
-[tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-    "coverage xml",
-]
-cov = [
-    "test-cov",
-    "cov-report",
-]
-e2e = [
-    "git submodule update --init --recursive",
-    "cp spec/specification/assets/gherkin/* tests/features/",
-    "behave tests/features/",
-    "rm tests/features/*.feature",
+    "pytest-asyncio",
+    "mypy",
+    "pre-commit"
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -134,3 +117,13 @@ max-statements = 30
 [tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.
 keep-runtime-typing = true
+
+[project.scripts]
+# workaround while UV doesn't support scripts directly in the pyproject.toml
+# see: https://github.com/astral-sh/uv/issues/5903
+test = "scripts.scripts:test"
+test-cov = "scripts.scripts:test_cov"
+cov-report = "scripts.scripts:cov_report"
+cov = "scripts.scripts:cov"
+e2e = "scripts.scripts:e2e"
+precommit = "scripts.scripts:precommit"
