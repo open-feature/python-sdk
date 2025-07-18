@@ -486,13 +486,13 @@ class OpenFeatureClient:
         # Any resulting evaluation context from a before hook will overwrite
         # duplicate fields defined globally, on the client, or in the invocation.
         # Requirement 3.2.2, 4.3.4: API.context->client.context->invocation.context
-        invocation_context = before_hooks(
+        before_hooks_context = before_hooks(
             flag_type, hook_context, merged_hooks, hook_hints
         )
 
         # The hook_context.evaluation_context already contains the merged context from
         # _establish_hooks_and_provider, so we just need to merge with the before hooks result
-        merged_context = hook_context.evaluation_context.merge(invocation_context)
+        merged_context = hook_context.evaluation_context.merge(before_hooks_context)
 
         return merged_context
 
