@@ -435,11 +435,20 @@ class OpenFeatureClient:
         evaluation_hooks = flag_evaluation_options.hooks
         hook_hints = flag_evaluation_options.hook_hints
 
+        # Merge transaction context into evaluation context before creating hook_context
+        # This ensures hooks have access to the complete context including transaction context
+        merged_eval_context = (
+            get_evaluation_context()
+            .merge(get_transaction_context())
+            .merge(self.context)
+            .merge(evaluation_context)
+        )
+
         hook_context = HookContext(
             flag_key=flag_key,
             flag_type=flag_type,
             default_value=default_value,
-            evaluation_context=evaluation_context,
+            evaluation_context=merged_eval_context,
             client_metadata=self.get_metadata(),
             provider_metadata=provider.get_metadata(),
         )
@@ -465,7 +474,7 @@ class OpenFeatureClient:
             return ProviderFatalError()
         return None
 
-    def _before_hooks_and_merge_context(
+    def _run_before_hooks_and_update_context(
         self,
         flag_type: FlagType,
         hook_context: HookContext,
@@ -477,19 +486,14 @@ class OpenFeatureClient:
         # Any resulting evaluation context from a before hook will overwrite
         # duplicate fields defined globally, on the client, or in the invocation.
         # Requirement 3.2.2, 4.3.4: API.context->client.context->invocation.context
-        invocation_context = before_hooks(
+        before_hooks_context = before_hooks(
             flag_type, hook_context, merged_hooks, hook_hints
         )
-        if evaluation_context:
-            invocation_context = invocation_context.merge(ctx2=evaluation_context)
 
-        # Requirement 3.2.2 merge: API.context->transaction.context->client.context->invocation.context
-        merged_context = (
-            get_evaluation_context()
-            .merge(get_transaction_context())
-            .merge(self.context)
-            .merge(invocation_context)
-        )
+        # The hook_context.evaluation_context already contains the merged context from
+        # _establish_hooks_and_provider, so we just need to merge with the before hooks result
+        merged_context = hook_context.evaluation_context.merge(before_hooks_context)
+
         return merged_context
 
     @typing.overload
@@ -599,7 +603,7 @@ class OpenFeatureClient:
                 )
                 return flag_evaluation
 
-            merged_context = self._before_hooks_and_merge_context(
+            merged_context = self._run_before_hooks_and_update_context(
                 flag_type,
                 hook_context,
                 merged_hooks,
@@ -775,7 +779,7 @@ class OpenFeatureClient:
                 )
                 return flag_evaluation
 
-            merged_context = self._before_hooks_and_merge_context(
+            merged_context = self._run_before_hooks_and_update_context(
                 flag_type,
                 hook_context,
                 merged_hooks,
