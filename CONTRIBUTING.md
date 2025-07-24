@@ -26,7 +26,7 @@ To install uv, follow the [installation guide](https://docs.astral.sh/uv/getting
 
 2. **Install dependencies:**
    ```bash
-   uv sync
+   uv sync --frozen
    ```
 
 ### Testing
