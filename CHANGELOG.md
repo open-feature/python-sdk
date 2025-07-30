@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.8.2](https://github.com/open-feature/python-sdk/compare/v0.8.1...v0.8.2) (2025-07-30)
+
+
+### 🐛 Bug Fixes
+
+* merge transaction context into hook context evaluation context ([#521](https://github.com/open-feature/python-sdk/issues/521)) ([#523](https://github.com/open-feature/python-sdk/issues/523)) ([a5b3aa9](https://github.com/open-feature/python-sdk/commit/a5b3aa9c5213dda311068695f9209282f5faaff5))
+
+
+### ✨ New Features
+
+* starting migration to uv ([#512](https://github.com/open-feature/python-sdk/issues/512)) ([fb47cbb](https://github.com/open-feature/python-sdk/commit/fb47cbb2a51da9154adf977aad0b16575d227c33))
+
+
+### 🧹 Chore
+
+* **deps:** pin astral-sh/setup-uv action to bd01e18 ([#514](https://github.com/open-feature/python-sdk/issues/514)) ([6da7890](https://github.com/open-feature/python-sdk/commit/6da7890ac6488bccf640f74bdc530fa9ce8bbec3))
+* **deps:** update actions/setup-python digest to a26af69 ([#489](https://github.com/open-feature/python-sdk/issues/489)) ([ad69f2c](https://github.com/open-feature/python-sdk/commit/ad69f2c55f3c8170a8a53981238130eb106207ba))
+* **deps:** update astral-sh/setup-uv digest to 7edac99 ([#524](https://github.com/open-feature/python-sdk/issues/524)) ([5652c0c](https://github.com/open-feature/python-sdk/commit/5652c0c457cc5a524e91405f3b229cf245ae4531))
+* **deps:** update codecov/codecov-action action to v5.4.2 ([#486](https://github.com/open-feature/python-sdk/issues/486)) ([798ac8d](https://github.com/open-feature/python-sdk/commit/798ac8ded00b8509068003367f36e6c04c574cbc))
+* **deps:** update codecov/codecov-action action to v5.4.3 ([#497](https://github.com/open-feature/python-sdk/issues/497)) ([7bb0f5e](https://github.com/open-feature/python-sdk/commit/7bb0f5e499ff8e0985b24696d0680251c90af32b))
+* **deps:** update github/codeql-action digest to 181d5ee ([#517](https://github.com/open-feature/python-sdk/issues/517)) ([a04e52c](https://github.com/open-feature/python-sdk/commit/a04e52c0224a6c1c269218df050ce7a56076211d))
+* **deps:** update github/codeql-action digest to 28deaed ([#488](https://github.com/open-feature/python-sdk/issues/488)) ([e0de4b2](https://github.com/open-feature/python-sdk/commit/e0de4b2faa109454a8079b934320f1c2b2b2b06e))
+* **deps:** update github/codeql-action digest to 39edc49 ([#515](https://github.com/open-feature/python-sdk/issues/515)) ([21ef53a](https://github.com/open-feature/python-sdk/commit/21ef53a156b17ce24db79c75b5bbfeaf2bd77f01))
+* **deps:** update github/codeql-action digest to 60168ef ([#492](https://github.com/open-feature/python-sdk/issues/492)) ([8aedfe8](https://github.com/open-feature/python-sdk/commit/8aedfe81ef67af3210ea9921e6b364fdd21ef8ac))
+* **deps:** update github/codeql-action digest to ce28f5b ([#508](https://github.com/open-feature/python-sdk/issues/508)) ([4628c24](https://github.com/open-feature/python-sdk/commit/4628c24f5c94821aecb06388703173bd5a8efc30))
+* **deps:** update github/codeql-action digest to fca7ace ([#505](https://github.com/open-feature/python-sdk/issues/505)) ([347517a](https://github.com/open-feature/python-sdk/commit/347517a7ccaf145a940fc6e2a37a8d1df621f3a3))
+* **deps:** update github/codeql-action digest to ff0a06e ([#498](https://github.com/open-feature/python-sdk/issues/498)) ([c722cf0](https://github.com/open-feature/python-sdk/commit/c722cf0239f2b9b95a1214b99447a9316c2c73d8))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.10 ([#496](https://github.com/open-feature/python-sdk/issues/496)) ([1dd8b29](https://github.com/open-feature/python-sdk/commit/1dd8b294930ee94e9c27a7bad4e43fda76bb1f9d))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.11 ([#499](https://github.com/open-feature/python-sdk/issues/499)) ([abb3137](https://github.com/open-feature/python-sdk/commit/abb31377790f95e4900e92f57050a4a12dc9f311))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.12 ([#501](https://github.com/open-feature/python-sdk/issues/501)) ([8dfa88c](https://github.com/open-feature/python-sdk/commit/8dfa88cf8aacada8b8b20803a51667b586e2182a))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.13 ([#507](https://github.com/open-feature/python-sdk/issues/507)) ([a21413b](https://github.com/open-feature/python-sdk/commit/a21413bd5069a9fd32378e197ae7709b34f001a5))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.5 ([#484](https://github.com/open-feature/python-sdk/issues/484)) ([95be943](https://github.com/open-feature/python-sdk/commit/95be943d33b9cfca137f94e5a1ad52bc562e4b4a))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.6 ([#487](https://github.com/open-feature/python-sdk/issues/487)) ([7fe752d](https://github.com/open-feature/python-sdk/commit/7fe752d8fd6148a38d53e5c7dfc071a6c8121c85))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.7 ([#490](https://github.com/open-feature/python-sdk/issues/490)) ([f4f9a12](https://github.com/open-feature/python-sdk/commit/f4f9a12081871f4797dc0e649219dc7be58d4116))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.8 ([#491](https://github.com/open-feature/python-sdk/issues/491)) ([1f16955](https://github.com/open-feature/python-sdk/commit/1f169551e37f286597400e5cb2c171a60a38436e))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.11.9 ([#493](https://github.com/open-feature/python-sdk/issues/493)) ([42fed6b](https://github.com/open-feature/python-sdk/commit/42fed6b2001b9056ed9bc7a390213206829a7b99))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.12.0 ([#510](https://github.com/open-feature/python-sdk/issues/510)) ([d21d9db](https://github.com/open-feature/python-sdk/commit/d21d9db90ae6f5f15f1aaf25a4e5d0669dbe1d96))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.12.1 ([#513](https://github.com/open-feature/python-sdk/issues/513)) ([7783a8b](https://github.com/open-feature/python-sdk/commit/7783a8b6c798246fc861fcb83e24427ea0f43e5f))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.12.2 ([#518](https://github.com/open-feature/python-sdk/issues/518)) ([288bd6b](https://github.com/open-feature/python-sdk/commit/288bd6bb34f2d5e857ae5b2b17f02f79276049c5))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.12.4 ([#525](https://github.com/open-feature/python-sdk/issues/525)) ([90a193d](https://github.com/open-feature/python-sdk/commit/90a193d22c64b8b708300dd436a16b8c7d632686))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.16.0 ([#503](https://github.com/open-feature/python-sdk/issues/503)) ([87e4485](https://github.com/open-feature/python-sdk/commit/87e448593d723b8239244a198e54e6cb056d3f95))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.16.1 ([#509](https://github.com/open-feature/python-sdk/issues/509)) ([ac95c7a](https://github.com/open-feature/python-sdk/commit/ac95c7a5b72d56e78dcb8e3411178967b00c04d9))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.17.0 ([#526](https://github.com/open-feature/python-sdk/issues/526)) ([00cab65](https://github.com/open-feature/python-sdk/commit/00cab65315ff3bc38f26b7281d8b258e6ec0f47d))
+* switch build backend to uv ([#527](https://github.com/open-feature/python-sdk/issues/527)) ([a369890](https://github.com/open-feature/python-sdk/commit/a3698902b55a1c9d53d4a7db2e6b18e4f2e77c70))
+* use publish env ([d54d239](https://github.com/open-feature/python-sdk/commit/d54d239a2d55359d9b49aa534a4b53339bf26571))
+
+
+### 🔄 Refactoring
+
+* refine typing.Any type hints ([#504](https://github.com/open-feature/python-sdk/issues/504)) ([f95b27a](https://github.com/open-feature/python-sdk/commit/f95b27a25ae1dda7281c2039ec9060363de2703e))
+
 ## [0.8.1](https://github.com/open-feature/python-sdk/compare/v0.8.0...v0.8.1) (2025-04-09)
 
 
