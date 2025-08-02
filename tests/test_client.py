@@ -1,4 +1,4 @@
-import asyncio
+import inspect
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -68,7 +68,7 @@ async def test_should_get_flag_value_based_on_method_type(
     # Given
     # When
     method = getattr(no_op_provider_client, get_method)
-    if asyncio.iscoroutinefunction(method):
+    if inspect.iscoroutinefunction(method):
         flag = await method(flag_key="Key", default_value=default_value)
     else:
         flag = method(flag_key="Key", default_value=default_value)
@@ -126,7 +126,7 @@ async def test_should_get_flag_detail_based_on_method_type(
     # Given
     # When
     method = getattr(no_op_provider_client, get_method)
-    if asyncio.iscoroutinefunction(method):
+    if inspect.iscoroutinefunction(method):
         flag = await method(flag_key="Key", default_value=default_value)
     else:
         flag = method(flag_key="Key", default_value=default_value)
