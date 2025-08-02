@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.3](https://github.com/open-feature/python-sdk/compare/v0.8.2...v0.8.3) (2025-08-02)
+
+
+### 🧹 Chore
+
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.17.1 ([#528](https://github.com/open-feature/python-sdk/issues/528)) ([9d0cbe8](https://github.com/open-feature/python-sdk/commit/9d0cbe8d4af95218f41d4e2dcb8e419b9639c825))
+* support Python 3.14 ([#530](https://github.com/open-feature/python-sdk/issues/530)) ([32fdec1](https://github.com/open-feature/python-sdk/commit/32fdec178122d0838e8e776ba30f2dd722b21233))
+
 ## [0.8.2](https://github.com/open-feature/python-sdk/compare/v0.8.1...v0.8.2) (2025-07-30)
 
 
