@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.9"
 
 [[package]]
@@ -202,7 +202,7 @@ wheels = [
 
 [[package]]
 name = "openfeature-sdk"
-version = "0.8.1"
+version = "0.8.2"
 source = { editable = "." }
 
 [package.dev-dependencies]

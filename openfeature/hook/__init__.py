@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing
-from collections.abc import Sequence
+from collections.abc import MutableMapping, Sequence
 from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 __all__ = [
     "Hook",
     "HookContext",
+    "HookData",
     "HookHints",
     "HookType",
     "add_hooks",
@@ -26,6 +27,10 @@ __all__ = [
 _hooks: list[Hook] = []
 
 
+# https://openfeature.dev/specification/sections/hooks/#requirement-461
+HookData = MutableMapping[str, typing.Any]
+
+
 class HookType(Enum):
     BEFORE = "before"
     AFTER = "after"
@@ -34,7 +39,7 @@ class HookType(Enum):
 
 
 class HookContext:
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         flag_key: str,
         flag_type: FlagType,
@@ -42,6 +47,7 @@ class HookContext:
         evaluation_context: EvaluationContext,
         client_metadata: typing.Optional[ClientMetadata] = None,
         provider_metadata: typing.Optional[Metadata] = None,
+        hook_data: typing.Optional[HookData] = None,
     ):
         self.flag_key = flag_key
         self.flag_type = flag_type
@@ -49,6 +55,7 @@ class HookContext:
         self.evaluation_context = evaluation_context
         self.client_metadata = client_metadata
         self.provider_metadata = provider_metadata
+        self.hook_data = hook_data or {}
 
     def __setattr__(self, key: str, value: typing.Any) -> None:
         if hasattr(self, key) and key in (
