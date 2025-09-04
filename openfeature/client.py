@@ -2,6 +2,7 @@ import logging
 import typing
 from collections.abc import Awaitable, Sequence
 from dataclasses import dataclass
+from itertools import chain
 
 from openfeature import _event_support
 from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
@@ -420,10 +421,10 @@ class OpenFeatureClient:
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions],
     ) -> tuple[
         FeatureProvider,
-        HookContext,
         HookHints,
-        list[Hook],
-        list[Hook],
+        list[tuple[Hook, HookContext]],
+        list[tuple[Hook, HookContext]],
+        EvaluationContext,
     ]:
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
@@ -444,25 +445,43 @@ class OpenFeatureClient:
             .merge(evaluation_context)
         )
 
-        hook_context = HookContext(
-            flag_key=flag_key,
-            flag_type=flag_type,
-            default_value=default_value,
-            evaluation_context=merged_eval_context,
-            client_metadata=self.get_metadata(),
-            provider_metadata=provider.get_metadata(),
-        )
+        client_metadata = self.get_metadata()
+        provider_metadata = provider.get_metadata()
+
         # Hooks need to be handled in different orders at different stages
         # in the flag evaluation
         # before: API, Client, Invocation, Provider
-        merged_hooks = (
-            get_hooks() + self.hooks + evaluation_hooks + provider.get_provider_hooks()
-        )
+        merged_hooks_and_context = [
+            (
+                hook,
+                HookContext(
+                    flag_key=flag_key,
+                    flag_type=flag_type,
+                    default_value=default_value,
+                    evaluation_context=merged_eval_context,
+                    client_metadata=client_metadata,
+                    provider_metadata=provider_metadata,
+                    hook_data={},
+                ),
+            )
+            for hook in chain(
+                get_hooks(),
+                self.hooks,
+                evaluation_hooks,
+                provider.get_provider_hooks(),
+            )
+        ]
         # after, error, finally: Provider, Invocation, Client, API
-        reversed_merged_hooks = merged_hooks[:]
-        reversed_merged_hooks.reverse()
+        reversed_merged_hooks_and_context = merged_hooks_and_context[:]
+        reversed_merged_hooks_and_context.reverse()
 
-        return provider, hook_context, hook_hints, merged_hooks, reversed_merged_hooks
+        return (
+            provider,
+            hook_hints,
+            merged_hooks_and_context,
+            reversed_merged_hooks_and_context,
+            merged_eval_context,
+        )
 
     def _assert_provider_status(
         self,
@@ -477,24 +496,21 @@ class OpenFeatureClient:
     def _run_before_hooks_and_update_context(
         self,
         flag_type: FlagType,
-        hook_context: HookContext,
-        merged_hooks: list[Hook],
+        merged_hooks_and_context: list[tuple[Hook, HookContext]],
         hook_hints: HookHints,
-        evaluation_context: typing.Optional[EvaluationContext],
+        evaluation_context: EvaluationContext,
     ) -> EvaluationContext:
         # https://github.com/open-feature/spec/blob/main/specification/sections/03-evaluation-context.md
         # Any resulting evaluation context from a before hook will overwrite
         # duplicate fields defined globally, on the client, or in the invocation.
         # Requirement 3.2.2, 4.3.4: API.context->client.context->invocation.context
         before_hooks_context = before_hooks(
-            flag_type, hook_context, merged_hooks, hook_hints
+            flag_type, merged_hooks_and_context, hook_hints
         )
 
         # The hook_context.evaluation_context already contains the merged context from
         # _establish_hooks_and_provider, so we just need to merge with the before hooks result
-        merged_context = hook_context.evaluation_context.merge(before_hooks_context)
-
-        return merged_context
+        return evaluation_context.merge(before_hooks_context)
 
     @typing.overload
     async def evaluate_flag_details_async(
@@ -575,23 +591,26 @@ class OpenFeatureClient:
         :return: a typing.Awaitable[FlagEvaluationDetails] object with the fully evaluated flag from a
         provider
         """
-        provider, hook_context, hook_hints, merged_hooks, reversed_merged_hooks = (
-            self._establish_hooks_and_provider(
-                flag_type,
-                flag_key,
-                default_value,
-                evaluation_context,
-                flag_evaluation_options,
-            )
+        (
+            provider,
+            hook_hints,
+            merged_hooks_and_context,
+            reversed_merged_hooks_and_context,
+            merged_eval_context,
+        ) = self._establish_hooks_and_provider(
+            flag_type,
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
         )
 
         try:
             if provider_err := self._assert_provider_status():
                 error_hooks(
                     flag_type,
-                    hook_context,
                     provider_err,
-                    reversed_merged_hooks,
+                    reversed_merged_hooks_and_context,
                     hook_hints,
                 )
                 flag_evaluation = FlagEvaluationDetails(
@@ -605,10 +624,9 @@ class OpenFeatureClient:
 
             merged_context = self._run_before_hooks_and_update_context(
                 flag_type,
-                hook_context,
-                merged_hooks,
+                merged_hooks_and_context,
                 hook_hints,
-                evaluation_context,
+                merged_eval_context,
             )
 
             flag_evaluation = await self._create_provider_evaluation_async(
@@ -620,22 +638,21 @@ class OpenFeatureClient:
             )
             if err := flag_evaluation.get_exception():
                 error_hooks(
-                    flag_type, hook_context, err, reversed_merged_hooks, hook_hints
+                    flag_type, err, reversed_merged_hooks_and_context, hook_hints
                 )
                 return flag_evaluation
 
             after_hooks(
                 flag_type,
-                hook_context,
                 flag_evaluation,
-                reversed_merged_hooks,
+                reversed_merged_hooks_and_context,
                 hook_hints,
             )
 
             return flag_evaluation
 
         except OpenFeatureError as err:
-            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
+            error_hooks(flag_type, err, reversed_merged_hooks_and_context, hook_hints)
             flag_evaluation = FlagEvaluationDetails(
                 flag_key=flag_key,
                 value=default_value,
@@ -651,7 +668,7 @@ class OpenFeatureClient:
                 "Unable to correctly evaluate flag with key: '%s'", flag_key
             )
 
-            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
+            error_hooks(flag_type, err, reversed_merged_hooks_and_context, hook_hints)
 
             error_message = getattr(err, "error_message", str(err))
             flag_evaluation = FlagEvaluationDetails(
@@ -666,9 +683,8 @@ class OpenFeatureClient:
         finally:
             after_all_hooks(
                 flag_type,
-                hook_context,
                 flag_evaluation,
-                reversed_merged_hooks,
+                reversed_merged_hooks_and_context,
                 hook_hints,
             )
 
@@ -751,23 +767,26 @@ class OpenFeatureClient:
         :return: a FlagEvaluationDetails object with the fully evaluated flag from a
         provider
         """
-        provider, hook_context, hook_hints, merged_hooks, reversed_merged_hooks = (
-            self._establish_hooks_and_provider(
-                flag_type,
-                flag_key,
-                default_value,
-                evaluation_context,
-                flag_evaluation_options,
-            )
+        (
+            provider,
+            hook_hints,
+            merged_hooks_and_context,
+            reversed_merged_hooks_and_context,
+            merged_eval_context,
+        ) = self._establish_hooks_and_provider(
+            flag_type,
+            flag_key,
+            default_value,
+            evaluation_context,
+            flag_evaluation_options,
         )
 
         try:
             if provider_err := self._assert_provider_status():
                 error_hooks(
                     flag_type,
-                    hook_context,
                     provider_err,
-                    reversed_merged_hooks,
+                    reversed_merged_hooks_and_context,
                     hook_hints,
                 )
                 flag_evaluation = FlagEvaluationDetails(
@@ -781,10 +800,9 @@ class OpenFeatureClient:
 
             merged_context = self._run_before_hooks_and_update_context(
                 flag_type,
-                hook_context,
-                merged_hooks,
+                merged_hooks_and_context,
                 hook_hints,
-                evaluation_context,
+                merged_eval_context,
             )
 
             flag_evaluation = self._create_provider_evaluation(
@@ -796,23 +814,22 @@ class OpenFeatureClient:
             )
             if err := flag_evaluation.get_exception():
                 error_hooks(
-                    flag_type, hook_context, err, reversed_merged_hooks, hook_hints
+                    flag_type, err, reversed_merged_hooks_and_context, hook_hints
                 )
                 flag_evaluation.value = default_value
                 return flag_evaluation
 
             after_hooks(
                 flag_type,
-                hook_context,
                 flag_evaluation,
-                reversed_merged_hooks,
+                reversed_merged_hooks_and_context,
                 hook_hints,
             )
 
             return flag_evaluation
 
         except OpenFeatureError as err:
-            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
+            error_hooks(flag_type, err, reversed_merged_hooks_and_context, hook_hints)
 
             flag_evaluation = FlagEvaluationDetails(
                 flag_key=flag_key,
@@ -829,7 +846,7 @@ class OpenFeatureClient:
                 "Unable to correctly evaluate flag with key: '%s'", flag_key
             )
 
-            error_hooks(flag_type, hook_context, err, reversed_merged_hooks, hook_hints)
+            error_hooks(flag_type, err, reversed_merged_hooks_and_context, hook_hints)
 
             error_message = getattr(err, "error_message", str(err))
             flag_evaluation = FlagEvaluationDetails(
@@ -844,9 +861,8 @@ class OpenFeatureClient:
         finally:
             after_all_hooks(
                 flag_type,
-                hook_context,
                 flag_evaluation,
-                reversed_merged_hooks,
+                reversed_merged_hooks_and_context,
                 hook_hints,
             )
 

@@ -11,52 +11,60 @@ logger = logging.getLogger("openfeature")
 
 def error_hooks(
     flag_type: FlagType,
-    hook_context: HookContext,
     exception: Exception,
-    hooks: list[Hook],
+    hooks_and_context: list[tuple[Hook, HookContext]],
     hints: typing.Optional[HookHints] = None,
 ) -> None:
-    kwargs = {"hook_context": hook_context, "exception": exception, "hints": hints}
+    kwargs = {"exception": exception, "hints": hints}
     _execute_hooks(
-        flag_type=flag_type, hooks=hooks, hook_method=HookType.ERROR, **kwargs
+        flag_type=flag_type,
+        hooks_and_context=hooks_and_context,
+        hook_method=HookType.ERROR,
+        **kwargs,
     )
 
 
 def after_all_hooks(
     flag_type: FlagType,
-    hook_context: HookContext,
     details: FlagEvaluationDetails[typing.Any],
-    hooks: list[Hook],
+    hooks_and_context: list[tuple[Hook, HookContext]],
     hints: typing.Optional[HookHints] = None,
 ) -> None:
-    kwargs = {"hook_context": hook_context, "details": details, "hints": hints}
+    kwargs = {"details": details, "hints": hints}
     _execute_hooks(
-        flag_type=flag_type, hooks=hooks, hook_method=HookType.FINALLY_AFTER, **kwargs
+        flag_type=flag_type,
+        hooks_and_context=hooks_and_context,
+        hook_method=HookType.FINALLY_AFTER,
+        **kwargs,
     )
 
 
 def after_hooks(
     flag_type: FlagType,
-    hook_context: HookContext,
     details: FlagEvaluationDetails[typing.Any],
-    hooks: list[Hook],
+    hooks_and_context: list[tuple[Hook, HookContext]],
     hints: typing.Optional[HookHints] = None,
 ) -> None:
-    kwargs = {"hook_context": hook_context, "details": details, "hints": hints}
+    kwargs = {"details": details, "hints": hints}
     _execute_hooks_unchecked(
-        flag_type=flag_type, hooks=hooks, hook_method=HookType.AFTER, **kwargs
+        flag_type=flag_type,
+        hooks_and_context=hooks_and_context,
+        hook_method=HookType.AFTER,
+        **kwargs,
     )
 
 
 def before_hooks(
     flag_type: FlagType,
-    hook_context: HookContext,
-    hooks: list[Hook],
+    hooks_and_context: list[tuple[Hook, HookContext]],
     hints: typing.Optional[HookHints] = None,
 ) -> EvaluationContext:
-    kwargs = {"hook_context": hook_context, "hints": hints}
+    kwargs = {"hints": hints}
     executed_hooks = _execute_hooks_unchecked(
-        flag_type=flag_type, hooks=hooks, hook_method=HookType.BEFORE, **kwargs
+        flag_type=flag_type,
+        hooks_and_context=hooks_and_context,
+        hook_method=HookType.BEFORE,
+        **kwargs,
     )
     filtered_hooks = [result for result in executed_hooks if result is not None]
 
@@ -68,30 +76,30 @@ def before_hooks(
 
 def _execute_hooks(
     flag_type: FlagType,
-    hooks: list[Hook],
+    hooks_and_context: list[tuple[Hook, HookContext]],
     hook_method: HookType,
     **kwargs: typing.Any,
-) -> list:
+) -> list[typing.Optional[EvaluationContext]]:
     """
     Run multiple hooks of any hook type. All of these hooks will be run through an
     exception check.
 
     :param flag_type: particular type of flag
-    :param hooks: a list of hooks
+    :param hooks_and_context: a list of hooks and their context
     :param hook_method: the type of hook that is being run
     :param kwargs: arguments that need to be provided to the hook method
     :return: a list of results from the applied hook methods
     """
     return [
-        _execute_hook_checked(hook, hook_method, **kwargs)
-        for hook in hooks
+        _execute_hook_checked(hook, hook_method, hook_context=hook_context, **kwargs)
+        for (hook, hook_context) in hooks_and_context
         if hook.supports_flag_value_type(flag_type)
     ]
 
 
 def _execute_hooks_unchecked(
     flag_type: FlagType,
-    hooks: list[Hook],
+    hooks_and_context: list[tuple[Hook, HookContext]],
     hook_method: HookType,
     **kwargs: typing.Any,
 ) -> list[typing.Optional[EvaluationContext]]:
@@ -101,14 +109,14 @@ def _execute_hooks_unchecked(
     client.
 
     :param flag_type: particular type of flag
-    :param hooks: a list of hooks
+    :param hooks_and_context: a list of hooks and their context
     :param hook_method: the type of hook that is being run
     :param kwargs: arguments that need to be provided to the hook method
     :return: a list of results from the applied hook methods
     """
     return [
-        getattr(hook, hook_method.value)(**kwargs)
-        for hook in hooks
+        getattr(hook, hook_method.value)(hook_context=hook_context, **kwargs)
+        for (hook, hook_context) in hooks_and_context
         if hook.supports_flag_value_type(flag_type)
     ]
 
