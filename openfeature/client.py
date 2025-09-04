@@ -2,7 +2,6 @@ import logging
 import typing
 from collections.abc import Awaitable, Sequence
 from dataclasses import dataclass
-from functools import reduce
 from itertools import chain
 
 from openfeature import _event_support
@@ -509,21 +508,9 @@ class OpenFeatureClient:
             flag_type, merged_hooks_and_context, hook_hints
         )
 
-        if not merged_hooks_and_context:
-            return evaluation_context.merge(before_hooks_context)
-
         # The hook_context.evaluation_context already contains the merged context from
         # _establish_hooks_and_provider, so we just need to merge with the before hooks result
-        merged_context = reduce(
-            lambda a, b: a.merge(b),
-            [
-                hook_context.evaluation_context
-                for (_, hook_context) in merged_hooks_and_context
-            ],
-        )
-        merged_context = merged_context.merge(before_hooks_context)
-
-        return merged_context
+        return evaluation_context.merge(before_hooks_context)
 
     @typing.overload
     async def evaluate_flag_details_async(
