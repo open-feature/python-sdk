@@ -19,7 +19,7 @@ EvaluationContextAttributes = typing.Mapping[
         str,
         datetime,
         Sequence["EvaluationContextAttributes"],
-        typing.Mapping[str, "EvaluationContextAttributes"],
+        "EvaluationContextAttributes",
     ],
 ]
 
