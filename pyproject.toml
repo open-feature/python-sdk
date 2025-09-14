@@ -45,7 +45,7 @@ module-root = ""
 namespace = true
 
 [tool.mypy]
-files = "openfeature"
+files = "openfeature,tests/typechecking"
 
 python_version = "3.9" # should be identical to the minimum supported version
 namespace_packages = true

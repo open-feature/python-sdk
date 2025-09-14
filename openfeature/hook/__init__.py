@@ -70,18 +70,17 @@ class HookContext:
 
 
 # https://openfeature.dev/specification/sections/hooks/#requirement-421
-HookHints = typing.Mapping[
+HookHintValue = typing.Union[
+    bool,
+    int,
+    float,
     str,
-    typing.Union[
-        bool,
-        int,
-        float,
-        str,
-        datetime,
-        Sequence["HookHints"],
-        typing.Mapping[str, "HookHints"],
-    ],
+    datetime,
+    Sequence["HookHintValue"],
+    typing.Mapping[str, "HookHintValue"],
 ]
+
+HookHints = typing.Mapping[str, HookHintValue]
 
 
 class Hook:
