@@ -1,20 +1,22 @@
-# ruff: noqa: S602, S607
+# ruff: noqa: S607
+import shutil
 import subprocess
+from pathlib import Path
 
 
 def test():
     """Run pytest tests."""
-    subprocess.run("pytest tests", shell=True, check=True)
+    subprocess.run(["pytest", "tests"], check=True)
 
 
 def test_cov():
     """Run tests with coverage."""
-    subprocess.run("coverage run -m pytest tests", shell=True, check=True)
+    subprocess.run(["coverage", "run", "-m", "pytest", "tests"], check=True)
 
 
 def cov_report():
     """Generate coverage report."""
-    subprocess.run("coverage xml", shell=True, check=True)
+    subprocess.run(["coverage", "xml"], check=True)
 
 
 def cov():
@@ -25,14 +27,17 @@ def cov():
 
 def e2e():
     """Run end-to-end tests."""
-    subprocess.run("git submodule update --init --recursive", shell=True, check=True)
-    subprocess.run(
-        "cp spec/specification/assets/gherkin/* tests/features/", shell=True, check=True
-    )
-    subprocess.run("behave tests/features/", shell=True, check=True)
-    subprocess.run("rm tests/features/*.feature", shell=True, check=True)
+    source_dir = Path("spec/specification/assets/gherkin")
+    dest_dir = Path("tests/features")
+
+    subprocess.run(["git", "submodule", "update", "--init", "--recursive"], check=True)
+    shutil.copytree(source_dir, dest_dir, dirs_exist_ok=True)
+    subprocess.run(["behave", "tests/features/"], check=True)
+
+    for feature_file in dest_dir.glob("*.feature"):
+        feature_file.unlink()
 
 
 def precommit():
     """Run pre-commit hooks."""
-    subprocess.run("uv run pre-commit run --all-files", shell=True, check=True)
+    subprocess.run(["uv", "run", "pre-commit", "run", "--all-files"], check=True)
