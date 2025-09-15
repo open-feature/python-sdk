@@ -19,4 +19,4 @@ repos:
     rev: v1.18.1
     hooks:
       - id: mypy
-        files: openfeature
+        files: openfeature|tests/typechecking

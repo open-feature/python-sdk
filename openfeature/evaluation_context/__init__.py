@@ -10,24 +10,23 @@ from openfeature.exception import GeneralError
 __all__ = ["EvaluationContext", "get_evaluation_context", "set_evaluation_context"]
 
 # https://openfeature.dev/specification/sections/evaluation-context#requirement-312
-EvaluationContextAttributes = typing.Mapping[
+EvaluationContextAttribute = typing.Union[
+    bool,
+    int,
+    float,
     str,
-    typing.Union[
-        bool,
-        int,
-        float,
-        str,
-        datetime,
-        Sequence["EvaluationContextAttributes"],
-        "EvaluationContextAttributes",
-    ],
+    datetime,
+    Sequence["EvaluationContextAttribute"],
+    typing.Mapping[str, "EvaluationContextAttribute"],
 ]
 
 
 @dataclass
 class EvaluationContext:
     targeting_key: typing.Optional[str] = None
-    attributes: EvaluationContextAttributes = field(default_factory=dict)
+    attributes: typing.Mapping[str, EvaluationContextAttribute] = field(
+        default_factory=dict
+    )
 
     def merge(self, ctx2: EvaluationContext) -> EvaluationContext:
         if not (self and ctx2):
