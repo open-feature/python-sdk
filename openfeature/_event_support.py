@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import threading
+import typing
 from collections import defaultdict
-from typing import TYPE_CHECKING
 
 from openfeature.event import (
     EventDetails,
@@ -12,7 +12,7 @@ from openfeature.event import (
 )
 from openfeature.provider import FeatureProvider, ProviderStatus
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from openfeature.client import OpenFeatureClient
 
 
