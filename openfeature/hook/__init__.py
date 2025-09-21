@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import typing
-from collections.abc import MutableMapping, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType, FlagValueType
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from openfeature.client import ClientMetadata
     from openfeature.provider.metadata import Metadata
 
@@ -77,10 +76,10 @@ HookHintValue = typing.Union[
     str,
     datetime,
     Sequence["HookHintValue"],
-    typing.Mapping[str, "HookHintValue"],
+    Mapping[str, "HookHintValue"],
 ]
 
-HookHints = typing.Mapping[str, HookHintValue]
+HookHints = Mapping[str, HookHintValue]
 
 
 class Hook:

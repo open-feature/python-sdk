@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -17,16 +17,14 @@ EvaluationContextAttribute = typing.Union[
     str,
     datetime,
     Sequence["EvaluationContextAttribute"],
-    typing.Mapping[str, "EvaluationContextAttribute"],
+    Mapping[str, "EvaluationContextAttribute"],
 ]
 
 
 @dataclass
 class EvaluationContext:
     targeting_key: typing.Optional[str] = None
-    attributes: typing.Mapping[str, EvaluationContextAttribute] = field(
-        default_factory=dict
-    )
+    attributes: Mapping[str, EvaluationContextAttribute] = field(default_factory=dict)
 
     def merge(self, ctx2: EvaluationContext) -> EvaluationContext:
         if not (self and ctx2):

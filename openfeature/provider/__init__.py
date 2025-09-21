@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 from abc import abstractmethod
-from collections.abc import Sequence
+from collections.abc import Callable, Mapping, Sequence
 from enum import Enum
 
 from openfeature.evaluation_context import EvaluationContext
@@ -29,9 +29,7 @@ class ProviderStatus(Enum):
 class FeatureProvider(typing.Protocol):  # pragma: no cover
     def attach(
         self,
-        on_emit: typing.Callable[
-            [FeatureProvider, ProviderEvent, ProviderEventDetails], None
-        ],
+        on_emit: Callable[[FeatureProvider, ProviderEvent, ProviderEventDetails], None],
     ) -> None: ...
 
     def detach(self) -> None: ...
@@ -104,22 +102,22 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[
-        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
     ]: ...
 
     async def resolve_object_details_async(
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[
-        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
     ]: ...
 
 
@@ -130,9 +128,7 @@ class AbstractProvider(FeatureProvider):
 
     def attach(
         self,
-        on_emit: typing.Callable[
-            [FeatureProvider, ProviderEvent, ProviderEventDetails], None
-        ],
+        on_emit: Callable[[FeatureProvider, ProviderEvent, ProviderEventDetails], None],
     ) -> None:
         self._on_emit = on_emit
 
@@ -226,11 +222,11 @@ class AbstractProvider(FeatureProvider):
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[
-        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
     ]:
         pass
 
@@ -238,11 +234,11 @@ class AbstractProvider(FeatureProvider):
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[
-        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
     ]:
         return self.resolve_object_details(flag_key, default_value, evaluation_context)
 
