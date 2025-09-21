@@ -1,5 +1,6 @@
 import inspect
 import time
+import types
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import MagicMock
@@ -242,7 +243,7 @@ def test_should_call_api_level_hooks(no_op_provider_client):
     api_hook.after.assert_called_once()
 
 
-# Requirement 1.7.5
+# Requirement 1.7.1, Requirement 1.7.3
 def test_should_define_a_provider_status_accessor(no_op_provider_client):
     # When
     status = no_op_provider_client.get_provider_status()
@@ -251,7 +252,23 @@ def test_should_define_a_provider_status_accessor(no_op_provider_client):
     assert status == ProviderStatus.READY
 
 
-# Requirement 1.7.6
+# Requirement 1.7.4
+def test_provider_should_return_error_status_if_failed():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+    client = get_client()
+
+    provider.emit_provider_error(ProviderEventDetails(error_code=ErrorCode.GENERAL))
+
+    # When
+    status = client.get_provider_status()
+
+    # Then
+    assert status == ProviderStatus.ERROR
+
+
+# Requirement 1.7.6, Requirement 1.7.8
 @pytest.mark.asyncio
 async def test_should_shortcircuit_if_provider_is_not_ready(
     no_op_provider_client, monkeypatch
@@ -281,7 +298,7 @@ async def test_should_shortcircuit_if_provider_is_not_ready(
     spy_hook.finally_after.assert_called_once()
 
 
-# Requirement 1.7.7
+# Requirement 1.7.5, Requirement 1.7.7
 @pytest.mark.asyncio
 async def test_should_shortcircuit_if_provider_is_in_irrecoverable_error_state(
     no_op_provider_client, monkeypatch
@@ -309,6 +326,27 @@ async def test_should_shortcircuit_if_provider_is_in_irrecoverable_error_state(
         assert flag_details.error_code == ErrorCode.PROVIDER_FATAL
     spy_hook.error.assert_called_once()
     spy_hook.finally_after.assert_called_once()
+
+
+# Requirement 1.7.9
+def test_provider_should_return_not_ready_status_after_shutdown(monkeypatch):
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+    client = get_client()
+
+    def _shutdown(self) -> None:
+        self._status = ProviderStatus.NOT_READY
+
+    monkeypatch.setattr(provider, "shutdown", types.MethodType(_shutdown, provider))
+
+    # When
+    api.shutdown()
+
+    status = client.get_provider_status()
+
+    # Then
+    assert status == ProviderStatus.NOT_READY
 
 
 @pytest.mark.asyncio
@@ -480,6 +518,34 @@ def test_provider_event_late_binding():
 
     # Then
     spy.provider_configuration_changed.assert_called_once_with(details)
+
+
+# Requirement 5.1.4, Requirement 5.1.5
+def test_provider_event_handler_exception():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+
+    spy = MagicMock()
+
+    client = get_client()
+    client.add_handler(ProviderEvent.PROVIDER_ERROR, spy.provider_error)
+
+    # When
+    provider.emit_provider_error(
+        ProviderEventDetails(error_code=ErrorCode.GENERAL, message="some_error")
+    )
+
+    # Then
+    spy.provider_error.assert_called_once_with(
+        EventDetails(
+            flags_changed=None,
+            message="some_error",
+            error_code=ErrorCode.GENERAL,
+            metadata={},
+            provider_name="No-op Provider",
+        )
+    )
 
 
 def test_client_handlers_thread_safety():
