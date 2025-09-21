@@ -31,7 +31,11 @@ def e2e():
     dest_dir = Path("tests/features")
 
     subprocess.run(["git", "submodule", "update", "--init", "--recursive"], check=True)
-    shutil.copytree(source_dir, dest_dir, dirs_exist_ok=True)
+
+    for file in source_dir.glob("*"):
+        if file.is_file():
+            shutil.copy(file, dest_dir)
+
     subprocess.run(["behave", "tests/features/"], check=True)
 
     for feature_file in dest_dir.glob("*.feature"):
