@@ -1,6 +1,6 @@
 import logging
 import typing
-from collections.abc import Awaitable, Sequence
+from collections.abc import Awaitable, Mapping, Sequence
 from dataclasses import dataclass
 from itertools import chain
 
@@ -345,11 +345,11 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]:
+    ) -> typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]:
         return self.get_object_details(
             flag_key,
             default_value,
@@ -361,11 +361,11 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]:
+    ) -> typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]:
         details = await self.get_object_details_async(
             flag_key,
             default_value,
@@ -378,12 +378,12 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails[
-        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
     ]:
         return self.evaluate_flag_details(
             FlagType.OBJECT,
@@ -397,12 +397,12 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
     ) -> FlagEvaluationDetails[
-        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
     ]:
         return await self.evaluate_flag_details_async(
             FlagType.OBJECT,
@@ -472,7 +472,7 @@ class OpenFeatureClient:
             )
         ]
         # after, error, finally: Provider, Invocation, Client, API
-        reversed_merged_hooks_and_context = merged_hooks_and_context[:]
+        reversed_merged_hooks_and_context = merged_hooks_and_context.copy()
         reversed_merged_hooks_and_context.reverse()
 
         return (
@@ -567,10 +567,10 @@ class OpenFeatureClient:
         self,
         flag_type: FlagType,
         flag_key: str,
-        default_value: typing.Mapping[str, "FlagValueType"],
+        default_value: Mapping[str, "FlagValueType"],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[typing.Mapping[str, "FlagValueType"]]: ...
+    ) -> FlagEvaluationDetails[Mapping[str, "FlagValueType"]]: ...
 
     async def evaluate_flag_details_async(
         self,
@@ -743,10 +743,10 @@ class OpenFeatureClient:
         self,
         flag_type: FlagType,
         flag_key: str,
-        default_value: typing.Mapping[str, "FlagValueType"],
+        default_value: Mapping[str, "FlagValueType"],
         evaluation_context: typing.Optional[EvaluationContext] = None,
         flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[typing.Mapping[str, "FlagValueType"]]: ...
+    ) -> FlagEvaluationDetails[Mapping[str, "FlagValueType"]]: ...
 
     def evaluate_flag_details(
         self,
@@ -874,9 +874,7 @@ class OpenFeatureClient:
         default_value: FlagValueType,
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagEvaluationDetails[FlagValueType]:
-        get_details_callables_async: typing.Mapping[
-            FlagType, ResolveDetailsCallableAsync
-        ] = {
+        get_details_callables_async: Mapping[FlagType, ResolveDetailsCallableAsync] = {
             FlagType.BOOLEAN: provider.resolve_boolean_details_async,
             FlagType.INTEGER: provider.resolve_integer_details_async,
             FlagType.FLOAT: provider.resolve_float_details_async,
@@ -931,7 +929,7 @@ class OpenFeatureClient:
         :return: a FlagEvaluationDetails object with the fully evaluated flag from a
         provider
         """
-        get_details_callables: typing.Mapping[FlagType, ResolveDetailsCallable] = {
+        get_details_callables: Mapping[FlagType, ResolveDetailsCallable] = {
             FlagType.BOOLEAN: provider.resolve_boolean_details,
             FlagType.INTEGER: provider.resolve_integer_details,
             FlagType.FLOAT: provider.resolve_float_details,
@@ -986,9 +984,9 @@ def _typecheck_flag_value(
         FlagType.FLOAT: float,
         FlagType.INTEGER: int,
     }
-    _type = type_map.get(flag_type)
-    if not _type:
+    py_type = type_map.get(flag_type)
+    if not py_type:
         return GeneralError(error_message="Unknown flag type")
-    if not isinstance(value, _type):
-        return TypeMismatchError(f"Expected type {_type} but got {type(value)}")
+    if not isinstance(value, py_type):
+        return TypeMismatchError(f"Expected type {py_type} but got {type(value)}")
     return None

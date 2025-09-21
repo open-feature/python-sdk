@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import typing
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable, Optional, Union
 
 from openfeature.exception import ErrorCode
 
@@ -18,19 +19,23 @@ class ProviderEvent(Enum):
 
 @dataclass
 class ProviderEventDetails:
-    flags_changed: Optional[list[str]] = None
-    message: Optional[str] = None
-    error_code: Optional[ErrorCode] = None
-    metadata: dict[str, Union[bool, str, int, float]] = field(default_factory=dict)
+    flags_changed: typing.Optional[list[str]] = None
+    message: typing.Optional[str] = None
+    error_code: typing.Optional[ErrorCode] = None
+    metadata: dict[str, typing.Union[bool, str, int, float]] = field(
+        default_factory=dict
+    )
 
 
 @dataclass
 class EventDetails(ProviderEventDetails):
     provider_name: str = ""
-    flags_changed: Optional[list[str]] = None
-    message: Optional[str] = None
-    error_code: Optional[ErrorCode] = None
-    metadata: dict[str, Union[bool, str, int, float]] = field(default_factory=dict)
+    flags_changed: typing.Optional[list[str]] = None
+    message: typing.Optional[str] = None
+    error_code: typing.Optional[ErrorCode] = None
+    metadata: dict[str, typing.Union[bool, str, int, float]] = field(
+        default_factory=dict
+    )
 
     @classmethod
     def from_provider_event_details(

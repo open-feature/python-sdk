@@ -86,6 +86,7 @@ select = [
     "FLY",
     "FURB",
     "I",
+    "ICN003",
     "LOG",
     "N",
     "PERF",
@@ -98,6 +99,7 @@ select = [
     "SIM",
     "T10",
     "T20",
+    "TID251",
     "UP",
     "W",
     "YTT",
@@ -116,6 +118,18 @@ max-statements = 30
 [tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.
 keep-runtime-typing = true
+
+[tool.ruff.lint.flake8-import-conventions]
+banned-from = ["typing"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"typing.Awaitable".msg = "Use collections.abc.Awaitable instead"
+"typing.Callable".msg = "Use collections.abc.Callable instead"
+"typing.Collection".msg = "Use collections.abc.Collection instead"
+"typing.Mapping".msg = "Use collections.abc.Mapping instead"
+"typing.Sequence".msg = "Use collections.abc.Sequence instead"
+"typing.MutableMapping".msg = "Use collections.abc.MutableMapping instead"
+"typing.MutableSequence".msg = "Use collections.abc.MutableSequence instead"
 
 [project.scripts]
 # workaround while UV doesn't support scripts directly in the pyproject.toml

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing
-from collections.abc import Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
@@ -36,9 +36,7 @@ class InMemoryFlag(typing.Generic[T_co]):
     flag_metadata: FlagMetadata = field(default_factory=dict)
     state: State = State.ENABLED
     context_evaluator: typing.Optional[
-        typing.Callable[
-            [InMemoryFlag[T_co], EvaluationContext], FlagResolutionDetails[T_co]
-        ]
+        Callable[[InMemoryFlag[T_co], EvaluationContext], FlagResolutionDetails[T_co]]
     ] = None
 
     def resolve(
@@ -142,11 +140,11 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[
-        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
     ]:
         return self._resolve(flag_key, default_value, evaluation_context)
 
@@ -154,11 +152,11 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[
-        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
     ]:
         return await self._resolve_async(flag_key, default_value, evaluation_context)
 
