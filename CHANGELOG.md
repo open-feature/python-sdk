@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.8.3](https://github.com/open-feature/python-sdk/compare/v0.8.2...v0.8.3) (2025-09-21)
+
+
+### 🐛 Bug Fixes
+
+* fix type hints of EvaluationContext and HookHints ([#535](https://github.com/open-feature/python-sdk/issues/535)) ([de37144](https://github.com/open-feature/python-sdk/commit/de371444b33b66ad0e6eb5c09224554c14aa5731))
+* invalid type alias for EvaluationContextAttributes ([#534](https://github.com/open-feature/python-sdk/issues/534)) ([0e0f018](https://github.com/open-feature/python-sdk/commit/0e0f018272bdf987b1e50a9190cd3b4585d3f9b1)), closes [#532](https://github.com/open-feature/python-sdk/issues/532)
+
+
+### ✨ New Features
+
+* add hook data ([#533](https://github.com/open-feature/python-sdk/issues/533)) ([92f5da4](https://github.com/open-feature/python-sdk/commit/92f5da492ebc75d28a353316d0f151f62bcd59b7))
+
+
+### 🧹 Chore
+
+* add missing stateless provider tests ([#531](https://github.com/open-feature/python-sdk/issues/531)) ([74409bf](https://github.com/open-feature/python-sdk/commit/74409bf06ced4a218ebc01fd83ea20e480b34a09))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.17.1 ([#528](https://github.com/open-feature/python-sdk/issues/528)) ([9d0cbe8](https://github.com/open-feature/python-sdk/commit/9d0cbe8d4af95218f41d4e2dcb8e419b9639c825))
+* remove shell flag usage in project scripts ([#538](https://github.com/open-feature/python-sdk/issues/538)) ([81a1d95](https://github.com/open-feature/python-sdk/commit/81a1d95e682f20d23ec03418fb8f5464cc747fdf))
+* replace deprecated typing aliases ([#537](https://github.com/open-feature/python-sdk/issues/537)) ([837fef9](https://github.com/open-feature/python-sdk/commit/837fef943e9585640975258ccf0d095faacf740b))
+* support Python 3.14 ([#530](https://github.com/open-feature/python-sdk/issues/530)) ([32fdec1](https://github.com/open-feature/python-sdk/commit/32fdec178122d0838e8e776ba30f2dd722b21233))
+* update mypy and ruff ([#536](https://github.com/open-feature/python-sdk/issues/536)) ([b418cb0](https://github.com/open-feature/python-sdk/commit/b418cb0e331fb1ce453eb29191cc899bd347a6dd))
+
 ## [0.8.2](https://github.com/open-feature/python-sdk/compare/v0.8.1...v0.8.2) (2025-07-30)
 
 
