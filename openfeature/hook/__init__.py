@@ -1,21 +1,21 @@
 from __future__ import annotations
 
 import typing
-from collections.abc import Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType, FlagValueType
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from openfeature.client import ClientMetadata
     from openfeature.provider.metadata import Metadata
 
 __all__ = [
     "Hook",
     "HookContext",
+    "HookData",
     "HookHints",
     "HookType",
     "add_hooks",
@@ -26,6 +26,10 @@ __all__ = [
 _hooks: list[Hook] = []
 
 
+# https://openfeature.dev/specification/sections/hooks/#requirement-461
+HookData = MutableMapping[str, typing.Any]
+
+
 class HookType(Enum):
     BEFORE = "before"
     AFTER = "after"
@@ -34,7 +38,7 @@ class HookType(Enum):
 
 
 class HookContext:
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         flag_key: str,
         flag_type: FlagType,
@@ -42,6 +46,7 @@ class HookContext:
         evaluation_context: EvaluationContext,
         client_metadata: typing.Optional[ClientMetadata] = None,
         provider_metadata: typing.Optional[Metadata] = None,
+        hook_data: typing.Optional[HookData] = None,
     ):
         self.flag_key = flag_key
         self.flag_type = flag_type
@@ -49,6 +54,7 @@ class HookContext:
         self.evaluation_context = evaluation_context
         self.client_metadata = client_metadata
         self.provider_metadata = provider_metadata
+        self.hook_data = hook_data or {}
 
     def __setattr__(self, key: str, value: typing.Any) -> None:
         if hasattr(self, key) and key in (
@@ -63,18 +69,17 @@ class HookContext:
 
 
 # https://openfeature.dev/specification/sections/hooks/#requirement-421
-HookHints = typing.Mapping[
+HookHintValue = typing.Union[
+    bool,
+    int,
+    float,
     str,
-    typing.Union[
-        bool,
-        int,
-        float,
-        str,
-        datetime,
-        Sequence["HookHints"],
-        typing.Mapping[str, "HookHints"],
-    ],
+    datetime,
+    Sequence["HookHintValue"],
+    Mapping[str, "HookHintValue"],
 ]
+
+HookHints = Mapping[str, HookHintValue]
 
 
 class Hook:

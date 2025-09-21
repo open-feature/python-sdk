@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.provider import AbstractProvider
@@ -75,11 +75,11 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: typing.Union[
-            Sequence[FlagValueType], typing.Mapping[str, FlagValueType]
+            Sequence[FlagValueType], Mapping[str, FlagValueType]
         ],
         evaluation_context: typing.Optional[EvaluationContext] = None,
     ) -> FlagResolutionDetails[
-        typing.Union[Sequence[FlagValueType], typing.Mapping[str, FlagValueType]]
+        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
     ]:
         return FlagResolutionDetails(
             value=default_value,

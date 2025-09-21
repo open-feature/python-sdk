@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
@@ -42,14 +42,14 @@ class Reason(StrEnum):
     UNKNOWN = "UNKNOWN"
 
 
-FlagMetadata = typing.Mapping[str, typing.Union[bool, int, float, str]]
+FlagMetadata = Mapping[str, typing.Union[bool, int, float, str]]
 FlagValueType = typing.Union[
     bool,
     int,
     float,
     str,
     Sequence["FlagValueType"],
-    typing.Mapping[str, "FlagValueType"],
+    Mapping[str, "FlagValueType"],
 ]
 
 T_co = typing.TypeVar("T_co", covariant=True)

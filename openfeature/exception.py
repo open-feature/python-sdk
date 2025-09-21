@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 
 from openfeature._backports.strenum import StrEnum
 
@@ -174,7 +174,7 @@ class ErrorCode(StrEnum):
     INVALID_CONTEXT = "INVALID_CONTEXT"
     GENERAL = "GENERAL"
 
-    __exceptions__: Mapping[str, typing.Callable[[str], OpenFeatureError]] = {
+    __exceptions__: Mapping[str, Callable[[str], OpenFeatureError]] = {
         PROVIDER_NOT_READY: ProviderNotReadyError,
         PROVIDER_FATAL: ProviderFatalError,
         FLAG_NOT_FOUND: FlagNotFoundError,
