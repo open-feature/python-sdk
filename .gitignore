@@ -38,6 +38,7 @@ coverage.xml
 .project
 .pydevproject
 .idea
+.cursor
 
 # Rope
 .ropeproject
