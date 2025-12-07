@@ -54,3 +54,7 @@ def test_evaluation_details_reason_should_be_a_string_when_set():
 
     # Then
     assert Reason.STATIC == flag_details.reason  # noqa: SIM300
+
+
+def test_reason_str():
+    assert str(Reason.DEFAULT) == "DEFAULT"
