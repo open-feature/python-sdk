@@ -11,4 +11,5 @@ else:
         Backport StrEnum for Python <3.11
         """
 
-        pass
+        def __str__(self) -> str:
+            return str(self.value)
