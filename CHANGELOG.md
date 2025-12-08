@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.8.4](https://github.com/open-feature/python-sdk/compare/v0.8.3...v0.8.4) (2025-12-08)
+
+
+### 🐛 Bug Fixes
+
+* mimic the behavior of stdlib StrEnum.__str__ in backport ([#552](https://github.com/open-feature/python-sdk/issues/552)) ([63db4d7](https://github.com/open-feature/python-sdk/commit/63db4d7f6cecbbf221d7870d18131456266c3253))
+
+
+### 🧹 Chore
+
+* **deps:** update actions/checkout action to v5 ([#539](https://github.com/open-feature/python-sdk/issues/539)) ([6aa54ba](https://github.com/open-feature/python-sdk/commit/6aa54ba42b08a27083551dc831f1177e03524174))
+* **deps:** update actions/checkout action to v6 ([#551](https://github.com/open-feature/python-sdk/issues/551)) ([8fdd784](https://github.com/open-feature/python-sdk/commit/8fdd784bac8a36ac517a30c8f180bacbb09a62e0))
+* **deps:** update amannn/action-semantic-pull-request action to v6 ([#541](https://github.com/open-feature/python-sdk/issues/541)) ([eea929d](https://github.com/open-feature/python-sdk/commit/eea929d62ee470f56629461aec5f8d9f717bcea4))
+* **deps:** update astral-sh/setup-uv action to v7 ([#546](https://github.com/open-feature/python-sdk/issues/546)) ([a9ee73a](https://github.com/open-feature/python-sdk/commit/a9ee73a670407bf23c150ae53112ac1dc037a75e))
+* **deps:** update astral-sh/setup-uv digest to d0cc045 ([#543](https://github.com/open-feature/python-sdk/issues/543)) ([22210e6](https://github.com/open-feature/python-sdk/commit/22210e69652384c0569117d50039045176d34d2a))
+* **deps:** update codecov/codecov-action action to v5.5.1 ([#544](https://github.com/open-feature/python-sdk/issues/544)) ([0d8369f](https://github.com/open-feature/python-sdk/commit/0d8369f8d35aaeb869f5fea4943568f6e86cd137))
+* **deps:** update github/codeql-action action to v4 ([#547](https://github.com/open-feature/python-sdk/issues/547)) ([d03223e](https://github.com/open-feature/python-sdk/commit/d03223e72af4c9d49473284877d3ccf3d2fdb8fe))
+* **deps:** update github/codeql-action digest to 64d10c1 ([#542](https://github.com/open-feature/python-sdk/issues/542)) ([95b5ea0](https://github.com/open-feature/python-sdk/commit/95b5ea04a22740a4733a68c16b2a6340adabb12d))
+* make the license field PEP639 compatible ([#548](https://github.com/open-feature/python-sdk/issues/548)) ([4d0779c](https://github.com/open-feature/python-sdk/commit/4d0779c56cc66d3fd9754a74f45c5c0a8e01c8ee))
+* remove year from copyright ([#550](https://github.com/open-feature/python-sdk/issues/550)) ([d537e5e](https://github.com/open-feature/python-sdk/commit/d537e5e2a3b1cb17b20b8cebc4a63920c59d1f4a))
+* update license copyright and add cursor to gitignore ([#549](https://github.com/open-feature/python-sdk/issues/549)) ([2138367](https://github.com/open-feature/python-sdk/commit/2138367be098740ea989ff49f800c5c5b748ff49))
+* upgrade uv and ruff ([#545](https://github.com/open-feature/python-sdk/issues/545)) ([63acac1](https://github.com/open-feature/python-sdk/commit/63acac1f544724b0aea23141769b03229f3c81d1))
+
 ## [0.8.3](https://github.com/open-feature/python-sdk/compare/v0.8.2...v0.8.3) (2025-09-21)
 
 
