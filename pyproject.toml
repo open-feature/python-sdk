@@ -33,7 +33,8 @@ dev = [
     "coverage[toml]>=6.5",
     "pytest",
     "pytest-asyncio",
-    "pre-commit"
+    "pre-commit",
+    "ty>=0.0.4,<0.1.0",
 ]
 
 [tool.uv]
@@ -43,19 +44,6 @@ required-version = "~=0.9.0"
 module-name = "openfeature"
 module-root = ""
 namespace = true
-
-[tool.mypy]
-files = "openfeature,tests/typechecking"
-
-python_version = "3.9" # should be identical to the minimum supported version
-namespace_packages = true
-explicit_package_bases = true
-local_partial_types = true # will become the new default from version 2
-allow_redefinition_new = true # will become the new default from version 2
-fixed_format_cache = true # new caching mechanism
-pretty = true
-strict = true
-disallow_any_generics = false
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
@@ -130,6 +118,18 @@ banned-from = ["typing"]
 "typing.Sequence".msg = "Use collections.abc.Sequence instead"
 "typing.MutableMapping".msg = "Use collections.abc.MutableMapping instead"
 "typing.MutableSequence".msg = "Use collections.abc.MutableSequence instead"
+
+[tool.ty.environment]
+python-version = "3.9"
+
+[tool.ty.src]
+include = [
+    "openfeature",
+    "tests/typechecking",
+]
+
+[tool.ty.rules]
+unused-ignore-comment = "error"
 
 [project.scripts]
 # workaround while UV doesn't support scripts directly in the pyproject.toml

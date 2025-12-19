@@ -76,15 +76,15 @@ EvaluationContext(
 # negative
 EvaluationContext(
     targeting_key="key",
-    attributes={"null": None},  # type: ignore[dict-item]
+    attributes={"null": None},  # ty: ignore[invalid-argument-type]
 )
 
 EvaluationContext(
     targeting_key="key",
-    attributes={"complex": -4.5j},  # type: ignore[dict-item]
+    attributes={"complex": -4.5j},  # ty: ignore[invalid-argument-type]
 )
 
 EvaluationContext(
     targeting_key="key",
-    attributes={42: 42},  # type: ignore[dict-item]
+    attributes={42: 42},  # ty: ignore[invalid-argument-type]
 )

@@ -17,7 +17,7 @@ class MappingProxyType(dict):
     `from types import MappingProxyType`
     """
 
-    def __hash__(self) -> int:  # type:ignore[override]
+    def __hash__(self) -> int:
         return id(self)
 
     def _immutable(self, *args: typing.Any, **kws: typing.Any) -> typing.NoReturn:

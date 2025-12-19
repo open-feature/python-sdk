@@ -893,7 +893,7 @@ class OpenFeatureClient:
 
         resolution = await get_details_callable(
             flag_key=flag_key,
-            default_value=default_value,
+            default_value=default_value,  # ty: ignore[invalid-argument-type]
             evaluation_context=evaluation_context,
         )
         if resolution.error_code:
@@ -949,7 +949,7 @@ class OpenFeatureClient:
 
         resolution = get_details_callable(
             flag_key=flag_key,
-            default_value=default_value,
+            default_value=default_value,  # ty: ignore[invalid-argument-type]
             evaluation_context=evaluation_context,
         )
         if resolution.error_code:
