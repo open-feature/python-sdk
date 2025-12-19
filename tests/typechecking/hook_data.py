@@ -31,4 +31,4 @@ class ExampleClass:
 class_hook_data: HookData = {"example": ExampleClass}
 
 # negative
-int_key_hook_data: HookData = {42: 42}  # type: ignore[dict-item]
+int_key_hook_data: HookData = {42: 42}  # ty: ignore[invalid-assignment]

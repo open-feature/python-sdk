@@ -53,8 +53,8 @@ dict_hook_hint: HookHints = {
 }
 
 # negative
-null_hook_hint: HookHints = {"null": None}  # type: ignore[dict-item]
+null_hook_hint: HookHints = {"null": None}  # ty: ignore[invalid-assignment]
 
-complex_hook_hint: HookHints = {"complex": -4.5j}  # type: ignore[dict-item]
+complex_hook_hint: HookHints = {"complex": -4.5j}  # ty: ignore[invalid-assignment]
 
-int_key_hook_hint: HookHints = {42: 42}  # type: ignore[dict-item]
+int_key_hook_hint: HookHints = {42: 42}  # ty: ignore[invalid-assignment]
