@@ -22,7 +22,7 @@ keywords = [
     "toggles",
 ]
 dependencies = []
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 [project.urls]
 Homepage = "https://github.com/open-feature/python-sdk"
@@ -47,7 +47,7 @@ namespace = true
 [tool.mypy]
 files = "openfeature,tests/typechecking"
 
-python_version = "3.9" # should be identical to the minimum supported version
+python_version = "3.10" # should be identical to the minimum supported version
 namespace_packages = true
 explicit_package_bases = true
 local_partial_types = true # will become the new default from version 2
