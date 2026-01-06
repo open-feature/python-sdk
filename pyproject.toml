@@ -73,7 +73,7 @@ exclude = [
     "__pycache__",
     "venv",
 ]
-target-version = "py39"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = [
