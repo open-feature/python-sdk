@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -9,7 +10,7 @@ from openfeature.exception import GeneralError
 __all__ = ["EvaluationContext", "get_evaluation_context", "set_evaluation_context"]
 
 # https://openfeature.dev/specification/sections/evaluation-context#requirement-312
-EvaluationContextAttribute = (
+EvaluationContextAttribute: typing.TypeAlias = (
     bool
     | int
     | float

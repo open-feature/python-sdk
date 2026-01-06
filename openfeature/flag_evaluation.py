@@ -43,7 +43,7 @@ class Reason(StrEnum):
 
 
 FlagMetadata = Mapping[str, bool | int | float | str]
-FlagValueType = (
+FlagValueType: typing.TypeAlias = (
     bool
     | int
     | float

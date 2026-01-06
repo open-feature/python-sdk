@@ -69,7 +69,7 @@ class HookContext:
 
 
 # https://openfeature.dev/specification/sections/hooks/#requirement-421
-HookHintValue = (
+HookHintValue: typing.TypeAlias = (
     bool
     | int
     | float
