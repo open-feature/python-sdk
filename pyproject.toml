@@ -71,6 +71,7 @@ exclude = [
     ".git",
     ".venv",
     "__pycache__",
+    "spec",
     "venv",
 ]
 target-version = "py310"
