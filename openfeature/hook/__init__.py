@@ -44,9 +44,9 @@ class HookContext:
         flag_type: FlagType,
         default_value: FlagValueType,
         evaluation_context: EvaluationContext,
-        client_metadata: typing.Optional[ClientMetadata] = None,
-        provider_metadata: typing.Optional[Metadata] = None,
-        hook_data: typing.Optional[HookData] = None,
+        client_metadata: ClientMetadata | None = None,
+        provider_metadata: Metadata | None = None,
+        hook_data: HookData | None = None,
     ):
         self.flag_key = flag_key
         self.flag_type = flag_type
@@ -85,7 +85,7 @@ HookHints = Mapping[str, HookHintValue]
 class Hook:
     def before(
         self, hook_context: HookContext, hints: HookHints
-    ) -> typing.Optional[EvaluationContext]:
+    ) -> EvaluationContext | None:
         """
         Runs before flag is resolved.
 

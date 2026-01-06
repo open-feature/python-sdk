@@ -25,7 +25,7 @@ T_co = typing.TypeVar("T_co", covariant=True)
 @dataclass
 class EvaluationEvent(typing.Generic[T_co]):
     name: str
-    attributes: Mapping[TelemetryAttribute, typing.Union[str, T_co]]
+    attributes: Mapping[TelemetryAttribute, str | T_co]
     body: Mapping[TelemetryBodyField, T_co]
 
 

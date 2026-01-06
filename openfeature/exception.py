@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import typing
 from collections.abc import Callable, Mapping
 
 from openfeature._backports.strenum import StrEnum
@@ -26,7 +25,7 @@ class OpenFeatureError(Exception):
     """
 
     def __init__(
-        self, error_code: ErrorCode, error_message: typing.Optional[str] = None
+        self, error_code: ErrorCode, error_message: str | None = None
     ):
         """
         Constructor for the generic OpenFeatureError.
@@ -43,7 +42,7 @@ class ProviderNotReadyError(OpenFeatureError):
     This exception should be raised when the provider is not ready to be used.
     """
 
-    def __init__(self, error_message: typing.Optional[str] = None):
+    def __init__(self, error_message: str | None = None):
         """
         Constructor for the ProviderNotReadyError. The error code for this type of
         exception is ErrorCode.PROVIDER_NOT_READY.
@@ -58,7 +57,7 @@ class ProviderFatalError(OpenFeatureError):
     This exception should be raised when the provider encounters a fatal error.
     """
 
-    def __init__(self, error_message: typing.Optional[str] = None):
+    def __init__(self, error_message: str | None = None):
         """
         Constructor for the ProviderFatalError. The error code for this type of
         exception is ErrorCode.PROVIDER_FATAL.
@@ -74,7 +73,7 @@ class FlagNotFoundError(OpenFeatureError):
     key provided by the user.
     """
 
-    def __init__(self, error_message: typing.Optional[str] = None):
+    def __init__(self, error_message: str | None = None):
         """
         Constructor for the FlagNotFoundError.  The error code for
         this type of exception is ErrorCode.FLAG_NOT_FOUND.
@@ -90,7 +89,7 @@ class GeneralError(OpenFeatureError):
     feature python sdk.
     """
 
-    def __init__(self, error_message: typing.Optional[str] = None):
+    def __init__(self, error_message: str | None = None):
         """
         Constructor for the GeneralError.  The error code for this type of exception
         is ErrorCode.GENERAL.
@@ -106,7 +105,7 @@ class ParseError(OpenFeatureError):
     be parsed into a FlagEvaluationDetails object.
     """
 
-    def __init__(self, error_message: typing.Optional[str] = None):
+    def __init__(self, error_message: str | None = None):
         """
         Constructor for the ParseError. The error code for this type of exception
         is ErrorCode.PARSE_ERROR.
@@ -122,7 +121,7 @@ class TypeMismatchError(OpenFeatureError):
     not match the type requested by the user.
     """
 
-    def __init__(self, error_message: typing.Optional[str] = None):
+    def __init__(self, error_message: str | None = None):
         """
         Constructor for the TypeMismatchError. The error code for this type of
         exception is ErrorCode.TYPE_MISMATCH.
@@ -138,7 +137,7 @@ class TargetingKeyMissingError(OpenFeatureError):
     but one was not provided in the evaluation context.
     """
 
-    def __init__(self, error_message: typing.Optional[str] = None):
+    def __init__(self, error_message: str | None = None):
         """
         Constructor for the TargetingKeyMissingError. The error code for this type of
         exception is ErrorCode.TARGETING_KEY_MISSING.
@@ -154,7 +153,7 @@ class InvalidContextError(OpenFeatureError):
     requirements.
     """
 
-    def __init__(self, error_message: typing.Optional[str]):
+    def __init__(self, error_message: str | None):
         """
         Constructor for the InvalidContextError. The error code for this type of
         exception is ErrorCode.INVALID_CONTEXT.

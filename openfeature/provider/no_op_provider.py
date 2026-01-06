@@ -27,7 +27,7 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[bool]:
         return FlagResolutionDetails(
             value=default_value,
@@ -39,7 +39,7 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[str]:
         return FlagResolutionDetails(
             value=default_value,
@@ -51,7 +51,7 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[int]:
         return FlagResolutionDetails(
             value=default_value,
@@ -63,7 +63,7 @@ class NoOpProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[float]:
         return FlagResolutionDetails(
             value=default_value,
@@ -74,12 +74,10 @@ class NoOpProvider(AbstractProvider):
     def resolve_object_details(
         self,
         flag_key: str,
-        default_value: typing.Union[
-            Sequence[FlagValueType], Mapping[str, FlagValueType]
-        ],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[
-        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
+        Sequence[FlagValueType] | Mapping[str, FlagValueType]
     ]:
         return FlagResolutionDetails(
             value=default_value,

@@ -13,7 +13,7 @@ def error_hooks(
     flag_type: FlagType,
     exception: Exception,
     hooks_and_context: list[tuple[Hook, HookContext]],
-    hints: typing.Optional[HookHints] = None,
+    hints: HookHints | None = None,
 ) -> None:
     kwargs = {"exception": exception, "hints": hints}
     _execute_hooks(
@@ -28,7 +28,7 @@ def after_all_hooks(
     flag_type: FlagType,
     details: FlagEvaluationDetails[typing.Any],
     hooks_and_context: list[tuple[Hook, HookContext]],
-    hints: typing.Optional[HookHints] = None,
+    hints: HookHints | None = None,
 ) -> None:
     kwargs = {"details": details, "hints": hints}
     _execute_hooks(
@@ -43,7 +43,7 @@ def after_hooks(
     flag_type: FlagType,
     details: FlagEvaluationDetails[typing.Any],
     hooks_and_context: list[tuple[Hook, HookContext]],
-    hints: typing.Optional[HookHints] = None,
+    hints: HookHints | None = None,
 ) -> None:
     kwargs = {"details": details, "hints": hints}
     _execute_hooks_unchecked(
@@ -57,7 +57,7 @@ def after_hooks(
 def before_hooks(
     flag_type: FlagType,
     hooks_and_context: list[tuple[Hook, HookContext]],
-    hints: typing.Optional[HookHints] = None,
+    hints: HookHints | None = None,
 ) -> EvaluationContext:
     kwargs = {"hints": hints}
     executed_hooks = _execute_hooks_unchecked(
@@ -79,7 +79,7 @@ def _execute_hooks(
     hooks_and_context: list[tuple[Hook, HookContext]],
     hook_method: HookType,
     **kwargs: typing.Any,
-) -> list[typing.Optional[EvaluationContext]]:
+) -> list[EvaluationContext | None]:
     """
     Run multiple hooks of any hook type. All of these hooks will be run through an
     exception check.
@@ -102,7 +102,7 @@ def _execute_hooks_unchecked(
     hooks_and_context: list[tuple[Hook, HookContext]],
     hook_method: HookType,
     **kwargs: typing.Any,
-) -> list[typing.Optional[EvaluationContext]]:
+) -> list[EvaluationContext | None]:
     """
     Execute a single hook without checking whether an exception is thrown. This is
     used in the before and after hooks since any exception will be caught in the
@@ -123,7 +123,7 @@ def _execute_hooks_unchecked(
 
 def _execute_hook_checked(
     hook: Hook, hook_method: HookType, **kwargs: typing.Any
-) -> typing.Optional[EvaluationContext]:
+) -> EvaluationContext | None:
     """
     Try and run a single hook and catch any exception thrown. This is used in the
     after all and error hooks since any error thrown at this point needs to be caught.
@@ -135,7 +135,7 @@ def _execute_hook_checked(
     """
     try:
         return typing.cast(
-            "typing.Optional[EvaluationContext]",
+            "EvaluationContext | None",
             getattr(hook, hook_method.value)(**kwargs),
         )
     except Exception:  # pragma: no cover

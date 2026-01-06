@@ -35,12 +35,10 @@ class InMemoryFlag(typing.Generic[T_co]):
     variants: dict[str, T_co]
     flag_metadata: FlagMetadata = field(default_factory=dict)
     state: State = State.ENABLED
-    context_evaluator: typing.Optional[
-        Callable[[InMemoryFlag[T_co], EvaluationContext], FlagResolutionDetails[T_co]]
-    ] = None
+    context_evaluator: Callable[[InMemoryFlag[T_co], EvaluationContext], FlagResolutionDetails[T_co]] | None = None
 
     def resolve(
-        self, evaluation_context: typing.Optional[EvaluationContext]
+        self, evaluation_context: EvaluationContext | None
     ) -> FlagResolutionDetails[T_co]:
         if self.context_evaluator:
             return self.context_evaluator(
@@ -76,7 +74,7 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[bool]:
         return self._resolve(flag_key, default_value, evaluation_context)
 
@@ -84,7 +82,7 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[bool]:
         return await self._resolve_async(flag_key, default_value, evaluation_context)
 
@@ -92,7 +90,7 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[str]:
         return self._resolve(flag_key, default_value, evaluation_context)
 
@@ -100,7 +98,7 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[str]:
         return await self._resolve_async(flag_key, default_value, evaluation_context)
 
@@ -108,7 +106,7 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[int]:
         return self._resolve(flag_key, default_value, evaluation_context)
 
@@ -116,7 +114,7 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[int]:
         return await self._resolve_async(flag_key, default_value, evaluation_context)
 
@@ -124,7 +122,7 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[float]:
         return self._resolve(flag_key, default_value, evaluation_context)
 
@@ -132,31 +130,27 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[float]:
         return await self._resolve_async(flag_key, default_value, evaluation_context)
 
     def resolve_object_details(
         self,
         flag_key: str,
-        default_value: typing.Union[
-            Sequence[FlagValueType], Mapping[str, FlagValueType]
-        ],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[
-        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
+        Sequence[FlagValueType] | Mapping[str, FlagValueType]
     ]:
         return self._resolve(flag_key, default_value, evaluation_context)
 
     async def resolve_object_details_async(
         self,
         flag_key: str,
-        default_value: typing.Union[
-            Sequence[FlagValueType], Mapping[str, FlagValueType]
-        ],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[
-        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
+        Sequence[FlagValueType] | Mapping[str, FlagValueType]
     ]:
         return await self._resolve_async(flag_key, default_value, evaluation_context)
 
@@ -164,7 +158,7 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: V,
-        evaluation_context: typing.Optional[EvaluationContext],
+        evaluation_context: EvaluationContext | None,
     ) -> FlagResolutionDetails[V]:
         flag = self._flags.get(flag_key)
         if flag is None:
@@ -180,6 +174,6 @@ class InMemoryProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: V,
-        evaluation_context: typing.Optional[EvaluationContext],
+        evaluation_context: EvaluationContext | None,
     ) -> FlagResolutionDetails[V]:
         return self._resolve(flag_key, default_value, evaluation_context)

@@ -1,4 +1,3 @@
-import typing
 
 from openfeature import _event_support
 from openfeature.client import OpenFeatureClient
@@ -40,13 +39,13 @@ __all__ = [
 
 
 def get_client(
-    domain: typing.Optional[str] = None, version: typing.Optional[str] = None
+    domain: str | None = None, version: str | None = None
 ) -> OpenFeatureClient:
     return OpenFeatureClient(domain=domain, version=version)
 
 
 def set_provider(
-    provider: FeatureProvider, domain: typing.Optional[str] = None
+    provider: FeatureProvider, domain: str | None = None
 ) -> None:
     if domain is None:
         provider_registry.set_default_provider(provider)
@@ -59,7 +58,7 @@ def clear_providers() -> None:
     _event_support.clear()
 
 
-def get_provider_metadata(domain: typing.Optional[str] = None) -> Metadata:
+def get_provider_metadata(domain: str | None = None) -> Metadata:
     return provider_registry.get_provider(domain).get_metadata()
 
 

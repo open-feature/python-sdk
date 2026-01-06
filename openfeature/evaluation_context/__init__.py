@@ -23,7 +23,7 @@ EvaluationContextAttribute = typing.Union[
 
 @dataclass
 class EvaluationContext:
-    targeting_key: typing.Optional[str] = None
+    targeting_key: str | None = None
     attributes: Mapping[str, EvaluationContextAttribute] = field(default_factory=dict)
 
     def merge(self, ctx2: EvaluationContext) -> EvaluationContext:
