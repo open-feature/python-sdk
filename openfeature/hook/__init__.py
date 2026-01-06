@@ -69,13 +69,15 @@ class HookContext:
 
 
 # https://openfeature.dev/specification/sections/hooks/#requirement-421
-HookHintValue = bool \
-    | int \
-    | float \
-    | str \
-    | datetime \
-    | Sequence["HookHintValue"] \
+HookHintValue = (
+    bool
+    | int
+    | float
+    | str
+    | datetime
+    | Sequence["HookHintValue"]
     | Mapping[str, "HookHintValue"]
+)
 
 HookHints = Mapping[str, HookHintValue]
 
