@@ -21,9 +21,7 @@ class ProviderEventDetails:
     flags_changed: list[str] | None = None
     message: str | None = None
     error_code: ErrorCode | None = None
-    metadata: dict[str, bool | str | int | float] = field(
-        default_factory=dict
-    )
+    metadata: dict[str, bool | str | int | float] = field(default_factory=dict)
 
 
 @dataclass
@@ -32,9 +30,7 @@ class EventDetails(ProviderEventDetails):
     flags_changed: list[str] | None = None
     message: str | None = None
     error_code: ErrorCode | None = None
-    metadata: dict[str, bool | str | int | float] = field(
-        default_factory=dict
-    )
+    metadata: dict[str, bool | str | int | float] = field(default_factory=dict)
 
     @classmethod
     def from_provider_event_details(

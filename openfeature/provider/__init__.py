@@ -219,9 +219,7 @@ class AbstractProvider(FeatureProvider):
         flag_key: str,
         default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
-    ) -> FlagResolutionDetails[
-        Sequence[FlagValueType] | Mapping[str, FlagValueType]
-    ]:
+    ) -> FlagResolutionDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
         pass
 
     async def resolve_object_details_async(
@@ -229,9 +227,7 @@ class AbstractProvider(FeatureProvider):
         flag_key: str,
         default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
-    ) -> FlagResolutionDetails[
-        Sequence[FlagValueType] | Mapping[str, FlagValueType]
-    ]:
+    ) -> FlagResolutionDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
         return self.resolve_object_details(flag_key, default_value, evaluation_context)
 
     def emit_provider_ready(self, details: ProviderEventDetails) -> None:

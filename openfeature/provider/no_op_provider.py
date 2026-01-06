@@ -76,9 +76,7 @@ class NoOpProvider(AbstractProvider):
         flag_key: str,
         default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
-    ) -> FlagResolutionDetails[
-        Sequence[FlagValueType] | Mapping[str, FlagValueType]
-    ]:
+    ) -> FlagResolutionDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
         return FlagResolutionDetails(
             value=default_value,
             reason=Reason.DEFAULT,

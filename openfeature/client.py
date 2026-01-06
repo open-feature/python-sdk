@@ -370,9 +370,7 @@ class OpenFeatureClient:
         default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
         flag_evaluation_options: FlagEvaluationOptions | None = None,
-    ) -> FlagEvaluationDetails[
-        Sequence[FlagValueType] | Mapping[str, FlagValueType]
-    ]:
+    ) -> FlagEvaluationDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
         return self.evaluate_flag_details(
             FlagType.OBJECT,
             flag_key,
@@ -387,9 +385,7 @@ class OpenFeatureClient:
         default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
         flag_evaluation_options: FlagEvaluationOptions | None = None,
-    ) -> FlagEvaluationDetails[
-        Sequence[FlagValueType] | Mapping[str, FlagValueType]
-    ]:
+    ) -> FlagEvaluationDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
         return await self.evaluate_flag_details_async(
             FlagType.OBJECT,
             flag_key,

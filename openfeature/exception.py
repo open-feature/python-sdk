@@ -24,9 +24,7 @@ class OpenFeatureError(Exception):
     the more specific exceptions extending this one should be used.
     """
 
-    def __init__(
-        self, error_code: ErrorCode, error_message: str | None = None
-    ):
+    def __init__(self, error_code: ErrorCode, error_message: str | None = None):
         """
         Constructor for the generic OpenFeatureError.
         @param error_message: an optional string message representing why the

@@ -44,12 +44,7 @@ class Reason(StrEnum):
 
 FlagMetadata = Mapping[str, bool | int | float | str]
 FlagValueType: typing.TypeAlias = (
-    bool
-    | int
-    | float
-    | str
-    | Sequence["FlagValueType"]
-    | Mapping[str, "FlagValueType"]
+    bool | int | float | str | Sequence["FlagValueType"] | Mapping[str, "FlagValueType"]
 )
 
 T_co = typing.TypeVar("T_co", covariant=True)

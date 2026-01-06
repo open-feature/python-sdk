@@ -1,4 +1,3 @@
-
 from openfeature import _event_support
 from openfeature.client import OpenFeatureClient
 from openfeature.evaluation_context import (
@@ -44,9 +43,7 @@ def get_client(
     return OpenFeatureClient(domain=domain, version=version)
 
 
-def set_provider(
-    provider: FeatureProvider, domain: str | None = None
-) -> None:
+def set_provider(provider: FeatureProvider, domain: str | None = None) -> None:
     if domain is None:
         provider_registry.set_default_provider(provider)
     else:

@@ -1,4 +1,3 @@
-
 import pytest
 
 from openfeature.api import get_client, set_provider

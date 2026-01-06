@@ -35,7 +35,10 @@ class InMemoryFlag(typing.Generic[T_co]):
     variants: dict[str, T_co]
     flag_metadata: FlagMetadata = field(default_factory=dict)
     state: State = State.ENABLED
-    context_evaluator: Callable[[InMemoryFlag[T_co], EvaluationContext], FlagResolutionDetails[T_co]] | None = None
+    context_evaluator: (
+        Callable[[InMemoryFlag[T_co], EvaluationContext], FlagResolutionDetails[T_co]]
+        | None
+    ) = None
 
     def resolve(
         self, evaluation_context: EvaluationContext | None
@@ -139,9 +142,7 @@ class InMemoryProvider(AbstractProvider):
         flag_key: str,
         default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
-    ) -> FlagResolutionDetails[
-        Sequence[FlagValueType] | Mapping[str, FlagValueType]
-    ]:
+    ) -> FlagResolutionDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
         return self._resolve(flag_key, default_value, evaluation_context)
 
     async def resolve_object_details_async(
@@ -149,9 +150,7 @@ class InMemoryProvider(AbstractProvider):
         flag_key: str,
         default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
-    ) -> FlagResolutionDetails[
-        Sequence[FlagValueType] | Mapping[str, FlagValueType]
-    ]:
+    ) -> FlagResolutionDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
         return await self._resolve_async(flag_key, default_value, evaluation_context)
 
     def _resolve(
