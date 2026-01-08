@@ -1,5 +1,3 @@
-import typing
-
 from openfeature._event_support import run_handlers_for_provider
 from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
 from openfeature.event import (
@@ -36,7 +34,7 @@ class ProviderRegistry:
             self._initialize_provider(provider)
         providers[domain] = provider
 
-    def get_provider(self, domain: typing.Optional[str]) -> FeatureProvider:
+    def get_provider(self, domain: str | None) -> FeatureProvider:
         if domain is None:
             return self._default_provider
         return self._providers.get(domain, self._default_provider)

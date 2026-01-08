@@ -43,16 +43,10 @@ logger = logging.getLogger("openfeature")
 
 TypeMap = dict[
     FlagType,
-    typing.Union[
-        type[bool],
-        type[int],
-        type[float],
-        type[str],
-        tuple[type[dict], type[list]],
-    ],
+    type[bool] | type[int] | type[float] | type[str] | tuple[type[dict], type[list]],
 ]
 
-T = typing.TypeVar("T", bool, int, float, str, typing.Union[dict, list])
+T = typing.TypeVar("T", bool, int, float, str, dict | list)
 
 
 class ResolveDetailsCallable(typing.Protocol[T]):
@@ -60,7 +54,7 @@ class ResolveDetailsCallable(typing.Protocol[T]):
         self,
         flag_key: str,
         default_value: T,
-        evaluation_context: typing.Optional[EvaluationContext],
+        evaluation_context: EvaluationContext | None,
     ) -> FlagResolutionDetails[T]: ...
 
 
@@ -69,23 +63,23 @@ class ResolveDetailsCallableAsync(typing.Protocol[T]):
         self,
         flag_key: str,
         default_value: T,
-        evaluation_context: typing.Optional[EvaluationContext],
+        evaluation_context: EvaluationContext | None,
     ) -> Awaitable[FlagResolutionDetails[T]]: ...
 
 
 @dataclass
 class ClientMetadata:
-    name: typing.Optional[str] = None
-    domain: typing.Optional[str] = None
+    name: str | None = None
+    domain: str | None = None
 
 
 class OpenFeatureClient:
     def __init__(
         self,
-        domain: typing.Optional[str],
-        version: typing.Optional[str],
-        context: typing.Optional[EvaluationContext] = None,
-        hooks: typing.Optional[list[Hook]] = None,
+        domain: str | None,
+        version: str | None,
+        context: EvaluationContext | None = None,
+        hooks: list[Hook] | None = None,
     ) -> None:
         self.domain = domain
         self.version = version
@@ -109,8 +103,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> bool:
         return self.get_boolean_details(
             flag_key,
@@ -123,8 +117,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> bool:
         details = await self.get_boolean_details_async(
             flag_key,
@@ -138,8 +132,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[bool]:
         return self.evaluate_flag_details(
             FlagType.BOOLEAN,
@@ -153,8 +147,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[bool]:
         return await self.evaluate_flag_details_async(
             FlagType.BOOLEAN,
@@ -168,8 +162,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> str:
         return self.get_string_details(
             flag_key,
@@ -182,8 +176,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> str:
         details = await self.get_string_details_async(
             flag_key,
@@ -197,8 +191,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[str]:
         return self.evaluate_flag_details(
             FlagType.STRING,
@@ -212,8 +206,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[str]:
         return await self.evaluate_flag_details_async(
             FlagType.STRING,
@@ -227,8 +221,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> int:
         return self.get_integer_details(
             flag_key,
@@ -241,8 +235,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> int:
         details = await self.get_integer_details_async(
             flag_key,
@@ -256,8 +250,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[int]:
         return self.evaluate_flag_details(
             FlagType.INTEGER,
@@ -271,8 +265,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[int]:
         return await self.evaluate_flag_details_async(
             FlagType.INTEGER,
@@ -286,8 +280,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> float:
         return self.get_float_details(
             flag_key,
@@ -300,8 +294,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> float:
         details = await self.get_float_details_async(
             flag_key,
@@ -315,8 +309,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[float]:
         return self.evaluate_flag_details(
             FlagType.FLOAT,
@@ -330,8 +324,8 @@ class OpenFeatureClient:
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[float]:
         return await self.evaluate_flag_details_async(
             FlagType.FLOAT,
@@ -344,12 +338,10 @@ class OpenFeatureClient:
     def get_object_value(
         self,
         flag_key: str,
-        default_value: typing.Union[
-            Sequence[FlagValueType], Mapping[str, FlagValueType]
-        ],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]:
+        default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
+    ) -> Sequence[FlagValueType] | Mapping[str, FlagValueType]:
         return self.get_object_details(
             flag_key,
             default_value,
@@ -360,12 +352,10 @@ class OpenFeatureClient:
     async def get_object_value_async(
         self,
         flag_key: str,
-        default_value: typing.Union[
-            Sequence[FlagValueType], Mapping[str, FlagValueType]
-        ],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]:
+        default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
+    ) -> Sequence[FlagValueType] | Mapping[str, FlagValueType]:
         details = await self.get_object_details_async(
             flag_key,
             default_value,
@@ -377,14 +367,10 @@ class OpenFeatureClient:
     def get_object_details(
         self,
         flag_key: str,
-        default_value: typing.Union[
-            Sequence[FlagValueType], Mapping[str, FlagValueType]
-        ],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[
-        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
-    ]:
+        default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
+    ) -> FlagEvaluationDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
         return self.evaluate_flag_details(
             FlagType.OBJECT,
             flag_key,
@@ -396,14 +382,10 @@ class OpenFeatureClient:
     async def get_object_details_async(
         self,
         flag_key: str,
-        default_value: typing.Union[
-            Sequence[FlagValueType], Mapping[str, FlagValueType]
-        ],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
-    ) -> FlagEvaluationDetails[
-        typing.Union[Sequence[FlagValueType], Mapping[str, FlagValueType]]
-    ]:
+        default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
+    ) -> FlagEvaluationDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
         return await self.evaluate_flag_details_async(
             FlagType.OBJECT,
             flag_key,
@@ -417,8 +399,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: FlagValueType,
-        evaluation_context: typing.Optional[EvaluationContext],
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions],
+        evaluation_context: EvaluationContext | None,
+        flag_evaluation_options: FlagEvaluationOptions | None,
     ) -> tuple[
         FeatureProvider,
         HookHints,
@@ -485,7 +467,7 @@ class OpenFeatureClient:
 
     def _assert_provider_status(
         self,
-    ) -> typing.Optional[OpenFeatureError]:
+    ) -> OpenFeatureError | None:
         status = self.get_provider_status()
         if status == ProviderStatus.NOT_READY:
             return ProviderNotReadyError()
@@ -518,8 +500,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[bool]: ...
 
     @typing.overload
@@ -528,8 +510,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[int]: ...
 
     @typing.overload
@@ -538,8 +520,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[float]: ...
 
     @typing.overload
@@ -548,8 +530,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[str]: ...
 
     @typing.overload
@@ -558,8 +540,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: Sequence["FlagValueType"],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[Sequence["FlagValueType"]]: ...
 
     @typing.overload
@@ -568,8 +550,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: Mapping[str, "FlagValueType"],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[Mapping[str, "FlagValueType"]]: ...
 
     async def evaluate_flag_details_async(
@@ -577,8 +559,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: FlagValueType,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[FlagValueType]:
         """
         Evaluate the flag requested by the user from the clients provider.
@@ -694,8 +676,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[bool]: ...
 
     @typing.overload
@@ -704,8 +686,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[int]: ...
 
     @typing.overload
@@ -714,8 +696,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[float]: ...
 
     @typing.overload
@@ -724,8 +706,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[str]: ...
 
     @typing.overload
@@ -734,8 +716,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: Sequence["FlagValueType"],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[Sequence["FlagValueType"]]: ...
 
     @typing.overload
@@ -744,8 +726,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: Mapping[str, "FlagValueType"],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[Mapping[str, "FlagValueType"]]: ...
 
     def evaluate_flag_details(
@@ -753,8 +735,8 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: FlagValueType,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-        flag_evaluation_options: typing.Optional[FlagEvaluationOptions] = None,
+        evaluation_context: EvaluationContext | None = None,
+        flag_evaluation_options: FlagEvaluationOptions | None = None,
     ) -> FlagEvaluationDetails[FlagValueType]:
         """
         Evaluate the flag requested by the user from the clients provider.
@@ -872,7 +854,7 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: FlagValueType,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagEvaluationDetails[FlagValueType]:
         get_details_callables_async: Mapping[FlagType, ResolveDetailsCallableAsync] = {
             FlagType.BOOLEAN: provider.resolve_boolean_details_async,
@@ -917,7 +899,7 @@ class OpenFeatureClient:
         flag_type: FlagType,
         flag_key: str,
         default_value: FlagValueType,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagEvaluationDetails[FlagValueType]:
         """
         Encapsulated method to create a FlagEvaluationDetail from a specific provider.
@@ -976,7 +958,7 @@ class OpenFeatureClient:
 
 def _typecheck_flag_value(
     value: typing.Any, flag_type: FlagType
-) -> typing.Optional[OpenFeatureError]:
+) -> OpenFeatureError | None:
     type_map: TypeMap = {
         FlagType.BOOLEAN: bool,
         FlagType.STRING: str,

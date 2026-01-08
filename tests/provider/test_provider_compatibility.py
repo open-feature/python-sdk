@@ -1,5 +1,3 @@
-import typing
-
 import pytest
 
 from openfeature.api import get_client, set_provider
@@ -19,7 +17,7 @@ class SynchronousProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: bool,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[bool]:
         return FlagResolutionDetails(value=True)
 
@@ -27,7 +25,7 @@ class SynchronousProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: str,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[str]:
         return FlagResolutionDetails(value="string")
 
@@ -35,7 +33,7 @@ class SynchronousProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: int,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[int]:
         return FlagResolutionDetails(value=1)
 
@@ -43,16 +41,16 @@ class SynchronousProvider(AbstractProvider):
         self,
         flag_key: str,
         default_value: float,
-        evaluation_context: typing.Optional[EvaluationContext] = None,
+        evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[float]:
         return FlagResolutionDetails(value=10.0)
 
     def resolve_object_details(
         self,
         flag_key: str,
-        default_value: typing.Union[dict, list],
-        evaluation_context: typing.Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+        default_value: dict | list,
+        evaluation_context: EvaluationContext | None = None,
+    ) -> FlagResolutionDetails[dict | list]:
         return FlagResolutionDetails(value={"key": "value"})
 
 
@@ -92,7 +90,7 @@ async def test_sync_provider_can_be_extended_async():
             self,
             flag_key: str,
             default_value: bool,
-            evaluation_context: typing.Optional[EvaluationContext] = None,
+            evaluation_context: EvaluationContext | None = None,
         ) -> FlagResolutionDetails[bool]:
             return FlagResolutionDetails(value=False)
 
@@ -116,7 +114,7 @@ def test_sync_methods_enforced_for_async_providers():
             self,
             flag_key: str,
             default_value: bool,
-            evaluation_context: typing.Optional[EvaluationContext] = None,
+            evaluation_context: EvaluationContext | None = None,
         ) -> FlagResolutionDetails[bool]:
             return FlagResolutionDetails(value=True)
 
@@ -144,7 +142,7 @@ async def test_async_provider_not_implemented_exception_workaround():
             self,
             flag_key: str,
             default_value: bool,
-            evaluation_context: typing.Optional[EvaluationContext] = None,
+            evaluation_context: EvaluationContext | None = None,
         ) -> FlagResolutionDetails[bool]:
             return FlagResolutionDetails(value=True)
 
@@ -152,7 +150,7 @@ async def test_async_provider_not_implemented_exception_workaround():
             self,
             flag_key: str,
             default_value: bool,
-            evaluation_context: typing.Optional[EvaluationContext] = None,
+            evaluation_context: EvaluationContext | None = None,
         ) -> FlagResolutionDetails[bool]:
             raise NotImplementedError("Use the async method")
 
@@ -160,7 +158,7 @@ async def test_async_provider_not_implemented_exception_workaround():
             self,
             flag_key: str,
             default_value: str,
-            evaluation_context: typing.Optional[EvaluationContext] = None,
+            evaluation_context: EvaluationContext | None = None,
         ) -> FlagResolutionDetails[str]:
             raise NotImplementedError("Use the async method")
 
@@ -168,7 +166,7 @@ async def test_async_provider_not_implemented_exception_workaround():
             self,
             flag_key: str,
             default_value: int,
-            evaluation_context: typing.Optional[EvaluationContext] = None,
+            evaluation_context: EvaluationContext | None = None,
         ) -> FlagResolutionDetails[int]:
             raise NotImplementedError("Use the async method")
 
@@ -176,16 +174,16 @@ async def test_async_provider_not_implemented_exception_workaround():
             self,
             flag_key: str,
             default_value: float,
-            evaluation_context: typing.Optional[EvaluationContext] = None,
+            evaluation_context: EvaluationContext | None = None,
         ) -> FlagResolutionDetails[float]:
             raise NotImplementedError("Use the async method")
 
         def resolve_object_details(
             self,
             flag_key: str,
-            default_value: typing.Union[dict, list],
-            evaluation_context: typing.Optional[EvaluationContext] = None,
-        ) -> FlagResolutionDetails[typing.Union[dict, list]]:
+            default_value: dict | list,
+            evaluation_context: EvaluationContext | None = None,
+        ) -> FlagResolutionDetails[dict | list]:
             raise NotImplementedError("Use the async method")
 
     # When

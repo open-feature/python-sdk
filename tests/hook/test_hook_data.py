@@ -20,7 +20,7 @@ class HookWithData(Hook):
 
     def before(
         self, hook_context: HookContext, hints: HookHints
-    ) -> typing.Optional[EvaluationContext]:
+    ) -> EvaluationContext | None:
         hook_context.hook_data = hook_context.hook_data | self.data_before
         return None
 

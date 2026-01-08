@@ -42,15 +42,10 @@ class Reason(StrEnum):
     UNKNOWN = "UNKNOWN"
 
 
-FlagMetadata = Mapping[str, typing.Union[bool, int, float, str]]
-FlagValueType = typing.Union[
-    bool,
-    int,
-    float,
-    str,
-    Sequence["FlagValueType"],
-    Mapping[str, "FlagValueType"],
-]
+FlagMetadata = Mapping[str, bool | int | float | str]
+FlagValueType: typing.TypeAlias = (
+    bool | int | float | str | Sequence["FlagValueType"] | Mapping[str, "FlagValueType"]
+)
 
 T_co = typing.TypeVar("T_co", covariant=True)
 
@@ -59,13 +54,13 @@ T_co = typing.TypeVar("T_co", covariant=True)
 class FlagEvaluationDetails(typing.Generic[T_co]):
     flag_key: str
     value: T_co
-    variant: typing.Optional[str] = None
+    variant: str | None = None
     flag_metadata: FlagMetadata = field(default_factory=dict)
-    reason: typing.Optional[typing.Union[str, Reason]] = None
-    error_code: typing.Optional[ErrorCode] = None
-    error_message: typing.Optional[str] = None
+    reason: str | Reason | None = None
+    error_code: ErrorCode | None = None
+    error_message: str | None = None
 
-    def get_exception(self) -> typing.Optional[OpenFeatureError]:
+    def get_exception(self) -> OpenFeatureError | None:
         if self.error_code:
             return ErrorCode.to_exception(self.error_code, self.error_message or "")
         return None
@@ -83,10 +78,10 @@ U_co = typing.TypeVar("U_co", covariant=True)
 @dataclass
 class FlagResolutionDetails(typing.Generic[U_co]):
     value: U_co
-    error_code: typing.Optional[ErrorCode] = None
-    error_message: typing.Optional[str] = None
-    reason: typing.Optional[typing.Union[str, Reason]] = None
-    variant: typing.Optional[str] = None
+    error_code: ErrorCode | None = None
+    error_message: str | None = None
+    reason: str | Reason | None = None
+    variant: str | None = None
     flag_metadata: FlagMetadata = field(default_factory=dict)
 
     def raise_for_error(self) -> None:

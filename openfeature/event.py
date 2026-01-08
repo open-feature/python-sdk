@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import typing
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
@@ -19,23 +18,19 @@ class ProviderEvent(Enum):
 
 @dataclass
 class ProviderEventDetails:
-    flags_changed: typing.Optional[list[str]] = None
-    message: typing.Optional[str] = None
-    error_code: typing.Optional[ErrorCode] = None
-    metadata: dict[str, typing.Union[bool, str, int, float]] = field(
-        default_factory=dict
-    )
+    flags_changed: list[str] | None = None
+    message: str | None = None
+    error_code: ErrorCode | None = None
+    metadata: dict[str, bool | str | int | float] = field(default_factory=dict)
 
 
 @dataclass
 class EventDetails(ProviderEventDetails):
     provider_name: str = ""
-    flags_changed: typing.Optional[list[str]] = None
-    message: typing.Optional[str] = None
-    error_code: typing.Optional[ErrorCode] = None
-    metadata: dict[str, typing.Union[bool, str, int, float]] = field(
-        default_factory=dict
-    )
+    flags_changed: list[str] | None = None
+    message: str | None = None
+    error_code: ErrorCode | None = None
+    metadata: dict[str, bool | str | int | float] = field(default_factory=dict)
 
     @classmethod
     def from_provider_event_details(

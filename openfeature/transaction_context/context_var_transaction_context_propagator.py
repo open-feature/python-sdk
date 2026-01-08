@@ -1,4 +1,3 @@
-import typing
 from contextvars import ContextVar
 
 from openfeature.evaluation_context import EvaluationContext
@@ -8,8 +7,8 @@ from openfeature.transaction_context.transaction_context_propagator import (
 
 
 class ContextVarsTransactionContextPropagator(TransactionContextPropagator):
-    _transaction_context_var: ContextVar[typing.Optional[EvaluationContext]] = (
-        ContextVar("transaction_context", default=None)
+    _transaction_context_var: ContextVar[EvaluationContext | None] = ContextVar(
+        "transaction_context", default=None
     )
 
     def get_transaction_context(self) -> EvaluationContext:
