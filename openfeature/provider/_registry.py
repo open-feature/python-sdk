@@ -24,6 +24,8 @@ class ProviderRegistry:
     def set_provider(self, domain: str, provider: FeatureProvider) -> None:
         if provider is None:
             raise GeneralError(error_message="No provider")
+        if domain is None:
+            raise GeneralError(error_message="No domain")
         providers = self._providers
         if domain in providers:
             old_provider = providers[domain]
