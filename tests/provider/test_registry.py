@@ -116,3 +116,27 @@ def test_setting_default_provider_initializes_it():
     registry.set_default_provider(provider)
 
     provider.initialize.assert_called_once()
+
+
+def test_registering_provider_as_default_then_domain_only_initializes_once():
+    """Test that registering the same provider as default and for a domain only initializes it once."""
+
+    registry = ProviderRegistry()
+    provider = Mock()
+
+    registry.set_default_provider(provider)
+    registry.set_provider("domain", provider)
+
+    provider.initialize.assert_called_once()
+
+
+def test_registering_provider_as_domain_then_default_only_initializes_once():
+    """Test that registering the same provider as default and for a domain only initializes it once."""
+
+    registry = ProviderRegistry()
+    provider = Mock()
+
+    registry.set_provider("domain", provider)
+    registry.set_default_provider(provider)
+
+    provider.initialize.assert_called_once()
