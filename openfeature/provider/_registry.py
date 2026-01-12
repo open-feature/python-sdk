@@ -102,7 +102,7 @@ class ProviderRegistry:
         try:
             if hasattr(provider, "shutdown"):
                 provider.shutdown()
-            self._provider_status[provider] = ProviderStatus.NOT_READY
+            del self._provider_status[provider]
         except Exception as err:
             self.dispatch_event(
                 provider,
