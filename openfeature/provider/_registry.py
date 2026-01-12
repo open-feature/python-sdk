@@ -30,7 +30,10 @@ class ProviderRegistry:
         if domain in providers:
             old_provider = providers[domain]
             del providers[domain]
-            if old_provider not in providers.values():
+            if (
+                old_provider not in providers.values()
+                and old_provider != self._default_provider
+            ):
                 self._shutdown_provider(old_provider)
         if provider not in providers.values() and provider != self._default_provider:
             self._initialize_provider(provider)
@@ -44,7 +47,10 @@ class ProviderRegistry:
     def set_default_provider(self, provider: FeatureProvider) -> None:
         if provider is None:
             raise GeneralError(error_message="No provider")
-        if self._default_provider:
+        if (
+            self._default_provider
+            and self._default_provider not in self._providers.values()
+        ):
             self._shutdown_provider(self._default_provider)
         self._default_provider = provider
 

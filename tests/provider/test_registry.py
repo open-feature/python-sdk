@@ -140,3 +140,35 @@ def test_registering_provider_as_domain_then_default_only_initializes_once():
     registry.set_default_provider(provider)
 
     provider.initialize.assert_called_once()
+
+
+def test_replacing_provider_used_as_default_does_not_shutdown():
+    """Test that replacing a provider that is also the default does not shut it down twice."""
+
+    registry = ProviderRegistry()
+    provider1 = Mock()
+    provider2 = Mock()
+
+    registry.set_default_provider(provider1)
+    registry.set_provider("domain", provider1)
+
+    registry.set_provider("domain", provider2)
+
+    provider1.shutdown.assert_not_called()
+    provider2.shutdown.assert_not_called()
+
+
+def test_replacing_default_provider_used_as_domain_does_not_shutdown():
+    """Test that replacing a default provider that is also used for a domain does not shut it down twice."""
+
+    registry = ProviderRegistry()
+    provider1 = Mock()
+    provider2 = Mock()
+
+    registry.set_provider("domain", provider1)
+    registry.set_default_provider(provider1)
+
+    registry.set_default_provider(provider2)
+
+    provider1.shutdown.assert_not_called()
+    provider2.shutdown.assert_not_called()
