@@ -31,8 +31,8 @@ class ProviderRegistry:
             old_provider = providers[domain]
             del providers[domain]
             if (
-                old_provider != self._default_provider and
-                old_provider not in providers.values()
+                old_provider != self._default_provider
+                and old_provider not in providers.values()
             ):
                 self._shutdown_provider(old_provider)
         if provider != self._default_provider and provider not in providers.values():
