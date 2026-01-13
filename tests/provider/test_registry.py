@@ -1,5 +1,7 @@
 from unittest.mock import Mock
 
+import pytest
+
 from openfeature.exception import GeneralError
 from openfeature.provider._registry import ProviderRegistry
 from openfeature.provider.no_op_provider import NoOpProvider
@@ -15,27 +17,19 @@ def test_registry_serves_noop_as_default():
 def test_setting_provider_requires_domain():
     registry = ProviderRegistry()
 
-    try:
+    with pytest.raises(GeneralError) as exc_info:
         registry.set_provider(None, NoOpProvider())  # type: ignore[reportArgumentType]
-        raise AssertionError(
-            "Expected an exception when setting provider with None domain"
-        )
-    except GeneralError as e:
-        assert e.error_message == "No domain"
-    except Exception as e:
-        raise AssertionError("Expected GeneralError, got {type(e)}") from e
+
+    assert exc_info.value.error_message == "No domain"
 
 
 def test_setting_provider_requires_provider():
     registry = ProviderRegistry()
 
-    try:
+    with pytest.raises(GeneralError) as exc_info:
         registry.set_provider("domain", None)  # type: ignore[reportArgumentType]
-        raise AssertionError("Expected an exception when setting provider to None")
-    except GeneralError as e:
-        assert e.error_message == "No provider"
-    except Exception as e:
-        raise AssertionError("Expected GeneralError, got {type(e)}") from e
+
+    assert exc_info.value.error_message == "No provider"
 
 
 def test_can_register_provider_to_multiple_domains():
@@ -81,15 +75,10 @@ def test_registering_provider_for_first_time_initializes_it():
 def test_setting_default_provider_requires_provider():
     registry = ProviderRegistry()
 
-    try:
+    with pytest.raises(GeneralError) as exc_info:
         registry.set_default_provider(None)  # type: ignore[reportArgumentType]
-        raise AssertionError(
-            "Expected an exception when setting default provider to None"
-        )
-    except GeneralError as e:
-        assert e.error_message == "No provider"
-    except Exception as e:
-        raise AssertionError("Expected GeneralError, got {type(e)}") from e
+
+    assert exc_info.value.error_message == "No provider"
 
 
 def test_replacing_default_provider_shuts_down_old_one():
