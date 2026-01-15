@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.9.0](https://github.com/open-feature/python-sdk/compare/v0.8.4...v0.9.0) (2026-01-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove deprecated openfeature.provider.provider module ([#558](https://github.com/open-feature/python-sdk/issues/558))
+* Drop python 3.9 support ([#554](https://github.com/open-feature/python-sdk/issues/554))
+
+### 🐛 Bug Fixes
+
+* validate domain is present when calling `set_provider` on registry ([#561](https://github.com/open-feature/python-sdk/issues/561)) ([9fc6121](https://github.com/open-feature/python-sdk/commit/9fc612180a3ea8d26820394b329abd24804d2df4))
+
+
+### ✨ New Features
+
+* Drop python 3.9 support ([04106f5](https://github.com/open-feature/python-sdk/commit/04106f532d3a92d9dd70fd2160a07672ca4404f8))
+
+
+### 🧹 Chore
+
+* Drop python 3.9 support ([#554](https://github.com/open-feature/python-sdk/issues/554)) ([04106f5](https://github.com/open-feature/python-sdk/commit/04106f532d3a92d9dd70fd2160a07672ca4404f8))
+
+
+### 🔄 Refactoring
+
+* remove deprecated openfeature.provider.provider module ([#558](https://github.com/open-feature/python-sdk/issues/558)) ([7c27c7a](https://github.com/open-feature/python-sdk/commit/7c27c7ae58ab498fdc85ab508a76f7d5261f02f1))
+
 ## [0.8.4](https://github.com/open-feature/python-sdk/compare/v0.8.3...v0.8.4) (2025-12-08)
 
 
