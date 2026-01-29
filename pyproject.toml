@@ -31,6 +31,7 @@ Homepage = "https://github.com/open-feature/python-sdk"
 dev = [
     "behave",
     "coverage[toml]>=6.5",
+    "poethepoet>=0.40.0",
     "pytest>=9.0.0",
     "pytest-asyncio>=1.3.0",
     "pre-commit"
@@ -133,12 +134,44 @@ banned-from = ["typing"]
 "typing.MutableMapping".msg = "Use collections.abc.MutableMapping instead"
 "typing.MutableSequence".msg = "Use collections.abc.MutableSequence instead"
 
-[project.scripts]
-# workaround while UV doesn't support scripts directly in the pyproject.toml
-# see: https://github.com/astral-sh/uv/issues/5903
-test = "scripts.scripts:test"
-test-cov = "scripts.scripts:test_cov"
-cov-report = "scripts.scripts:cov_report"
-cov = "scripts.scripts:cov"
-e2e = "scripts.scripts:e2e"
-precommit = "scripts.scripts:precommit"
+[tool.poe]
+executor = "uv"
+
+[tool.poe.tasks]
+test = "pytest tests"
+test-cov = "coverage run -m pytest tests"
+cov-report = "coverage xml"
+cov = [
+    "test-cov",
+    "cov-report"
+]
+e2e = [
+    { cmd = "git submodule update --init --recursive" },
+    { cmd = "cp spec/specification/assets/gherkin/* tests/features/" },
+    { cmd = "behave tests/features/" },
+    { cmd = "rm tests/features/*.feature" },
+]
+pre-commit = "pre-commit run -a"
+
+[tool.poe.tasks.test-py310]
+cmd = "pytest tests"
+executor = { python = "3.10", isolated = true, frozen = true }
+
+[tool.poe.tasks.test-py311]
+cmd = "pytest tests"
+executor = { python = "3.11", isolated = true, frozen = true }
+
+[tool.poe.tasks.test-py312]
+cmd = "pytest tests"
+executor = { python = "3.12", isolated = true, frozen = true }
+
+[tool.poe.tasks.test-py313]
+cmd = "pytest tests"
+executor = { python = "3.13", isolated = true, frozen = true }
+
+[tool.poe.tasks.test-py314]
+cmd = "pytest tests"
+executor = { python = "3.14", isolated = true, frozen = true }
+
+[tool.poe.tasks.test-all]
+parallel = ["test-py310", "test-py311", "test-py312", "test-py313", "test-py314"]

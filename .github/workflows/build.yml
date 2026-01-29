@@ -37,10 +37,10 @@ jobs:
         run: uv sync --frozen
 
       - name: Test with pytest
-        run: uv run cov --frozen
+        run: poe cov
 
       - name: Run E2E tests with behave
-        run: uv run e2e --frozen
+        run: poe e2e
 
       - if: matrix.python-version == '3.13'
         name: Upload coverage to Codecov
