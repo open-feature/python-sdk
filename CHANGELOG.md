@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.9.0](https://github.com/open-feature/python-sdk/compare/v0.8.4...v0.9.0) (2026-01-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove deprecated openfeature.provider.provider module ([#558](https://github.com/open-feature/python-sdk/issues/558))
+* Drop python 3.9 support ([#554](https://github.com/open-feature/python-sdk/issues/554))
+
+### 🐛 Bug Fixes
+
+* Prevent providers from being initialized multiple times ([45f7fd1](https://github.com/open-feature/python-sdk/commit/45f7fd1fd3dd39240282e23bf0ce587435f3ff2f))
+* Prevent providers from being shutdown multiple times ([45f7fd1](https://github.com/open-feature/python-sdk/commit/45f7fd1fd3dd39240282e23bf0ce587435f3ff2f))
+* replace project.scripts with poethepoet ([#563](https://github.com/open-feature/python-sdk/issues/563)) ([05382aa](https://github.com/open-feature/python-sdk/commit/05382aad368800d593209ece7966045b9daf9756))
+* validate domain is present when calling `set_provider` on registry ([#561](https://github.com/open-feature/python-sdk/issues/561)) ([9fc6121](https://github.com/open-feature/python-sdk/commit/9fc612180a3ea8d26820394b329abd24804d2df4))
+
+
+### ✨ New Features
+
+* Drop python 3.9 support ([04106f5](https://github.com/open-feature/python-sdk/commit/04106f532d3a92d9dd70fd2160a07672ca4404f8))
+
+
+### 🧹 Chore
+
+* Drop python 3.9 support ([#554](https://github.com/open-feature/python-sdk/issues/554)) ([04106f5](https://github.com/open-feature/python-sdk/commit/04106f532d3a92d9dd70fd2160a07672ca4404f8))
+* update pytest to v9 ([#559](https://github.com/open-feature/python-sdk/issues/559)) ([71ebb9f](https://github.com/open-feature/python-sdk/commit/71ebb9fe961acb2ed256f12695123864fcf69cd5))
+
+
+### 🔄 Refactoring
+
+* Delete provider status instead of marking as NOT_READY ([45f7fd1](https://github.com/open-feature/python-sdk/commit/45f7fd1fd3dd39240282e23bf0ce587435f3ff2f))
+* remove deprecated openfeature.provider.provider module ([#558](https://github.com/open-feature/python-sdk/issues/558)) ([7c27c7a](https://github.com/open-feature/python-sdk/commit/7c27c7ae58ab498fdc85ab508a76f7d5261f02f1))
+
 ## [0.8.4](https://github.com/open-feature/python-sdk/compare/v0.8.3...v0.8.4) (2025-12-08)
 
 
