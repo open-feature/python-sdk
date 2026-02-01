@@ -5,10 +5,11 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import MagicMock
 
+from openfeature.track import TrackingEventDetails
 import pytest
 
 from openfeature import api
-from openfeature.api import add_hooks, clear_hooks, get_client, set_provider
+from openfeature.api import add_hooks, clear_hooks, get_client, set_evaluation_context, set_provider, set_transaction_context
 from openfeature.client import OpenFeatureClient, _typecheck_flag_value
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import EventDetails, ProviderEvent, ProviderEventDetails
@@ -623,3 +624,28 @@ def test_client_should_merge_contexts():
     assert context.attributes["transaction_attr"] == "transaction_value"
     assert context.attributes["client_attr"] == "client_value"
     assert context.attributes["invocation_attr"] == "invocation_value"
+
+def test_client_should_track_event():
+    spy_provider = MagicMock(spec=NoOpProvider)
+    set_provider(spy_provider)
+    client = get_client()
+    client.track(tracking_event_name="test")
+    spy_provider.track.assert_called_once()
+
+def test_tracking_merges_evaluation_contexts():
+    spy_provider = MagicMock(spec=NoOpProvider)
+    api.set_provider(spy_provider)
+    client = get_client()
+    set_evaluation_context(EvaluationContext("id", attributes={"key": "eval_value"}))
+    set_transaction_context(EvaluationContext("id", attributes={"transaction_attr": "transaction_value"}))
+    client.track(tracking_event_name="test", evaluation_context=EvaluationContext("id", attributes={"key": "value"}))
+    spy_provider.track.assert_called_once_with("test", EvaluationContext("id", attributes={"transaction_attr": "transaction_value", "key": "value"}), None)
+
+
+@pytest.mark.asyncio
+async def test_should_noop_if_provider_does_not_support_tracking(monkeypatch):
+    provider = NoOpProvider()
+    monkeypatch.delattr(NoOpProvider, "track", False)
+    set_provider(provider)
+    client = get_client()
+    client.track(tracking_event_name="test")
