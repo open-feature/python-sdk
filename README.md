@@ -185,6 +185,25 @@ client.add_hooks([MyHook()])
 options = FlagEvaluationOptions(hooks=[MyHook()])
 client.get_boolean_flag("my-flag", False, flag_evaluation_options=options)
 ```
+### Tracking
+
+The [tracking API](https://openfeature.dev/specification/sections/tracking/) allows you to use OpenFeature abstractions and objects to associate user actions with feature flag evaluations.
+This is essential for robust experimentation powered by feature flags.
+For example, a flag enhancing the appearance of a UI component might drive user engagement to a new feature; to test this hypothesis, telemetry collected by a [hook](#hooks) or [provider](#providers) can be associated with telemetry reported in the client's `track` function.
+
+```python
+// initilize a client
+client := api.get_client()
+
+// trigger tracking event action
+client.Track(
+    'visited-promo-page', 
+    EvaluationContext{}, 
+    openfeature.TrackingEventDetails(99.77).add("currencyCode", "USD"),
+    )
+```
+
+Note that some providers may not support tracking; check the documentation for your provider for more information.
 
 ### Logging
 
