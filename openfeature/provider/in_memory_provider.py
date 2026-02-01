@@ -195,8 +195,8 @@ class InMemoryProvider(AbstractProvider):
     def track(self, tracking_event_name: str, evaluation_context: EvaluationContext | None = None, tracking_event_details: TrackingEventDetails | None = None) -> None:
         value, data, context_attributes = None, None, None
         if tracking_event_details is not None:
-            value = tracking_event_details.get_value()
-            data = tracking_event_details.get_attributes()
+            value = tracking_event_details.value
+            data = tracking_event_details.attributes
 
         if evaluation_context is not None:
             context_attributes = evaluation_context.attributes
