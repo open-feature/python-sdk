@@ -964,16 +964,17 @@ class OpenFeatureClient:
         :param evaluation_context: the evaluation context
         :param tracking_event_details: Optional data relevant to the tracking event
         """
-        provider = self.provider
-        if not hasattr(provider, "track"):
-            return
+
+        if evaluation_context is None:
+            evaluation_context = EvaluationContext()
+
         merged_eval_context = (
             get_evaluation_context()
             .merge(get_transaction_context())
             .merge(self.context)
             .merge(evaluation_context)
         )
-        provider.track(tracking_event_name, merged_eval_context, tracking_event_details)
+        self.provider.track(tracking_event_name, merged_eval_context, tracking_event_details)
 
 def _typecheck_flag_value(
     value: typing.Any, flag_type: FlagType

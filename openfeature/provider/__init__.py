@@ -9,6 +9,7 @@ from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import ProviderEvent, ProviderEventDetails
 from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.hook import Hook
+from openfeature.track import TrackingEventDetails
 
 from .metadata import Metadata
 
@@ -116,6 +117,8 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
         Sequence[FlagValueType] | Mapping[str, FlagValueType]
     ]: ...
 
+    def track(self, tracking_event_name: str, evaluation_context: EvaluationContext | None = None, tracking_event_details: TrackingEventDetails | None = None) -> None: ...
+
 
 class AbstractProvider(FeatureProvider):
     def __init__(self, *args: typing.Any, **kwargs: typing.Any) -> None:
@@ -136,6 +139,9 @@ class AbstractProvider(FeatureProvider):
         pass
 
     def shutdown(self) -> None:
+        pass
+
+    def track(self, tracking_event_name: str, evaluation_context: EvaluationContext | None = None, tracking_event_details: TrackingEventDetails | None = None) -> None:
         pass
 
     @abstractmethod
