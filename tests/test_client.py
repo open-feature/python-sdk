@@ -625,14 +625,16 @@ def test_client_should_merge_contexts():
     assert context.attributes["client_attr"] == "client_value"
     assert context.attributes["invocation_attr"] == "invocation_value"
 
-def test_client_should_track_event():
+@pytest.mark.asyncio
+async def test_client_should_track_event():
     spy_provider = MagicMock(spec=NoOpProvider)
     set_provider(spy_provider)
     client = get_client()
     client.track(tracking_event_name="test")
     spy_provider.track.assert_called_once()
 
-def test_tracking_merges_evaluation_contexts():
+@pytest.mark.asyncio
+async def test_tracking_merges_evaluation_contexts():
     spy_provider = MagicMock(spec=NoOpProvider)
     api.set_provider(spy_provider)
     client = get_client()
