@@ -965,6 +965,9 @@ class OpenFeatureClient:
         :param tracking_event_details: Optional data relevant to the tracking event
         """
 
+        if not hasattr(self.provider, "track"):
+            return
+        
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
 
