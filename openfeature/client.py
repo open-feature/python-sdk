@@ -957,6 +957,13 @@ class OpenFeatureClient:
         _event_support.remove_client_handler(self, event, handler)
     
     def track(self, tracking_event_name: str, evaluation_context: EvaluationContext | None = None, tracking_event_details: TrackingEventDetails | None = None) -> None:
+        """
+        Tracks the occurrence of a particular action or application state.
+
+        :param tracking_event_name: the name of the tracking event
+        :param evaluation_context: the evaluation context
+        :param tracking_event_details: Optional data relevant to the tracking event
+        """
         provider = self.provider
         if not hasattr(provider, "track"):
             return
