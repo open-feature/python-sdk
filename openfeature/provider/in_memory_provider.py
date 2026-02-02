@@ -25,7 +25,7 @@ class InMemoryMetadata(Metadata):
 @dataclass
 class InMemoryTrackingEvent():
     value: float | None = None
-    data: dict[str, typing.Any] = field(default_factory=dict)
+    details: dict[str, typing.Any] = field(default_factory=dict)
     eval_context_attributes: dict[str, typing.Any] = field(default_factory=dict)
 
 
@@ -193,16 +193,12 @@ class InMemoryProvider(AbstractProvider):
         return self._resolve(flag_key, default_value, evaluation_context)
 
     def track(self, tracking_event_name: str, evaluation_context: EvaluationContext | None = None, tracking_event_details: TrackingEventDetails | None = None) -> None:
-        value, data, eval_context_attributes = None, None, None
-        if tracking_event_details is not None:
-            value = tracking_event_details.value
-            data = tracking_event_details.attributes
-
-        if evaluation_context is not None:
-            eval_context_attributes = evaluation_context.attributes
+        value = tracking_event_details.value if tracking_event_details is not None else None
+        details = tracking_event_details.attributes if tracking_event_details is not None else {}
+        eval_context_attributes = evaluation_context.attributes if evaluation_context is not None else None
 
         self._tracking_events[tracking_event_name] = InMemoryTrackingEvent(
             value=value,
-            data=data,
+            details=details,
             eval_context_attributes=eval_context_attributes,
         )

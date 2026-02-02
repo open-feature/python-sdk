@@ -205,4 +205,4 @@ async def test_should_track_event():
         {"Key": InMemoryFlag("hundred", {"zero": 0, "hundred": 100})}
     )
     provider.track(tracking_event_name="test", evaluation_context=EvaluationContext(attributes={"key": "value"}), tracking_event_details=TrackingEventDetails(value=1, attributes={"key": "value"}))
-    assert provider._tracking_events == {"test": InMemoryTrackingEvent(value=1, data={"key": "value"}, context_attributes={"key": "value"})}
+    assert provider._tracking_events == {"test": InMemoryTrackingEvent(value=1, details={"key": "value"}, eval_context_attributes={"key": "value"})}
