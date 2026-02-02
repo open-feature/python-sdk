@@ -5,7 +5,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
-from openfeature.evaluation_context import EvaluationContext
+from openfeature.evaluation_context import EvaluationContext, EvaluationContextAttribute
 from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.provider import AbstractProvider, Metadata
@@ -26,7 +26,7 @@ class InMemoryMetadata(Metadata):
 class InMemoryTrackingEvent():
     value: float | None = None
     details: dict[str, typing.Any] = field(default_factory=dict)
-    eval_context_attributes: dict[str, typing.Any] = field(default_factory=dict)
+    eval_context_attributes: Mapping[str, EvaluationContextAttribute] = field(default_factory=dict)
 
 
 
@@ -195,7 +195,7 @@ class InMemoryProvider(AbstractProvider):
     def track(self, tracking_event_name: str, evaluation_context: EvaluationContext | None = None, tracking_event_details: TrackingEventDetails | None = None) -> None:
         value = tracking_event_details.value if tracking_event_details is not None else None
         details = tracking_event_details.attributes if tracking_event_details is not None else {}
-        eval_context_attributes = evaluation_context.attributes if evaluation_context is not None else None
+        eval_context_attributes = evaluation_context.attributes if evaluation_context is not None else {}
 
         self._tracking_events[tracking_event_name] = InMemoryTrackingEvent(
             value=value,
