@@ -193,14 +193,14 @@ This is essential for robust experimentation powered by feature flags.
 For example, a flag enhancing the appearance of a UI component might drive user engagement to a new feature; to test this hypothesis, telemetry collected by a [hook](#hooks) or [provider](#providers) can be associated with telemetry reported in the client's `track` function.
 
 ```python
-// initilize a client
-client := api.get_client()
+# initilize a client
+client = api.get_client()
 
-// trigger tracking event action
+# trigger tracking event action
 client.Track(
     'visited-promo-page', 
-    EvaluationContext{}, 
-    openfeature.TrackingEventDetails(99.77).add("currencyCode", "USD"),
+    evaluation_context=EvaluationContext{}, 
+    tracking_event_details=openfeature.TrackingEventDetails(99.77).add("currencyCode", "USD"),
     )
 ```
 
