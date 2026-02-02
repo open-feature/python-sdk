@@ -625,16 +625,14 @@ def test_client_should_merge_contexts():
     assert context.attributes["client_attr"] == "client_value"
     assert context.attributes["invocation_attr"] == "invocation_value"
 
-@pytest.mark.asyncio
-async def test_client_should_track_event():
+def test_client_should_track_event():
     spy_provider = MagicMock(spec=NoOpProvider)
     set_provider(spy_provider)
     client = get_client()
     client.track(tracking_event_name="test")
     spy_provider.track.assert_called_once()
 
-@pytest.mark.asyncio
-async def test_tracking_merges_evaluation_contexts():
+def test_tracking_merges_evaluation_contexts():
     spy_provider = MagicMock(spec=NoOpProvider)
     api.set_provider(spy_provider)
     client = get_client()
@@ -644,8 +642,7 @@ async def test_tracking_merges_evaluation_contexts():
     spy_provider.track.assert_called_once_with("test", EvaluationContext("id", attributes={"transaction_attr": "transaction_value", "key": "value"}), None)
 
 
-@pytest.mark.asyncio
-async def test_should_noop_if_provider_does_not_support_tracking(monkeypatch):
+def test_should_noop_if_provider_does_not_support_tracking(monkeypatch):
     provider = NoOpProvider()
     monkeypatch.delattr(NoOpProvider, "track", False)
     set_provider(provider)
