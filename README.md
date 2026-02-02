@@ -197,9 +197,9 @@ For example, a flag enhancing the appearance of a UI component might drive user 
 client = api.get_client()
 
 # trigger tracking event action
-client.Track(
+client.track(
     'visited-promo-page', 
-    evaluation_context=EvaluationContext{}, 
+    evaluation_context=EvaluationContext(), 
     tracking_event_details=openfeature.TrackingEventDetails(99.77).add("currencyCode", "USD"),
     )
 ```
