@@ -955,8 +955,13 @@ class OpenFeatureClient:
 
     def remove_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
         _event_support.remove_client_handler(self, event, handler)
-    
-    def track(self, tracking_event_name: str, evaluation_context: EvaluationContext | None = None, tracking_event_details: TrackingEventDetails | None = None) -> None:
+
+    def track(
+        self,
+        tracking_event_name: str,
+        evaluation_context: EvaluationContext | None = None,
+        tracking_event_details: TrackingEventDetails | None = None,
+    ) -> None:
         """
         Tracks the occurrence of a particular action or application state.
 
@@ -967,7 +972,7 @@ class OpenFeatureClient:
 
         if not hasattr(self.provider, "track"):
             return
-        
+
         if evaluation_context is None:
             evaluation_context = EvaluationContext()
 
@@ -977,7 +982,10 @@ class OpenFeatureClient:
             .merge(self.context)
             .merge(evaluation_context)
         )
-        self.provider.track(tracking_event_name, merged_eval_context, tracking_event_details)
+        self.provider.track(
+            tracking_event_name, merged_eval_context, tracking_event_details
+        )
+
 
 def _typecheck_flag_value(
     value: typing.Any, flag_type: FlagType

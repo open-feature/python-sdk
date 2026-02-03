@@ -1,13 +1,16 @@
 from numbers import Number
 
-from openfeature.evaluation_context import EvaluationContext
-from openfeature.provider.no_op_provider import NoOpProvider
-from openfeature.track import TrackingEventDetails
 import pytest
 
+from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
-from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider, InMemoryTrackingEvent
+from openfeature.provider.in_memory_provider import (
+    InMemoryFlag,
+    InMemoryProvider,
+    InMemoryTrackingEvent,
+)
+from openfeature.track import TrackingEventDetails
 
 
 def test_should_return_in_memory_provider_metadata():
@@ -204,5 +207,15 @@ async def test_should_track_event():
     provider = InMemoryProvider(
         {"Key": InMemoryFlag("hundred", {"zero": 0, "hundred": 100})}
     )
-    provider.track(tracking_event_name="test", evaluation_context=EvaluationContext(attributes={"key": "value"}), tracking_event_details=TrackingEventDetails(value=1, attributes={"key": "value"}))
-    assert provider._tracking_events == {"test": InMemoryTrackingEvent(value=1, details={"key": "value"}, eval_context_attributes={"key": "value"})}
+    provider.track(
+        tracking_event_name="test",
+        evaluation_context=EvaluationContext(attributes={"key": "value"}),
+        tracking_event_details=TrackingEventDetails(
+            value=1, attributes={"key": "value"}
+        ),
+    )
+    assert provider._tracking_events == {
+        "test": InMemoryTrackingEvent(
+            value=1, details={"key": "value"}, eval_context_attributes={"key": "value"}
+        )
+    }

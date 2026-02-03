@@ -117,7 +117,12 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
         Sequence[FlagValueType] | Mapping[str, FlagValueType]
     ]: ...
 
-    def track(self, tracking_event_name: str, evaluation_context: EvaluationContext | None = None, tracking_event_details: TrackingEventDetails | None = None) -> None: ...
+    def track(
+        self,
+        tracking_event_name: str,
+        evaluation_context: EvaluationContext | None = None,
+        tracking_event_details: TrackingEventDetails | None = None,
+    ) -> None: ...
 
 
 class AbstractProvider(FeatureProvider):
@@ -141,7 +146,12 @@ class AbstractProvider(FeatureProvider):
     def shutdown(self) -> None:
         pass
 
-    def track(self, tracking_event_name: str, evaluation_context: EvaluationContext | None = None, tracking_event_details: TrackingEventDetails | None = None) -> None:
+    def track(
+        self,
+        tracking_event_name: str,
+        evaluation_context: EvaluationContext | None = None,
+        tracking_event_details: TrackingEventDetails | None = None,
+    ) -> None:
         pass
 
     @abstractmethod
