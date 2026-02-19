@@ -6,7 +6,6 @@ from collections.abc import Mapping, Sequence
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.provider import AbstractProvider
 from openfeature.provider.no_op_metadata import NoOpMetadata
-from openfeature.track import TrackingEventDetails
 
 if typing.TYPE_CHECKING:
     from openfeature.evaluation_context import EvaluationContext
