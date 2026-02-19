@@ -5,10 +5,11 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
-from openfeature.evaluation_context import EvaluationContext
+from openfeature.evaluation_context import EvaluationContext, EvaluationContextAttribute
 from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.provider import AbstractProvider, Metadata
+from openfeature.track import TrackingEventDetails
 
 if typing.TYPE_CHECKING:
     from openfeature.flag_evaluation import FlagMetadata, FlagValueType
@@ -20,6 +21,15 @@ PASSED_IN_DEFAULT = "Passed in default"
 @dataclass
 class InMemoryMetadata(Metadata):
     name: str = "In-Memory Provider"
+
+
+@dataclass
+class InMemoryTrackingEvent:
+    value: float | None = None
+    details: dict[str, typing.Any] = field(default_factory=dict)
+    eval_context_attributes: Mapping[str, EvaluationContextAttribute] = field(
+        default_factory=dict
+    )
 
 
 T_co = typing.TypeVar("T_co", covariant=True)
@@ -58,14 +68,24 @@ class InMemoryFlag(typing.Generic[T_co]):
 
 FlagStorage = dict[str, InMemoryFlag[typing.Any]]
 
+TrackingStorage = dict[str, InMemoryTrackingEvent]
+
 V = typing.TypeVar("V")
 
 
 class InMemoryProvider(AbstractProvider):
     _flags: FlagStorage
+    _tracking_events: TrackingStorage
 
-    def __init__(self, flags: FlagStorage) -> None:
+    # tracking_events defaults to an empty dict
+    def __init__(
+        self, flags: FlagStorage, tracking_events: TrackingStorage | None = None
+    ) -> None:
         self._flags = flags.copy()
+        if tracking_events is not None:
+            self._tracking_events = tracking_events.copy()
+        else:
+            self._tracking_events = {}
 
     def get_metadata(self) -> Metadata:
         return InMemoryMetadata()
@@ -176,3 +196,27 @@ class InMemoryProvider(AbstractProvider):
         evaluation_context: EvaluationContext | None,
     ) -> FlagResolutionDetails[V]:
         return self._resolve(flag_key, default_value, evaluation_context)
+
+    def track(
+        self,
+        tracking_event_name: str,
+        evaluation_context: EvaluationContext | None = None,
+        tracking_event_details: TrackingEventDetails | None = None,
+    ) -> None:
+        value = (
+            tracking_event_details.value if tracking_event_details is not None else None
+        )
+        details = (
+            tracking_event_details.attributes
+            if tracking_event_details is not None
+            else {}
+        )
+        eval_context_attributes = (
+            evaluation_context.attributes if evaluation_context is not None else {}
+        )
+
+        self._tracking_events[tracking_event_name] = InMemoryTrackingEvent(
+            value=value,
+            details=details,
+            eval_context_attributes=eval_context_attributes,
+        )
