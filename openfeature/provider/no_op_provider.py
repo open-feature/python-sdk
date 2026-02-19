@@ -83,11 +83,3 @@ class NoOpProvider(AbstractProvider):
             reason=Reason.DEFAULT,
             variant=PASSED_IN_DEFAULT,
         )
-
-    def track(
-        self,
-        tracking_event_name: str,
-        evaluation_context: EvaluationContext | None = None,
-        tracking_event_details: TrackingEventDetails | None = None,
-    ) -> None:
-        pass

@@ -663,7 +663,6 @@ def test_tracking_merges_evaluation_contexts():
 
 def test_should_noop_if_provider_does_not_support_tracking(monkeypatch):
     provider = NoOpProvider()
-    monkeypatch.delattr(NoOpProvider, "track", False)
     set_provider(provider)
     client = get_client()
     client.track(tracking_event_name="test")
