@@ -99,6 +99,18 @@ class OpenFeatureClient:
     def add_hooks(self, hooks: list[Hook]) -> None:
         self.hooks = self.hooks + hooks
 
+    def set_evaluation_context(self, context: EvaluationContext) -> None:
+        """
+        Set the evaluation context for this client.
+
+        The client-level context will be merged with API, transaction, and invocation contexts
+        during flag evaluation, with the following precedence (lowest to highest):
+        API context -> Transaction context -> Client context -> Invocation context
+
+        :param context: The evaluation context to set for this client
+        """
+        self.context = context
+
     def get_boolean_value(
         self,
         flag_key: str,
