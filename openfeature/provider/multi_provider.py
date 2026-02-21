@@ -36,8 +36,9 @@ class EvaluationStrategy(typing.Protocol):
     """
     Strategy interface for determining which provider's result to use.
     
-    Strategies can be 'sequential' (evaluate one at a time, stop early) or
-    'parallel' (evaluate all simultaneously).
+    Current implementation supports 'sequential' mode (evaluate one at a time,
+    stop early). 'parallel' mode (evaluate all simultaneously using asyncio.gather
+    or ThreadPoolExecutor) is planned for a future enhancement.
     """
 
     run_mode: typing.Literal["sequential", "parallel"]
@@ -168,7 +169,12 @@ class MultiProvider(AbstractProvider):
         return hooks
 
     def initialize(self, evaluation_context: EvaluationContext) -> None:
-        """Initialize all providers in parallel."""
+        """
+        Initialize all providers sequentially.
+        
+        Note: Parallel initialization using ThreadPoolExecutor or asyncio.gather()
+        is planned for a future enhancement.
+        """
         errors: list[Exception] = []
         
         for name, provider in self._registered_providers:
@@ -201,6 +207,10 @@ class MultiProvider(AbstractProvider):
         """
         Core evaluation logic that delegates to providers based on strategy.
         
+        Current implementation evaluates providers sequentially regardless of
+        strategy.run_mode. True concurrent evaluation for 'parallel' mode is
+        planned for a future enhancement.
+        
         :param flag_key: The flag key to evaluate
         :param default_value: Default value for the flag
         :param evaluation_context: Evaluation context
@@ -229,7 +239,7 @@ class MultiProvider(AbstractProvider):
                 )
                 results.append((provider_name, error_result))
         
-        # In parallel mode or if all sequential attempts completed, pick best result
+        # If all sequential attempts completed (or parallel mode), pick best result
         for provider_name, result in results:
             if self.strategy.should_use_result(flag_key, provider_name, result):
                 return result
@@ -264,7 +274,13 @@ class MultiProvider(AbstractProvider):
         default_value: bool,
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[bool]:
-        # For async, delegate to sync for now (async aggregation would be more complex)
+        """
+        Async boolean evaluation (currently delegates to sync implementation).
+        
+        Note: True async evaluation using await and provider-level async methods
+        is planned for a future enhancement. The current implementation maintains
+        API compatibility but does not provide non-blocking I/O benefits.
+        """
         return self.resolve_boolean_details(flag_key, default_value, evaluation_context)
 
     def resolve_string_details(
@@ -286,6 +302,7 @@ class MultiProvider(AbstractProvider):
         default_value: str,
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[str]:
+        """Async string evaluation (currently delegates to sync implementation)."""
         return self.resolve_string_details(flag_key, default_value, evaluation_context)
 
     def resolve_integer_details(
@@ -307,6 +324,7 @@ class MultiProvider(AbstractProvider):
         default_value: int,
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[int]:
+        """Async integer evaluation (currently delegates to sync implementation)."""
         return self.resolve_integer_details(flag_key, default_value, evaluation_context)
 
     def resolve_float_details(
@@ -328,6 +346,7 @@ class MultiProvider(AbstractProvider):
         default_value: float,
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[float]:
+        """Async float evaluation (currently delegates to sync implementation)."""
         return self.resolve_float_details(flag_key, default_value, evaluation_context)
 
     def resolve_object_details(
@@ -349,4 +368,5 @@ class MultiProvider(AbstractProvider):
         default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
+        """Async object evaluation (currently delegates to sync implementation)."""
         return self.resolve_object_details(flag_key, default_value, evaluation_context)
