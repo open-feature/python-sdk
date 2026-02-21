@@ -670,7 +670,11 @@ def test_client_set_evaluation_context_is_merged_during_evaluation():
     # Given
     api.clear_hooks()
     api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
-    
+    # Transaction-level context
+    transaction_context = EvaluationContext(
+        targeting_key="transaction", attributes={"transaction_attr": "transaction_value"}
+    )
+    api.set_transaction_context(transaction_context)
     provider = NoOpProvider()
     provider.resolve_boolean_details = MagicMock(wraps=provider.resolve_boolean_details)
     api.set_provider(provider)
