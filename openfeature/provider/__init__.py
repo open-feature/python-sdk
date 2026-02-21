@@ -11,11 +11,26 @@ from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.hook import Hook
 
 from .metadata import Metadata
+from .multi_provider import (
+    EvaluationStrategy,
+    FirstMatchStrategy,
+    MultiProvider,
+    ProviderEntry,
+)
 
 if typing.TYPE_CHECKING:
     from openfeature.flag_evaluation import FlagValueType
 
-__all__ = ["AbstractProvider", "FeatureProvider", "Metadata", "ProviderStatus"]
+__all__ = [
+    "AbstractProvider",
+    "EvaluationStrategy",
+    "FeatureProvider",
+    "FirstMatchStrategy",
+    "Metadata",
+    "MultiProvider",
+    "ProviderEntry",
+    "ProviderStatus",
+]
 
 
 class ProviderStatus(Enum):
