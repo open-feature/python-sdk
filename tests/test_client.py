@@ -623,3 +623,92 @@ def test_client_should_merge_contexts():
     assert context.attributes["transaction_attr"] == "transaction_value"
     assert context.attributes["client_attr"] == "client_value"
     assert context.attributes["invocation_attr"] == "invocation_value"
+
+
+def test_client_set_evaluation_context():
+    # Given
+    api.clear_hooks()
+    api.set_provider(NoOpProvider())
+    client = api.get_client()
+    
+    initial_context = EvaluationContext(
+        targeting_key="initial", attributes={"initial_attr": "initial_value"}
+    )
+    
+    # When
+    client.set_evaluation_context(initial_context)
+    
+    # Then
+    assert client.context == initial_context
+    assert client.context.targeting_key == "initial"
+    assert client.context.attributes["initial_attr"] == "initial_value"
+
+
+def test_client_set_evaluation_context_updates_existing():
+    # Given
+    api.clear_hooks()
+    api.set_provider(NoOpProvider())
+    initial_context = EvaluationContext(
+        targeting_key="initial", attributes={"initial_attr": "initial_value"}
+    )
+    client = OpenFeatureClient(domain=None, version=None, context=initial_context)
+    
+    new_context = EvaluationContext(
+        targeting_key="updated", attributes={"updated_attr": "updated_value"}
+    )
+    
+    # When
+    client.set_evaluation_context(new_context)
+    
+    # Then
+    assert client.context == new_context
+    assert client.context.targeting_key == "updated"
+    assert client.context.attributes["updated_attr"] == "updated_value"
+
+
+def test_client_set_evaluation_context_is_merged_during_evaluation():
+    # Given
+    api.clear_hooks()
+    api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
+    # Transaction-level context
+    transaction_context = EvaluationContext(
+        targeting_key="transaction", attributes={"transaction_attr": "transaction_value"}
+    )
+    api.set_transaction_context(transaction_context)
+    provider = NoOpProvider()
+    provider.resolve_boolean_details = MagicMock(wraps=provider.resolve_boolean_details)
+    api.set_provider(provider)
+    
+    # API-level context
+    api_context = EvaluationContext(
+        targeting_key="api", attributes={"api_attr": "api_value"}
+    )
+    api.set_evaluation_context(api_context)
+    
+    # Create client with initial context
+    client = api.get_client()
+    
+    # Update client context via setter
+    client_context = EvaluationContext(
+        targeting_key="client", attributes={"client_attr": "client_value"}
+    )
+    client.set_evaluation_context(client_context)
+    
+    # Invocation context
+    invocation_context = EvaluationContext(
+        targeting_key="invocation", attributes={"invocation_attr": "invocation_value"}
+    )
+    
+    # When
+    client.get_boolean_details("flag", False, invocation_context)
+    
+    # Then
+    _, kwargs = provider.resolve_boolean_details.call_args
+    context = kwargs["evaluation_context"]
+    
+    # Verify all contexts are merged with correct precedence
+    assert context.targeting_key == "invocation"  # Highest precedence
+    assert context.attributes["transaction_attr"] == "transaction_value"
+    assert context.attributes["api_attr"] == "api_value"
+    assert context.attributes["client_attr"] == "client_value"
+    assert context.attributes["invocation_attr"] == "invocation_value"
