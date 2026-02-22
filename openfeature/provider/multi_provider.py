@@ -15,6 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 
 from openfeature.evaluation_context import EvaluationContext
+from openfeature.event import ProviderEvent, ProviderEventDetails
 from openfeature.exception import ErrorCode, GeneralError
 from openfeature.flag_evaluation import FlagResolutionDetails, FlagValueType, Reason
 from openfeature.hook import Hook
@@ -127,8 +128,8 @@ class MultiProvider(AbstractProvider):
         
         Names are determined by:
         1. Explicit name in ProviderEntry
-        2. provider.get_metadata().name if unique
-        3. {metadata.name}_{index} if not unique
+        2. provider.get_metadata().name if unique and not conflicting
+        3. {metadata.name}_{index} if not unique or conflicting
         """
         # Count providers by their metadata name to detect duplicates
         name_counts: dict[str, int] = {}
@@ -144,17 +145,20 @@ class MultiProvider(AbstractProvider):
             metadata_name = entry.provider.get_metadata().name or "provider"
             
             if entry.name:
-                # Explicit name provided
+                # Explicit name provided - must be unique
                 if entry.name in used_names:
                     raise ValueError(f"Provider name '{entry.name}' is not unique")
                 final_name = entry.name
-            elif name_counts[metadata_name] == 1:
-                # Metadata name is unique
+            elif name_counts[metadata_name] == 1 and metadata_name not in used_names:
+                # Metadata name is unique and not already taken by explicit name
                 final_name = metadata_name
             else:
-                # Multiple providers with same metadata name, add index
-                name_indices[metadata_name] = name_indices.get(metadata_name, 0) + 1
-                final_name = f"{metadata_name}_{name_indices[metadata_name]}"
+                # Multiple providers or collision with explicit name, add index
+                while True:
+                    name_indices[metadata_name] = name_indices.get(metadata_name, 0) + 1
+                    final_name = f"{metadata_name}_{name_indices[metadata_name]}"
+                    if final_name not in used_names:
+                        break
             
             used_names.add(final_name)
             self._registered_providers.append((final_name, entry.provider))
@@ -172,6 +176,32 @@ class MultiProvider(AbstractProvider):
             self._cached_hooks = hooks
         return self._cached_hooks
 
+    def attach(
+        self,
+        on_emit: Callable[[FeatureProvider, ProviderEvent, ProviderEventDetails], None],
+    ) -> None:
+        """
+        Attach event handler and propagate to all underlying providers.
+        
+        Events from underlying providers are forwarded through the MultiProvider.
+        This enables features like cache invalidation to work across all providers.
+        """
+        super().attach(on_emit)
+        
+        # Propagate attach to all wrapped providers
+        for _, provider in self._registered_providers:
+            provider.attach(on_emit)
+
+    def detach(self) -> None:
+        """
+        Detach event handler and propagate to all underlying providers.
+        """
+        super().detach()
+        
+        # Propagate detach to all wrapped providers
+        for _, provider in self._registered_providers:
+            provider.detach()
+
     def initialize(self, evaluation_context: EvaluationContext) -> None:
         """
         Initialize all providers in parallel using ThreadPoolExecutor.
@@ -186,7 +216,7 @@ class MultiProvider(AbstractProvider):
             except Exception as e:
                 return f"Provider '{name}' initialization failed: {e}"
 
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=len(self._registered_providers)) as executor:
             results = list(executor.map(init_provider, self._registered_providers))
 
         errors = [r for r in results if r is not None]
@@ -195,20 +225,27 @@ class MultiProvider(AbstractProvider):
             raise GeneralError(f"Multi-provider initialization failed: {error_msgs}")
 
     def shutdown(self) -> None:
-        """Shutdown all providers."""
-        for _, provider in self._registered_providers:
+        """Shutdown all providers in parallel."""
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        def shutdown_provider(entry: tuple[str, FeatureProvider]) -> None:
+            name, provider = entry
             try:
                 provider.shutdown()
-            except Exception:
-                # Log but don't fail shutdown
-                pass
+            except Exception as e:
+                logger.error(f"Provider '{name}' shutdown failed: {e}")
+
+        with ThreadPoolExecutor(max_workers=len(self._registered_providers)) as executor:
+            list(executor.map(shutdown_provider, self._registered_providers))
 
     def _evaluate_with_providers(
         self,
         flag_key: str,
         default_value: FlagValueType,
         evaluation_context: EvaluationContext | None,
-        resolve_fn: Callable[[FeatureProvider, str, FlagValueType, EvaluationContext | None], FlagResolutionDetails],
+        resolve_fn: Callable[[FeatureProvider, str, FlagValueType, EvaluationContext | None], FlagResolutionDetails[FlagValueType]],
     ) -> FlagResolutionDetails[FlagValueType]:
         """
         Core evaluation logic that delegates to providers based on strategy.
@@ -223,7 +260,7 @@ class MultiProvider(AbstractProvider):
         :param resolve_fn: Function to call on each provider for resolution
         :return: Final resolution details
         """
-        results: list[tuple[str, FlagResolutionDetails]] = []
+        results: list[tuple[str, FlagResolutionDetails[FlagValueType]]] = []
         
         for provider_name, provider in self._registered_providers:
             try:
@@ -279,7 +316,7 @@ class MultiProvider(AbstractProvider):
         flag_key: str,
         default_value: FlagValueType,
         evaluation_context: EvaluationContext | None,
-        resolve_fn: Callable,
+        resolve_fn: Callable[[FeatureProvider, str, FlagValueType, EvaluationContext | None], typing.Awaitable[FlagResolutionDetails[FlagValueType]]],
     ) -> FlagResolutionDetails[FlagValueType]:
         """
         Async evaluation logic that properly awaits provider async methods.
@@ -290,7 +327,7 @@ class MultiProvider(AbstractProvider):
         :param resolve_fn: Async function to call on each provider for resolution
         :return: Final resolution details
         """
-        results: list[tuple[str, FlagResolutionDetails]] = []
+        results: list[tuple[str, FlagResolutionDetails[FlagValueType]]] = []
         
         for provider_name, provider in self._registered_providers:
             try:
