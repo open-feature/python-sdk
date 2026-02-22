@@ -9,17 +9,16 @@ See: https://openfeature.dev/specification/appendix-a/#multi-provider
 
 from __future__ import annotations
 
-import asyncio
 import typing
 from collections.abc import Callable, Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 
 from openfeature.evaluation_context import EvaluationContext
-from openfeature.event import ProviderEvent, ProviderEventDetails
-from openfeature.exception import GeneralError
+from openfeature.exception import ErrorCode, GeneralError
 from openfeature.flag_evaluation import FlagResolutionDetails, FlagValueType, Reason
 from openfeature.hook import Hook
-from openfeature.provider import AbstractProvider, FeatureProvider, Metadata, ProviderStatus
+from openfeature.provider import AbstractProvider, FeatureProvider, Metadata
 
 __all__ = ["MultiProvider", "ProviderEntry", "FirstMatchStrategy", "EvaluationStrategy"]
 
@@ -36,9 +35,11 @@ class EvaluationStrategy(typing.Protocol):
     """
     Strategy interface for determining which provider's result to use.
     
-    Current implementation supports 'sequential' mode (evaluate one at a time,
-    stop early). 'parallel' mode (evaluate all simultaneously using asyncio.gather
-    or ThreadPoolExecutor) is planned for a future enhancement.
+    Supports 'sequential' mode (evaluate one at a time, stop early when strategy
+    is satisfied) and 'parallel' mode (evaluate all providers, then select best
+    result). Note: Both modes currently execute provider calls sequentially;
+    true concurrent evaluation using asyncio.gather or ThreadPoolExecutor is
+    planned for a future enhancement.
     """
 
     run_mode: typing.Literal["sequential", "parallel"]
@@ -118,6 +119,7 @@ class MultiProvider(AbstractProvider):
         self.strategy = strategy or FirstMatchStrategy()
         self._registered_providers: list[tuple[str, FeatureProvider]] = []
         self._register_providers(providers)
+        self._cached_hooks: list[Hook] | None = None
 
     def _register_providers(self, providers: list[ProviderEntry]) -> None:
         """
@@ -162,30 +164,34 @@ class MultiProvider(AbstractProvider):
         return Metadata(name="MultiProvider")
 
     def get_provider_hooks(self) -> list[Hook]:
-        """Aggregate hooks from all providers."""
-        hooks: list[Hook] = []
-        for _, provider in self._registered_providers:
-            hooks.extend(provider.get_provider_hooks())
-        return hooks
+        """Aggregate hooks from all providers (cached for efficiency)."""
+        if self._cached_hooks is None:
+            hooks: list[Hook] = []
+            for _, provider in self._registered_providers:
+                hooks.extend(provider.get_provider_hooks())
+            self._cached_hooks = hooks
+        return self._cached_hooks
 
     def initialize(self, evaluation_context: EvaluationContext) -> None:
         """
-        Initialize all providers sequentially.
+        Initialize all providers in parallel using ThreadPoolExecutor.
         
-        Note: Parallel initialization using ThreadPoolExecutor or asyncio.gather()
-        is planned for a future enhancement.
+        This allows concurrent initialization of I/O-bound providers.
         """
-        errors: list[Exception] = []
-        
-        for name, provider in self._registered_providers:
+        def init_provider(entry: tuple[str, FeatureProvider]) -> str | None:
+            name, provider = entry
             try:
                 provider.initialize(evaluation_context)
+                return None
             except Exception as e:
-                errors.append(Exception(f"Provider '{name}' initialization failed: {e}"))
-        
+                return f"Provider '{name}' initialization failed: {e}"
+
+        with ThreadPoolExecutor() as executor:
+            results = list(executor.map(init_provider, self._registered_providers))
+
+        errors = [r for r in results if r is not None]
         if errors:
-            # Aggregate errors
-            error_msgs = "; ".join(str(e) for e in errors)
+            error_msgs = "; ".join(errors)
             raise GeneralError(f"Multi-provider initialization failed: {error_msgs}")
 
     def shutdown(self) -> None:
@@ -232,9 +238,9 @@ class MultiProvider(AbstractProvider):
             except Exception as e:
                 # Record error but continue to next provider
                 error_result = FlagResolutionDetails(
-                    flag_key=flag_key,
                     value=default_value,
                     reason=Reason.ERROR,
+                    error_code=ErrorCode.GENERAL,
                     error_message=str(e),
                 )
                 results.append((provider_name, error_result))
@@ -249,9 +255,9 @@ class MultiProvider(AbstractProvider):
             return results[-1][1]
         
         return FlagResolutionDetails(
-            flag_key=flag_key,
             value=default_value,
             reason=Reason.ERROR,
+            error_code=ErrorCode.GENERAL,
             error_message="No providers returned a result",
         )
 
@@ -268,20 +274,73 @@ class MultiProvider(AbstractProvider):
             lambda p, k, d, ctx: p.resolve_boolean_details(k, d, ctx),
         )
 
+    async def _evaluate_with_providers_async(
+        self,
+        flag_key: str,
+        default_value: FlagValueType,
+        evaluation_context: EvaluationContext | None,
+        resolve_fn: Callable,
+    ) -> FlagResolutionDetails[FlagValueType]:
+        """
+        Async evaluation logic that properly awaits provider async methods.
+        
+        :param flag_key: The flag key to evaluate
+        :param default_value: Default value for the flag
+        :param evaluation_context: Evaluation context
+        :param resolve_fn: Async function to call on each provider for resolution
+        :return: Final resolution details
+        """
+        results: list[tuple[str, FlagResolutionDetails]] = []
+        
+        for provider_name, provider in self._registered_providers:
+            try:
+                result = await resolve_fn(provider, flag_key, default_value, evaluation_context)
+                results.append((provider_name, result))
+                
+                # In sequential mode, stop if strategy says to use this result
+                if (self.strategy.run_mode == "sequential" and 
+                    self.strategy.should_use_result(flag_key, provider_name, result)):
+                    return result
+                    
+            except Exception as e:
+                # Record error but continue to next provider
+                error_result = FlagResolutionDetails(
+                    value=default_value,
+                    reason=Reason.ERROR,
+                    error_code=ErrorCode.GENERAL,
+                    error_message=str(e),
+                )
+                results.append((provider_name, error_result))
+        
+        # If all sequential attempts completed (or parallel mode), pick best result
+        for provider_name, result in results:
+            if self.strategy.should_use_result(flag_key, provider_name, result):
+                return result
+        
+        # No successful result - return last error or default
+        if results:
+            return results[-1][1]
+        
+        return FlagResolutionDetails(
+            value=default_value,
+            reason=Reason.ERROR,
+            error_code=ErrorCode.GENERAL,
+            error_message="No providers returned a result",
+        )
+
     async def resolve_boolean_details_async(
         self,
         flag_key: str,
         default_value: bool,
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[bool]:
-        """
-        Async boolean evaluation (currently delegates to sync implementation).
-        
-        Note: True async evaluation using await and provider-level async methods
-        is planned for a future enhancement. The current implementation maintains
-        API compatibility but does not provide non-blocking I/O benefits.
-        """
-        return self.resolve_boolean_details(flag_key, default_value, evaluation_context)
+        """Async boolean evaluation using provider async methods."""
+        return await self._evaluate_with_providers_async(
+            flag_key,
+            default_value,
+            evaluation_context,
+            lambda p, k, d, ctx: p.resolve_boolean_details_async(k, d, ctx),
+        )
 
     def resolve_string_details(
         self,
@@ -302,8 +361,13 @@ class MultiProvider(AbstractProvider):
         default_value: str,
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[str]:
-        """Async string evaluation (currently delegates to sync implementation)."""
-        return self.resolve_string_details(flag_key, default_value, evaluation_context)
+        """Async string evaluation using provider async methods."""
+        return await self._evaluate_with_providers_async(
+            flag_key,
+            default_value,
+            evaluation_context,
+            lambda p, k, d, ctx: p.resolve_string_details_async(k, d, ctx),
+        )
 
     def resolve_integer_details(
         self,
@@ -324,8 +388,13 @@ class MultiProvider(AbstractProvider):
         default_value: int,
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[int]:
-        """Async integer evaluation (currently delegates to sync implementation)."""
-        return self.resolve_integer_details(flag_key, default_value, evaluation_context)
+        """Async integer evaluation using provider async methods."""
+        return await self._evaluate_with_providers_async(
+            flag_key,
+            default_value,
+            evaluation_context,
+            lambda p, k, d, ctx: p.resolve_integer_details_async(k, d, ctx),
+        )
 
     def resolve_float_details(
         self,
@@ -346,8 +415,13 @@ class MultiProvider(AbstractProvider):
         default_value: float,
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[float]:
-        """Async float evaluation (currently delegates to sync implementation)."""
-        return self.resolve_float_details(flag_key, default_value, evaluation_context)
+        """Async float evaluation using provider async methods."""
+        return await self._evaluate_with_providers_async(
+            flag_key,
+            default_value,
+            evaluation_context,
+            lambda p, k, d, ctx: p.resolve_float_details_async(k, d, ctx),
+        )
 
     def resolve_object_details(
         self,
@@ -368,5 +442,10 @@ class MultiProvider(AbstractProvider):
         default_value: Sequence[FlagValueType] | Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagResolutionDetails[Sequence[FlagValueType] | Mapping[str, FlagValueType]]:
-        """Async object evaluation (currently delegates to sync implementation)."""
-        return self.resolve_object_details(flag_key, default_value, evaluation_context)
+        """Async object evaluation using provider async methods."""
+        return await self._evaluate_with_providers_async(
+            flag_key,
+            default_value,
+            evaluation_context,
+            lambda p, k, d, ctx: p.resolve_object_details_async(k, d, ctx),
+        )
