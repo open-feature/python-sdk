@@ -708,6 +708,7 @@ def test_client_set_evaluation_context_is_merged_during_evaluation():
     
     # Verify all contexts are merged with correct precedence
     assert context.targeting_key == "invocation"  # Highest precedence
+    assert context.attributes["transaction_attr"] == "transaction_value"
     assert context.attributes["api_attr"] == "api_value"
     assert context.attributes["client_attr"] == "client_value"
     assert context.attributes["invocation_attr"] == "invocation_value"
