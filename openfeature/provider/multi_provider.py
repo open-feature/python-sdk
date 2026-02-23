@@ -10,7 +10,7 @@ See: https://openfeature.dev/specification/appendix-a/#multi-provider
 from __future__ import annotations
 
 import typing
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 
@@ -316,7 +316,7 @@ class MultiProvider(AbstractProvider):
         flag_key: str,
         default_value: FlagValueType,
         evaluation_context: EvaluationContext | None,
-        resolve_fn: Callable[[FeatureProvider, str, FlagValueType, EvaluationContext | None], typing.Awaitable[FlagResolutionDetails[FlagValueType]]],
+        resolve_fn: Callable[[FeatureProvider, str, FlagValueType, EvaluationContext | None], Awaitable[FlagResolutionDetails[FlagValueType]]],
     ) -> FlagResolutionDetails[FlagValueType]:
         """
         Async evaluation logic that properly awaits provider async methods.
