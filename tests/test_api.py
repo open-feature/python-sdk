@@ -14,6 +14,7 @@ from openfeature.api import (
     remove_handler,
     set_evaluation_context,
     set_provider,
+    set_provider_and_wait,
     shutdown,
 )
 from openfeature.evaluation_context import EvaluationContext
@@ -328,6 +329,51 @@ def test_provider_error_handlers_run_if_provider_initialize_function_terminates_
 
     # Then
     spy.provider_error.assert_called_once()
+
+
+def test_set_provider_and_wait_blocks_until_initialize_completes():
+    # Given
+    evaluation_context = EvaluationContext("targeting_key", {"attr1": "val1"})
+    provider = MagicMock(spec=FeatureProvider)
+
+    # When
+    set_evaluation_context(evaluation_context)
+    set_provider_and_wait(provider)
+
+    # Then - initialize should have been called synchronously
+    provider.initialize.assert_called_with(evaluation_context)
+    # Provider should be READY after set_provider_and_wait returns
+    client = get_client()
+    assert client.get_provider_status() == ProviderStatus.READY
+
+
+def test_set_provider_and_wait_raises_on_initialization_failure():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    provider.initialize.side_effect = ProviderFatalError()
+
+    spy = MagicMock()
+    add_handler(ProviderEvent.PROVIDER_ERROR, spy.provider_error)
+
+    # When / Then - should propagate the exception to the caller
+    with pytest.raises(ProviderFatalError):
+        set_provider_and_wait(provider)
+
+    # Error handler should still have been called
+    spy.provider_error.assert_called_once()
+
+
+def test_set_provider_and_wait_with_domain():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+
+    # When
+    set_provider_and_wait(provider, domain="test")
+
+    # Then
+    provider.initialize.assert_called_once()
+    test_client = get_client("test")
+    assert test_client.provider == provider
 
 
 def test_provider_status_is_updated_after_provider_emits_event():
