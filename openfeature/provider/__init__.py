@@ -11,21 +11,17 @@ from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.hook import Hook
 
 from .metadata import Metadata
-from .multi_provider import (
-    EvaluationStrategy,
-    FirstMatchStrategy,
-    MultiProvider,
-    ProviderEntry,
-)
 
 if typing.TYPE_CHECKING:
     from openfeature.flag_evaluation import FlagValueType
 
 __all__ = [
     "AbstractProvider",
+    "ComparisonStrategy",
     "EvaluationStrategy",
     "FeatureProvider",
     "FirstMatchStrategy",
+    "FirstSuccessfulStrategy",
     "Metadata",
     "MultiProvider",
     "ProviderEntry",
@@ -262,3 +258,13 @@ class AbstractProvider(FeatureProvider):
     def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
         if hasattr(self, "_on_emit"):
             self._on_emit(self, event, details)
+
+
+from .multi_provider import (  # noqa: E402
+    ComparisonStrategy,
+    EvaluationStrategy,
+    FirstMatchStrategy,
+    FirstSuccessfulStrategy,
+    MultiProvider,
+    ProviderEntry,
+)

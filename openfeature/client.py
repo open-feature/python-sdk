@@ -429,6 +429,11 @@ class OpenFeatureClient:
 
         client_metadata = self.get_metadata()
         provider_metadata = provider.get_metadata()
+        provider_hooks = (
+            []
+            if self._provider_uses_internal_hooks(provider)
+            else provider.get_provider_hooks()
+        )
 
         # Hooks need to be handled in different orders at different stages
         # in the flag evaluation
@@ -450,7 +455,7 @@ class OpenFeatureClient:
                 get_hooks(),
                 self.hooks,
                 evaluation_hooks,
-                provider.get_provider_hooks(),
+                provider_hooks,
             )
         ]
         # after, error, finally: Provider, Invocation, Client, API
@@ -464,6 +469,36 @@ class OpenFeatureClient:
             reversed_merged_hooks_and_context,
             merged_eval_context,
         )
+
+    def _provider_uses_internal_hooks(self, provider: FeatureProvider) -> bool:
+        uses_internal_hooks = getattr(provider, "uses_internal_provider_hooks", None)
+        return bool(callable(uses_internal_hooks) and uses_internal_hooks())
+
+    def _set_internal_provider_hook_runtime(
+        self,
+        provider: FeatureProvider,
+        flag_type: FlagType,
+        hook_hints: HookHints,
+    ) -> object | None:
+        if not self._provider_uses_internal_hooks(provider):
+            return None
+        set_hook_runtime = getattr(provider, "set_internal_provider_hook_runtime", None)
+        if not callable(set_hook_runtime):
+            return None
+        return set_hook_runtime(
+            flag_type=flag_type,
+            client_metadata=self.get_metadata(),
+            hook_hints=hook_hints,
+        )
+
+    def _reset_internal_provider_hook_runtime(
+        self, provider: FeatureProvider, runtime_token: object | None
+    ) -> None:
+        if runtime_token is None:
+            return
+        reset_hook_runtime = getattr(provider, "reset_internal_provider_hook_runtime", None)
+        if callable(reset_hook_runtime):
+            reset_hook_runtime(runtime_token)
 
     def _assert_provider_status(
         self,
@@ -611,13 +646,21 @@ class OpenFeatureClient:
                 merged_eval_context,
             )
 
-            flag_evaluation = await self._create_provider_evaluation_async(
+            runtime_token = self._set_internal_provider_hook_runtime(
                 provider,
                 flag_type,
-                flag_key,
-                default_value,
-                merged_context,
+                hook_hints,
             )
+            try:
+                flag_evaluation = await self._create_provider_evaluation_async(
+                    provider,
+                    flag_type,
+                    flag_key,
+                    default_value,
+                    merged_context,
+                )
+            finally:
+                self._reset_internal_provider_hook_runtime(provider, runtime_token)
             if err := flag_evaluation.get_exception():
                 error_hooks(
                     flag_type, err, reversed_merged_hooks_and_context, hook_hints
@@ -787,13 +830,21 @@ class OpenFeatureClient:
                 merged_eval_context,
             )
 
-            flag_evaluation = self._create_provider_evaluation(
+            runtime_token = self._set_internal_provider_hook_runtime(
                 provider,
                 flag_type,
-                flag_key,
-                default_value,
-                merged_context,
+                hook_hints,
             )
+            try:
+                flag_evaluation = self._create_provider_evaluation(
+                    provider,
+                    flag_type,
+                    flag_key,
+                    default_value,
+                    merged_context,
+                )
+            finally:
+                self._reset_internal_provider_hook_runtime(provider, runtime_token)
             if err := flag_evaluation.get_exception():
                 error_hooks(
                     flag_type, err, reversed_merged_hooks_and_context, hook_hints
