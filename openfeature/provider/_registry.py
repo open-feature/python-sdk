@@ -80,23 +80,25 @@ class ProviderRegistry:
         try:
             if hasattr(provider, "initialize"):
                 provider.initialize(self._get_evaluation_context())
-            self.dispatch_event(
-                provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
-            )
+            if self.get_provider_status(provider) == ProviderStatus.NOT_READY:
+                self.dispatch_event(
+                    provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
+                )
         except Exception as err:
             error_code = (
                 err.error_code
                 if isinstance(err, OpenFeatureError)
                 else ErrorCode.GENERAL
             )
-            self.dispatch_event(
-                provider,
-                ProviderEvent.PROVIDER_ERROR,
-                ProviderEventDetails(
-                    message=f"Provider initialization failed: {err}",
-                    error_code=error_code,
-                ),
-            )
+            if self.get_provider_status(provider) == ProviderStatus.NOT_READY:
+                self.dispatch_event(
+                    provider,
+                    ProviderEvent.PROVIDER_ERROR,
+                    ProviderEventDetails(
+                        message=f"Provider initialization failed: {err}",
+                        error_code=error_code,
+                    ),
+                )
 
     def _shutdown_provider(self, provider: FeatureProvider) -> None:
         try:
@@ -115,6 +117,11 @@ class ProviderRegistry:
         provider.detach()
 
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
+        provider_status_getter = getattr(provider, "get_status", None)
+        if callable(provider_status_getter):
+            status = provider_status_getter()
+            if isinstance(status, ProviderStatus):
+                return status
         return self._provider_status.get(provider, ProviderStatus.NOT_READY)
 
     def dispatch_event(
