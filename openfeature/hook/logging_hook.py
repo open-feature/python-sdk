@@ -52,23 +52,17 @@ class LoggingHook(Hook):
         hints: HookHints,
     ) -> None:
         args = self._build_args(hook_context)
-        extra_args = {
-            "stage": "after",
-            "reason": details.reason,
-            "variant": details.variant,
-            "value": details.value,
-        }
-        self.logger.debug("After stage %s", {**args, **extra_args})
+        args["stage"] = "after"
+        args["reason"] = details.reason
+        args["variant"] = details.variant
+        args["value"] = details.value
+        self.logger.debug("After stage %s", args)
 
     def error(
         self, hook_context: HookContext, exception: Exception, hints: HookHints
     ) -> None:
         args = self._build_args(hook_context)
-        extra_args = {
-            "stage": "error",
-            "error_code": exception.error_code
-            if isinstance(exception, OpenFeatureError)
-            else ErrorCode.GENERAL,
-            "error_message": str(exception),
-        }
-        self.logger.error("Error stage %s", {**args, **extra_args})
+        args["stage"] = "error"
+        args["error_code"] = exception.error_code if isinstance(exception, OpenFeatureError) else ErrorCode.GENERAL
+        args["error_message"] = str(exception)
+        self.logger.error("Error stage %s", args)
