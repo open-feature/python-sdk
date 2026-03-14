@@ -107,6 +107,7 @@ print("Value: " + str(flag_value))
 | ✅      | [Logging](#logging)                                                 | Integrate with popular logging packages.                                                                                              |
 | ✅      | [Domains](#domains)                                                 | Logically bind clients with providers.                                                                                                |
 | ✅      | [Eventing](#eventing)                                               | React to state changes in the provider or flag management system.                                                                     |
+| ✅      | [Tracking](#tracking)                                               | Associate user actions with feature flag evaluations.                                                                                |
 | ✅      | [Shutdown](#shutdown)                                               | Gracefully clean up a provider during application shutdown.                                                                           |
 | ✅      | [Transaction Context Propagation](#transaction-context-propagation) | Set a specific [evaluation context](https://openfeature.dev/docs/reference/concepts/evaluation-context) for a transaction (e.g. an HTTP request or a thread) |
 | ✅      | [Extending](#extending)                                             | Extend OpenFeature with custom providers and hooks.                                                                                   |
@@ -185,6 +186,25 @@ client.add_hooks([MyHook()])
 options = FlagEvaluationOptions(hooks=[MyHook()])
 client.get_boolean_flag("my-flag", False, flag_evaluation_options=options)
 ```
+### Tracking
+
+The [tracking API](https://openfeature.dev/specification/sections/tracking/) allows you to use OpenFeature abstractions and objects to associate user actions with feature flag evaluations.
+This is essential for robust experimentation powered by feature flags.
+For example, a flag enhancing the appearance of a UI component might drive user engagement to a new feature; to test this hypothesis, telemetry collected by a [hook](#hooks) or [provider](#providers) can be associated with telemetry reported in the client's `track` function.
+
+```python
+# initialize a client
+client = api.get_client()
+
+# trigger tracking event action
+client.track(
+    'visited-promo-page',
+    evaluation_context=EvaluationContext(),
+    tracking_event_details=openfeature.TrackingEventDetails(99.77).add("currencyCode", "USD"),
+    )
+```
+
+Note that some providers may not support tracking; check the documentation for your provider for more information.
 
 ### Logging
 
