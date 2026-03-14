@@ -86,10 +86,7 @@ def test_after_calls_debug_with_evaluation_context(hook_context):
             "reason": "STATIC",
             "variant": "on",
             "value": True,
-            "evaluation_context": {
-                "targeting_key": "user-1",
-                "attributes": {"env": "prod"},
-            },
+            "evaluation_context": '{"targeting_key": "user-1", "attributes": {"env": "prod"}}',
         },
     )
 
@@ -172,8 +169,26 @@ def test_build_args_includes_evaluation_context_when_enabled(hook_context):
         "default_value": False,
         "domain": "my-domain",
         "provider_name": "my-provider",
-        "evaluation_context": {
-            "targeting_key": "user-1",
-            "attributes": {"env": "prod"},
-        },
+        "evaluation_context": '{"targeting_key": "user-1", "attributes": {"env": "prod"}}',
     }
+
+
+def test_error_calls_error_log_with_evaluation_context(hook_context):
+    mock_logger = MagicMock()
+    hook = LoggingHook(logger=mock_logger, include_evaluation_context=True)
+    exception = Exception("something went wrong")
+    hook.error(hook_context, exception, hints={})
+
+    mock_logger.error.assert_called_with(
+        "Error stage %s",
+        {
+            "stage": "error",
+            "flag_key": "my-flag",
+            "default_value": False,
+            "domain": "my-domain",
+            "provider_name": "my-provider",
+            "evaluation_context": '{"targeting_key": "user-1", "attributes": {"env": "prod"}}',
+            "error_code": ErrorCode.GENERAL,
+            "error_message": "something went wrong",
+        },
+    )
