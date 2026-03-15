@@ -61,7 +61,6 @@ class LoggingHook(Hook):
         self, hook_context: HookContext, exception: Exception, hints: HookHints
     ) -> None:
         args = self._build_args(hook_context, "error")
-        args["stage"] = "error"
         args["error_code"] = (
             exception.error_code
             if isinstance(exception, OpenFeatureError)

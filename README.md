@@ -196,7 +196,7 @@ The Python SDK includes a `LoggingHook`, which logs detailed information at key 
 
 ```python
 from openfeature import api
-from openfeature.hook import LoggingHook
+from openfeature.hook.logging_hook import LoggingHook
 
 api.add_hooks([LoggingHook()])
 ```
