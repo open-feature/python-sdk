@@ -126,7 +126,7 @@ def test_error_extracts_error_code_from_open_feature_error(hook_context):
             "domain": "my-domain",
             "provider_name": "my-provider",
             "error_code": ErrorCode.FLAG_NOT_FOUND,
-            "error_message": str(exception),
+            "error_message": "flag not found",
         },
     )
 

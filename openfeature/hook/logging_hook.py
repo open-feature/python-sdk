@@ -59,10 +59,10 @@ class LoggingHook(Hook):
         self, hook_context: HookContext, exception: Exception, hints: HookHints
     ) -> None:
         args = self._build_args(hook_context, "error")
-        args["error_code"] = (
-            exception.error_code
-            if isinstance(exception, OpenFeatureError)
-            else ErrorCode.GENERAL
-        )
-        args["error_message"] = str(exception)
+        if isinstance(exception, OpenFeatureError):
+            args["error_code"] = exception.error_code
+            args["error_message"] = exception.error_message
+        else:
+            args["error_code"] = ErrorCode.GENERAL
+            args["error_message"] = str(exception)
         self.logger.error("Flag evaluation %s", args)
