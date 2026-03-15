@@ -40,7 +40,7 @@ class LoggingHook(Hook):
         self, hook_context: HookContext, hints: HookHints
     ) -> EvaluationContext | None:
         args = self._build_args(hook_context, "before")
-        self.logger.debug("Before stage %s", args)
+        self.logger.debug("Flag evaluation %s", args)
         return None
 
     def after(
@@ -53,7 +53,7 @@ class LoggingHook(Hook):
         args["reason"] = details.reason
         args["variant"] = details.variant
         args["value"] = details.value
-        self.logger.debug("After stage %s", args)
+        self.logger.debug("Flag evaluation %s", args)
 
     def error(
         self, hook_context: HookContext, exception: Exception, hints: HookHints
@@ -65,4 +65,4 @@ class LoggingHook(Hook):
             else ErrorCode.GENERAL
         )
         args["error_message"] = str(exception)
-        self.logger.error("Error stage %s", args)
+        self.logger.error("Flag evaluation %s", args)

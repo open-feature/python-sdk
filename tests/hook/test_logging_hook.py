@@ -27,7 +27,7 @@ def test_before_calls_debug_with_stage(hook_context):
     hook = LoggingHook(logger=mock_logger)
     hook.before(hook_context, hints={})
     mock_logger.debug.assert_called_with(
-        "Before stage %s",
+        "Flag evaluation %s",
         {
             "stage": "before",
             "flag_key": "my-flag",
@@ -50,7 +50,7 @@ def test_after_calls_debug_with_stage(hook_context):
     hook.after(hook_context, details, hints={})
 
     mock_logger.debug.assert_called_with(
-        "After stage %s",
+        "Flag evaluation %s",
         {
             "stage": "after",
             "flag_key": "my-flag",
@@ -76,7 +76,7 @@ def test_after_calls_debug_with_evaluation_context(hook_context):
     hook.after(hook_context, details, hints={})
 
     mock_logger.debug.assert_called_with(
-        "After stage %s",
+        "Flag evaluation %s",
         {
             "stage": "after",
             "flag_key": "my-flag",
@@ -98,7 +98,7 @@ def test_error_calls_error_log(hook_context):
     hook.error(hook_context, exception, hints={})
 
     mock_logger.error.assert_called_with(
-        "Error stage %s",
+        "Flag evaluation %s",
         {
             "stage": "error",
             "flag_key": "my-flag",
@@ -118,7 +118,7 @@ def test_error_extracts_error_code_from_open_feature_error(hook_context):
     hook.error(hook_context, exception, hints={})
 
     mock_logger.error.assert_called_with(
-        "Error stage %s",
+        "Flag evaluation %s",
         {
             "stage": "error",
             "flag_key": "my-flag",
@@ -183,7 +183,7 @@ def test_error_calls_error_log_with_evaluation_context(hook_context):
     hook.error(hook_context, exception, hints={})
 
     mock_logger.error.assert_called_with(
-        "Error stage %s",
+        "Flag evaluation %s",
         {
             "stage": "error",
             "flag_key": "my-flag",
