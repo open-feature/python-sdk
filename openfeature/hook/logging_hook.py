@@ -4,7 +4,7 @@ import logging
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import ErrorCode, OpenFeatureError
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagValueType
-from openfeature.hook.hook import Hook, HookContext, HookHints
+from openfeature.hook import Hook, HookContext, HookHints
 
 
 class LoggingHook(Hook):

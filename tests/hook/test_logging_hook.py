@@ -6,7 +6,7 @@ from openfeature.client import ClientMetadata
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import ErrorCode, FlagNotFoundError
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
-from openfeature.hook import HookContext, LoggingHook
+from openfeature.hook.logging_hook import HookContext, LoggingHook
 from openfeature.provider.metadata import Metadata
 
 
