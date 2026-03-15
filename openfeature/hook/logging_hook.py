@@ -1,5 +1,6 @@
 import json
 import logging
+from dataclasses import asdict
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import ErrorCode, OpenFeatureError
@@ -30,10 +31,7 @@ class LoggingHook(Hook):
         }
         if self.include_evaluation_context:
             args["evaluation_context"] = json.dumps(
-                {
-                    "targeting_key": hook_context.evaluation_context.targeting_key,
-                    "attributes": hook_context.evaluation_context.attributes,
-                },
+                asdict(hook_context.evaluation_context),
                 default=str,
             )
         return args
