@@ -16,7 +16,7 @@ class LoggingHook(Hook):
         self.logger = logger or logging.getLogger("openfeature")
         self.include_evaluation_context = include_evaluation_context
 
-    def _build_args(self, hook_context: HookContext) -> dict:
+    def _build_args(self, hook_context: HookContext, stage: str) -> dict:
         args = {
             "domain": hook_context.client_metadata.domain
             if hook_context.client_metadata
@@ -26,6 +26,7 @@ class LoggingHook(Hook):
             else None,
             "flag_key": hook_context.flag_key,
             "default_value": hook_context.default_value,
+            "stage": stage,
         }
         if self.include_evaluation_context:
             args["evaluation_context"] = json.dumps(
@@ -40,8 +41,7 @@ class LoggingHook(Hook):
     def before(
         self, hook_context: HookContext, hints: HookHints
     ) -> EvaluationContext | None:
-        args = self._build_args(hook_context)
-        args["stage"] = "before"
+        args = self._build_args(hook_context, "before")
         self.logger.debug("Before stage %s", args)
         return None
 
@@ -51,8 +51,7 @@ class LoggingHook(Hook):
         details: FlagEvaluationDetails[FlagValueType],
         hints: HookHints,
     ) -> None:
-        args = self._build_args(hook_context)
-        args["stage"] = "after"
+        args = self._build_args(hook_context, "after")
         args["reason"] = details.reason
         args["variant"] = details.variant
         args["value"] = details.value
@@ -61,7 +60,7 @@ class LoggingHook(Hook):
     def error(
         self, hook_context: HookContext, exception: Exception, hints: HookHints
     ) -> None:
-        args = self._build_args(hook_context)
+        args = self._build_args(hook_context, "error")
         args["stage"] = "error"
         args["error_code"] = (
             exception.error_code
