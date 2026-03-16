@@ -30,7 +30,7 @@ from openfeature.hook._hook_support import (
     before_hooks,
     error_hooks,
 )
-from openfeature.provider import FeatureProvider, ProviderStatus
+from openfeature.provider import FeatureProvider, InternalHookProvider, ProviderStatus
 from openfeature.provider._registry import provider_registry
 from openfeature.transaction_context import get_transaction_context
 
@@ -429,6 +429,11 @@ class OpenFeatureClient:
 
         client_metadata = self.get_metadata()
         provider_metadata = provider.get_metadata()
+        provider_hooks = (
+            []
+            if self._provider_uses_internal_hooks(provider)
+            else provider.get_provider_hooks()
+        )
 
         # Hooks need to be handled in different orders at different stages
         # in the flag evaluation
@@ -450,7 +455,7 @@ class OpenFeatureClient:
                 get_hooks(),
                 self.hooks,
                 evaluation_hooks,
-                provider.get_provider_hooks(),
+                provider_hooks,
             )
         ]
         # after, error, finally: Provider, Invocation, Client, API
@@ -464,6 +469,45 @@ class OpenFeatureClient:
             reversed_merged_hooks_and_context,
             merged_eval_context,
         )
+
+    def _as_internal_hook_provider(
+        self, provider: FeatureProvider
+    ) -> InternalHookProvider | None:
+        """Return the provider as InternalHookProvider if it opts in, else None."""
+        if getattr(provider, "_is_internal_hook_provider", False) and isinstance(
+            provider, InternalHookProvider
+        ):
+            return provider
+        return None
+
+    def _provider_uses_internal_hooks(self, provider: FeatureProvider) -> bool:
+        ihp = self._as_internal_hook_provider(provider)
+        return ihp is not None and ihp.uses_internal_provider_hooks()
+
+    def _set_internal_provider_hook_runtime(
+        self,
+        provider: FeatureProvider,
+        flag_type: FlagType,
+        hook_hints: HookHints,
+    ) -> object | None:
+        ihp = self._as_internal_hook_provider(provider)
+        if ihp is None or not ihp.uses_internal_provider_hooks():
+            return None
+        result: object | None = ihp.set_internal_provider_hook_runtime(
+            flag_type=flag_type,
+            client_metadata=self.get_metadata(),
+            hook_hints=hook_hints,
+        )
+        return result
+
+    def _reset_internal_provider_hook_runtime(
+        self, provider: FeatureProvider, runtime_token: object | None
+    ) -> None:
+        if runtime_token is None:
+            return
+        ihp = self._as_internal_hook_provider(provider)
+        if ihp is not None:
+            ihp.reset_internal_provider_hook_runtime(runtime_token)
 
     def _assert_provider_status(
         self,
@@ -611,13 +655,21 @@ class OpenFeatureClient:
                 merged_eval_context,
             )
 
-            flag_evaluation = await self._create_provider_evaluation_async(
+            runtime_token = self._set_internal_provider_hook_runtime(
                 provider,
                 flag_type,
-                flag_key,
-                default_value,
-                merged_context,
+                hook_hints,
             )
+            try:
+                flag_evaluation = await self._create_provider_evaluation_async(
+                    provider,
+                    flag_type,
+                    flag_key,
+                    default_value,
+                    merged_context,
+                )
+            finally:
+                self._reset_internal_provider_hook_runtime(provider, runtime_token)
             if err := flag_evaluation.get_exception():
                 error_hooks(
                     flag_type, err, reversed_merged_hooks_and_context, hook_hints
@@ -787,13 +839,21 @@ class OpenFeatureClient:
                 merged_eval_context,
             )
 
-            flag_evaluation = self._create_provider_evaluation(
+            runtime_token = self._set_internal_provider_hook_runtime(
                 provider,
                 flag_type,
-                flag_key,
-                default_value,
-                merged_context,
+                hook_hints,
             )
+            try:
+                flag_evaluation = self._create_provider_evaluation(
+                    provider,
+                    flag_type,
+                    flag_key,
+                    default_value,
+                    merged_context,
+                )
+            finally:
+                self._reset_internal_provider_hook_runtime(provider, runtime_token)
             if err := flag_evaluation.get_exception():
                 error_hooks(
                     flag_type, err, reversed_merged_hooks_and_context, hook_hints
