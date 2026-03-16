@@ -30,7 +30,7 @@ from openfeature.hook._hook_support import (
     before_hooks,
     error_hooks,
 )
-from openfeature.provider import FeatureProvider, ProviderStatus
+from openfeature.provider import FeatureProvider, InternalHookProvider, ProviderStatus
 from openfeature.provider._registry import provider_registry
 from openfeature.transaction_context import get_transaction_context
 
@@ -471,8 +471,10 @@ class OpenFeatureClient:
         )
 
     def _provider_uses_internal_hooks(self, provider: FeatureProvider) -> bool:
-        uses_internal_hooks = getattr(provider, "uses_internal_provider_hooks", None)
-        return bool(callable(uses_internal_hooks) and uses_internal_hooks())
+        return (
+            isinstance(provider, InternalHookProvider)
+            and provider.uses_internal_provider_hooks()
+        )
 
     def _set_internal_provider_hook_runtime(
         self,
@@ -480,12 +482,11 @@ class OpenFeatureClient:
         flag_type: FlagType,
         hook_hints: HookHints,
     ) -> object | None:
-        if not self._provider_uses_internal_hooks(provider):
+        if not isinstance(provider, InternalHookProvider):
             return None
-        set_hook_runtime = getattr(provider, "set_internal_provider_hook_runtime", None)
-        if not callable(set_hook_runtime):
+        if not provider.uses_internal_provider_hooks():
             return None
-        return set_hook_runtime(
+        return provider.set_internal_provider_hook_runtime(
             flag_type=flag_type,
             client_metadata=self.get_metadata(),
             hook_hints=hook_hints,
@@ -496,9 +497,8 @@ class OpenFeatureClient:
     ) -> None:
         if runtime_token is None:
             return
-        reset_hook_runtime = getattr(provider, "reset_internal_provider_hook_runtime", None)
-        if callable(reset_hook_runtime):
-            reset_hook_runtime(runtime_token)
+        if isinstance(provider, InternalHookProvider):
+            provider.reset_internal_provider_hook_runtime(runtime_token)
 
     def _assert_provider_status(
         self,

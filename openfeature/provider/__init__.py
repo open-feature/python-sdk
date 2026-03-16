@@ -22,6 +22,7 @@ __all__ = [
     "FeatureProvider",
     "FirstMatchStrategy",
     "FirstSuccessfulStrategy",
+    "InternalHookProvider",
     "Metadata",
     "MultiProvider",
     "ProviderEntry",
@@ -126,6 +127,32 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
     ) -> FlagResolutionDetails[
         Sequence[FlagValueType] | Mapping[str, FlagValueType]
     ]: ...
+
+
+@typing.runtime_checkable
+class InternalHookProvider(typing.Protocol):
+    """Protocol for providers that manage their own provider hook execution.
+
+    Providers implementing this protocol (e.g. MultiProvider) handle provider
+    hook lifecycle internally. The client will skip its own provider hook
+    invocations and instead delegate to the provider via the set/reset methods.
+
+    The registry will also use get_status() from this protocol instead of its
+    own internal status tracking for providers that implement it.
+    """
+
+    def uses_internal_provider_hooks(self) -> bool: ...
+
+    def set_internal_provider_hook_runtime(
+        self,
+        flag_type: typing.Any,
+        client_metadata: typing.Any,
+        hook_hints: typing.Any,
+    ) -> typing.Any: ...
+
+    def reset_internal_provider_hook_runtime(self, token: typing.Any) -> None: ...
+
+    def get_status(self) -> ProviderStatus: ...
 
 
 class AbstractProvider(FeatureProvider):
