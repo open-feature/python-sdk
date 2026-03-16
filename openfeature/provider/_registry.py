@@ -5,7 +5,7 @@ from openfeature.event import (
     ProviderEventDetails,
 )
 from openfeature.exception import ErrorCode, GeneralError, OpenFeatureError
-from openfeature.provider import FeatureProvider, ProviderStatus
+from openfeature.provider import FeatureProvider, InternalHookProvider, ProviderStatus
 from openfeature.provider.no_op_provider import NoOpProvider
 
 
@@ -80,6 +80,9 @@ class ProviderRegistry:
         try:
             if hasattr(provider, "initialize"):
                 provider.initialize(self._get_evaluation_context())
+            # InternalHookProvider (e.g. MultiProvider) emits its own events
+            # during initialize(), so only dispatch PROVIDER_READY if the
+            # provider hasn't already transitioned away from NOT_READY.
             if self.get_provider_status(provider) == ProviderStatus.NOT_READY:
                 self.dispatch_event(
                     provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
@@ -90,6 +93,8 @@ class ProviderRegistry:
                 if isinstance(err, OpenFeatureError)
                 else ErrorCode.GENERAL
             )
+            # Same guard: skip if the provider already emitted its own error
+            # event and transitioned out of NOT_READY.
             if self.get_provider_status(provider) == ProviderStatus.NOT_READY:
                 self.dispatch_event(
                     provider,
@@ -117,11 +122,10 @@ class ProviderRegistry:
         provider.detach()
 
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
-        provider_status_getter = getattr(provider, "get_status", None)
-        if callable(provider_status_getter):
-            status = provider_status_getter()
-            if isinstance(status, ProviderStatus):
-                return status
+        # Only InternalHookProvider implementations (e.g. MultiProvider) manage
+        # their own status. For all other providers, use the registry's tracking.
+        if isinstance(provider, InternalHookProvider):
+            return provider.get_status()
         return self._provider_status.get(provider, ProviderStatus.NOT_READY)
 
     def dispatch_event(
