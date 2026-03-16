@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.9.0](https://github.com/open-feature/python-sdk/compare/v0.8.4...v0.9.0) (2026-03-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove deprecated openfeature.provider.provider module ([#558](https://github.com/open-feature/python-sdk/issues/558))
+* Drop python 3.9 support ([#554](https://github.com/open-feature/python-sdk/issues/554))
+
+### 🐛 Bug Fixes
+
+* Prevent providers from being initialized multiple times ([45f7fd1](https://github.com/open-feature/python-sdk/commit/45f7fd1fd3dd39240282e23bf0ce587435f3ff2f))
+* Prevent providers from being shutdown multiple times ([45f7fd1](https://github.com/open-feature/python-sdk/commit/45f7fd1fd3dd39240282e23bf0ce587435f3ff2f))
+* replace project.scripts with poethepoet ([#563](https://github.com/open-feature/python-sdk/issues/563)) ([05382aa](https://github.com/open-feature/python-sdk/commit/05382aad368800d593209ece7966045b9daf9756))
+* validate domain is present when calling `set_provider` on registry ([#561](https://github.com/open-feature/python-sdk/issues/561)) ([9fc6121](https://github.com/open-feature/python-sdk/commit/9fc612180a3ea8d26820394b329abd24804d2df4))
+
+
+### ✨ New Features
+
+* add logging hook ([#577](https://github.com/open-feature/python-sdk/issues/577)) ([ae59756](https://github.com/open-feature/python-sdk/commit/ae59756109f39f4a0d0551cdd80aeaa5aaada571))
+* Drop python 3.9 support ([04106f5](https://github.com/open-feature/python-sdk/commit/04106f532d3a92d9dd70fd2160a07672ca4404f8))
+
+
+### 🧹 Chore
+
+* add pyproject-fmt hook ([#578](https://github.com/open-feature/python-sdk/issues/578)) ([fafd902](https://github.com/open-feature/python-sdk/commit/fafd9023c7c1c82656b5af99c998124e88160fdf))
+* **deps:** update actions/checkout digest to de0fac2 ([#572](https://github.com/open-feature/python-sdk/issues/572)) ([e9dfeac](https://github.com/open-feature/python-sdk/commit/e9dfeac1e696ec038af3b62ed5a6bb6d11453696))
+* **deps:** update astral-sh/setup-uv digest to e06108d ([#573](https://github.com/open-feature/python-sdk/issues/573)) ([c35a1e5](https://github.com/open-feature/python-sdk/commit/c35a1e5664613da36e1264ec348b540e1aa0c8da))
+* **deps:** update dependency uv_build to ~=0.10.0 ([#571](https://github.com/open-feature/python-sdk/issues/571)) ([a6366e2](https://github.com/open-feature/python-sdk/commit/a6366e21c41f1c7560ca245840ece09f31c6938e))
+* **deps:** update github/codeql-action digest to 0d579ff ([#574](https://github.com/open-feature/python-sdk/issues/574)) ([0696033](https://github.com/open-feature/python-sdk/commit/0696033b30788bed6d7e0c0360192c2913f130cd))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.15.6 ([#575](https://github.com/open-feature/python-sdk/issues/575)) ([d0d7d8f](https://github.com/open-feature/python-sdk/commit/d0d7d8f6a2c83cf9488cb2185ebb2cb9cc32fbfe))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v1.19.1 ([#576](https://github.com/open-feature/python-sdk/issues/576)) ([ade3870](https://github.com/open-feature/python-sdk/commit/ade3870dcd734722df357a11771bfc584f128093))
+* Drop python 3.9 support ([#554](https://github.com/open-feature/python-sdk/issues/554)) ([04106f5](https://github.com/open-feature/python-sdk/commit/04106f532d3a92d9dd70fd2160a07672ca4404f8))
+* update pytest to v9 ([#559](https://github.com/open-feature/python-sdk/issues/559)) ([71ebb9f](https://github.com/open-feature/python-sdk/commit/71ebb9fe961acb2ed256f12695123864fcf69cd5))
+
+
+### 🔄 Refactoring
+
+* Delete provider status instead of marking as NOT_READY ([45f7fd1](https://github.com/open-feature/python-sdk/commit/45f7fd1fd3dd39240282e23bf0ce587435f3ff2f))
+* remove deprecated openfeature.provider.provider module ([#558](https://github.com/open-feature/python-sdk/issues/558)) ([7c27c7a](https://github.com/open-feature/python-sdk/commit/7c27c7ae58ab498fdc85ab508a76f7d5261f02f1))
+
 ## [0.8.4](https://github.com/open-feature/python-sdk/compare/v0.8.3...v0.8.4) (2025-12-08)
 
 
