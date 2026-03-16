@@ -60,7 +60,9 @@ class BooleanProvider(AbstractProvider):
     ) -> FlagResolutionDetails[bool]:
         del flag_key
         self.resolveCount += 1
-        self.seenContexts.append(dict((evaluation_context or EvaluationContext()).attributes))
+        self.seenContexts.append(
+            dict((evaluation_context or EvaluationContext()).attributes)
+        )
         if self.sync_blocker is not None:
             self.sync_blocker.wait()
         if self.booleanException is not None:
@@ -77,7 +79,9 @@ class BooleanProvider(AbstractProvider):
     ) -> FlagResolutionDetails[bool]:
         del flag_key
         self.resolveCount += 1
-        self.seenContexts.append(dict((evaluation_context or EvaluationContext()).attributes))
+        self.seenContexts.append(
+            dict((evaluation_context or EvaluationContext()).attributes)
+        )
         if self.async_blocker is not None:
             await self.async_blocker.wait()
         if self.booleanException is not None:
@@ -225,7 +229,9 @@ def test_comparison_strategy_rejects_unknown_fallback_provider():
     first_provider = BooleanProvider("first")
     second_provider = BooleanProvider("second")
 
-    with pytest.raises(ValueError, match="Fallback provider 'missing' is not registered"):
+    with pytest.raises(
+        ValueError, match="Fallback provider 'missing' is not registered"
+    ):
         MultiProvider(
             [
                 ProviderEntry(first_provider, name="first"),
@@ -311,7 +317,9 @@ def test_first_successful_skips_general_errors():
 
 def test_first_successful_aggregates_errors_when_all_providers_fail():
     first_provider = BooleanProvider("first", boolean_exception=GeneralError("first"))
-    second_provider = BooleanProvider("second", boolean_exception=GeneralError("second"))
+    second_provider = BooleanProvider(
+        "second", boolean_exception=GeneralError("second")
+    )
     multi_provider = MultiProvider(
         [
             ProviderEntry(first_provider, name="first"),
@@ -583,8 +591,12 @@ def test_multi_provider_forwards_configuration_changed_events():
         spy.provider_configuration_changed,
     )
 
-    first_provider.emit_provider_configuration_changed(ProviderEventDetails(message="one"))
-    second_provider.emit_provider_configuration_changed(ProviderEventDetails(message="two"))
+    first_provider.emit_provider_configuration_changed(
+        ProviderEventDetails(message="one")
+    )
+    second_provider.emit_provider_configuration_changed(
+        ProviderEventDetails(message="two")
+    )
 
     assert spy.provider_configuration_changed.call_count == 2
 

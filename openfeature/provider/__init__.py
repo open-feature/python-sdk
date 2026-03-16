@@ -139,7 +139,13 @@ class InternalHookProvider(typing.Protocol):
 
     The registry will also use get_status() from this protocol instead of its
     own internal status tracking for providers that implement it.
+
+    Implementations must set ``_is_internal_hook_provider = True`` as a class
+    attribute. This marker is checked alongside ``isinstance`` to avoid false
+    positives from duck-typed objects (e.g. ``Mock``).
     """
+
+    _is_internal_hook_provider: typing.ClassVar[bool]
 
     def uses_internal_provider_hooks(self) -> bool: ...
 

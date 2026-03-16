@@ -470,11 +470,19 @@ class OpenFeatureClient:
             merged_eval_context,
         )
 
+    def _as_internal_hook_provider(
+        self, provider: FeatureProvider
+    ) -> InternalHookProvider | None:
+        """Return the provider as InternalHookProvider if it opts in, else None."""
+        if getattr(provider, "_is_internal_hook_provider", False) and isinstance(
+            provider, InternalHookProvider
+        ):
+            return provider
+        return None
+
     def _provider_uses_internal_hooks(self, provider: FeatureProvider) -> bool:
-        return (
-            isinstance(provider, InternalHookProvider)
-            and provider.uses_internal_provider_hooks()
-        )
+        ihp = self._as_internal_hook_provider(provider)
+        return ihp is not None and ihp.uses_internal_provider_hooks()
 
     def _set_internal_provider_hook_runtime(
         self,
@@ -482,23 +490,24 @@ class OpenFeatureClient:
         flag_type: FlagType,
         hook_hints: HookHints,
     ) -> object | None:
-        if not isinstance(provider, InternalHookProvider):
+        ihp = self._as_internal_hook_provider(provider)
+        if ihp is None or not ihp.uses_internal_provider_hooks():
             return None
-        if not provider.uses_internal_provider_hooks():
-            return None
-        return provider.set_internal_provider_hook_runtime(
+        result: object | None = ihp.set_internal_provider_hook_runtime(
             flag_type=flag_type,
             client_metadata=self.get_metadata(),
             hook_hints=hook_hints,
         )
+        return result
 
     def _reset_internal_provider_hook_runtime(
         self, provider: FeatureProvider, runtime_token: object | None
     ) -> None:
         if runtime_token is None:
             return
-        if isinstance(provider, InternalHookProvider):
-            provider.reset_internal_provider_hook_runtime(runtime_token)
+        ihp = self._as_internal_hook_provider(provider)
+        if ihp is not None:
+            ihp.reset_internal_provider_hook_runtime(runtime_token)
 
     def _assert_provider_status(
         self,
