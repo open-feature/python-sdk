@@ -109,7 +109,9 @@ def _validate_run_mode(run_mode: RunMode) -> RunMode:
 def _format_result_error(
     provider_name: str, result: FlagResolutionDetails[FlagValueType]
 ) -> str:
-    error_code = result.error_code.value if result.error_code else ErrorCode.GENERAL.value
+    error_code = (
+        result.error_code.value if result.error_code else ErrorCode.GENERAL.value
+    )
     error_message = result.error_message or "Unknown error"
     return f"{provider_name}: {error_code} ({error_message})"
 
@@ -280,7 +282,9 @@ class ComparisonStrategy:
         evaluations: list[_ProviderEvaluation[FlagValueType]],
     ) -> FlagResolutionDetails[FlagValueType]:
         failed_evaluations = [
-            evaluation for evaluation in evaluations if not _is_success(evaluation.result)
+            evaluation
+            for evaluation in evaluations
+            if not _is_success(evaluation.result)
         ]
         if failed_evaluations:
             return _build_aggregated_error(
@@ -338,6 +342,8 @@ class MultiProvider(AbstractProvider):
         ProviderStatus.READY,
     )
 
+    _is_internal_hook_provider: typing.ClassVar[bool] = True
+
     def __init__(
         self,
         providers: list[ProviderEntry],
@@ -365,7 +371,9 @@ class MultiProvider(AbstractProvider):
             provider_name: ProviderStatus.NOT_READY
             for provider_name, _ in self._registered_providers
         }
-        validate_provider_names = getattr(self.strategy, "validate_provider_names", None)
+        validate_provider_names = getattr(
+            self.strategy, "validate_provider_names", None
+        )
         if callable(validate_provider_names):
             validate_provider_names(
                 [provider_name for provider_name, _ in self._registered_providers]
@@ -455,8 +463,12 @@ class MultiProvider(AbstractProvider):
             except Exception as err:
                 return provider_name, err
 
-        with ThreadPoolExecutor(max_workers=len(self._registered_providers)) as executor:
-            init_results = list(executor.map(initialize_provider, self._registered_providers))
+        with ThreadPoolExecutor(
+            max_workers=len(self._registered_providers)
+        ) as executor:
+            init_results = list(
+                executor.map(initialize_provider, self._registered_providers)
+            )
 
         error_messages: list[str] = []
         event_details = ProviderEventDetails()
@@ -475,7 +487,9 @@ class MultiProvider(AbstractProvider):
         self._refresh_aggregate_status(event_details, force=True)
 
         if error_messages:
-            raise GeneralError(f"Multi-provider initialization failed: {'; '.join(error_messages)}")
+            raise GeneralError(
+                f"Multi-provider initialization failed: {'; '.join(error_messages)}"
+            )
 
     def shutdown(self) -> None:
         for _, provider in self._registered_providers:
@@ -488,7 +502,9 @@ class MultiProvider(AbstractProvider):
             except Exception:
                 logger.exception("Provider '%s' shutdown failed", provider_name)
 
-        with ThreadPoolExecutor(max_workers=len(self._registered_providers)) as executor:
+        with ThreadPoolExecutor(
+            max_workers=len(self._registered_providers)
+        ) as executor:
             list(executor.map(shutdown_provider, self._registered_providers))
 
         with self._status_lock:
@@ -522,7 +538,9 @@ class MultiProvider(AbstractProvider):
                 provider_name,
                 self._status_from_event_details(details),
             )
-        self._refresh_aggregate_status(self._with_provider_metadata(details, provider_name))
+        self._refresh_aggregate_status(
+            self._with_provider_metadata(details, provider_name)
+        )
 
     def _set_provider_status(
         self, provider_name: str, provider_status: ProviderStatus
@@ -547,7 +565,9 @@ class MultiProvider(AbstractProvider):
         if not self._initialized:
             return True
         with self._status_lock:
-            status = self._provider_statuses.get(provider_name, ProviderStatus.NOT_READY)
+            status = self._provider_statuses.get(
+                provider_name, ProviderStatus.NOT_READY
+            )
         return status not in (ProviderStatus.NOT_READY, ProviderStatus.FATAL)
 
     def _calculate_aggregate_status(self) -> ProviderStatus:
@@ -577,7 +597,9 @@ class MultiProvider(AbstractProvider):
         if event_to_emit is not None:
             self.emit(event_to_emit, event_details)
 
-    def _event_from_status(self, provider_status: ProviderStatus) -> ProviderEvent | None:
+    def _event_from_status(
+        self, provider_status: ProviderStatus
+    ) -> ProviderEvent | None:
         if provider_status == ProviderStatus.READY:
             return ProviderEvent.PROVIDER_READY
         if provider_status == ProviderStatus.STALE:
@@ -632,9 +654,7 @@ class MultiProvider(AbstractProvider):
         self, err: Exception, provider_name: str
     ) -> ProviderEventDetails:
         error_code = (
-            err.error_code
-            if isinstance(err, OpenFeatureError)
-            else ErrorCode.GENERAL
+            err.error_code if isinstance(err, OpenFeatureError) else ErrorCode.GENERAL
         )
         error_message = self._error_message_from_exception(err)
         return ProviderEventDetails(
@@ -652,9 +672,7 @@ class MultiProvider(AbstractProvider):
         self, default_value: T, err: Exception
     ) -> FlagResolutionDetails[T]:
         error_code = (
-            err.error_code
-            if isinstance(err, OpenFeatureError)
-            else ErrorCode.GENERAL
+            err.error_code if isinstance(err, OpenFeatureError) else ErrorCode.GENERAL
         )
         error_message = self._error_message_from_exception(err)
         return FlagResolutionDetails(
@@ -709,7 +727,9 @@ class MultiProvider(AbstractProvider):
                 return _ProviderEvaluation(
                     provider_name=provider_name,
                     provider=provider,
-                    result=resolve_fn(provider, flag_key, default_value, evaluation_context),
+                    result=resolve_fn(
+                        provider, flag_key, default_value, evaluation_context
+                    ),
                 )
             except Exception as err:
                 return _ProviderEvaluation(
@@ -821,7 +841,9 @@ class MultiProvider(AbstractProvider):
         try:
             before_context = before_hooks(flag_type, hook_contexts, runtime.hook_hints)
             resolved_context = provider_context.merge(before_context)
-            resolution = await resolve_fn(provider, flag_key, default_value, resolved_context)
+            resolution = await resolve_fn(
+                provider, flag_key, default_value, resolved_context
+            )
             flag_evaluation = resolution.to_flag_evaluation_details(flag_key)
             if err := flag_evaluation.get_exception():
                 error_hooks(
@@ -883,12 +905,16 @@ class MultiProvider(AbstractProvider):
             if self._should_evaluate_provider(name)
         ]
 
+        evaluations: list[_ProviderEvaluation[T]] = []
+
         if self.strategy.run_mode == "parallel":
             # Each worker thread gets its own copy of the current context so
             # that ContextVars (e.g. _hook_runtime) are propagated correctly.
             # ThreadPoolExecutor does not automatically copy context on
             # Python < 3.12, and a single Context.run() is not reentrant.
-            with ThreadPoolExecutor(max_workers=len(eligible_providers) or 1) as executor:
+            with ThreadPoolExecutor(
+                max_workers=len(eligible_providers) or 1
+            ) as executor:
                 futures = [
                     executor.submit(
                         contextvars.copy_context().run,
@@ -916,7 +942,6 @@ class MultiProvider(AbstractProvider):
                 ),
             )
 
-        evaluations: list[_ProviderEvaluation[T]] = []
         for provider_name, provider in eligible_providers:
             evaluation = self._evaluate_provider_sync(
                 provider_name,
@@ -970,6 +995,8 @@ class MultiProvider(AbstractProvider):
             if self._should_evaluate_provider(name)
         ]
 
+        evaluations: list[_ProviderEvaluation[T]] = []
+
         if self.strategy.run_mode == "parallel":
             tasks = [
                 asyncio.create_task(
@@ -985,7 +1012,7 @@ class MultiProvider(AbstractProvider):
                 )
                 for provider_name, provider in eligible_providers
             ]
-            evaluations = await asyncio.gather(*tasks)
+            evaluations = list(await asyncio.gather(*tasks))
             return typing.cast(
                 FlagResolutionDetails[T],
                 self.strategy.determine_final_result(
@@ -993,12 +1020,11 @@ class MultiProvider(AbstractProvider):
                     default_value,
                     typing.cast(
                         list[_ProviderEvaluation[FlagValueType]],
-                        list(evaluations),
+                        evaluations,
                     ),
                 ),
             )
 
-        evaluations: list[_ProviderEvaluation[T]] = []
         for provider_name, provider in eligible_providers:
             evaluation = await self._evaluate_provider_async(
                 provider_name,
