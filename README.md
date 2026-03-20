@@ -212,6 +212,17 @@ Note that some providers may not support tracking; check the documentation for y
 
 The OpenFeature SDK logs to the `openfeature` logger using the `logging` package from the Python Standard Library.
 
+#### Logging Hook
+
+The Python SDK includes a `LoggingHook`, which logs detailed information at key points during flag evaluation, using the `logging` package. This hook can be particularly helpful for troubleshooting and debugging; simply attach it at the global, client or invocation level and ensure your log level is set to "debug".
+
+```python
+from openfeature import api
+from openfeature.hook.logging_hook import LoggingHook
+
+api.add_hooks([LoggingHook()])
+```
+
 ### Domains
 
 Clients can be assigned to a domain.

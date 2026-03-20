@@ -1,177 +1,151 @@
-# pyproject.toml
 [build-system]
-requires = ["uv_build~=0.9.0"]
 build-backend = "uv_build"
+requires = [ "uv-build~=0.10.0" ]
 
 [project]
-name = "openfeature_sdk"
+name = "openfeature-sdk"
 version = "0.8.4"
 description = "Standardizing Feature Flagging for Everyone"
 readme = "README.md"
-authors = [{ name = "OpenFeature", email = "openfeature-core@groups.io" }]
-license = "Apache-2.0"
-license-files = ["LICENSE"]
-classifiers = [
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-]
 keywords = [
-    "openfeature",
-    "feature",
-    "flags",
-    "toggles",
+  "feature",
+  "flags",
+  "openfeature",
+  "toggles",
+]
+license = "Apache-2.0"
+license-files = [ "LICENSE" ]
+authors = [ { name = "OpenFeature", email = "openfeature-core@groups.io" } ]
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
 dependencies = []
-requires-python = ">=3.10"
-
-[project.urls]
-Homepage = "https://github.com/open-feature/python-sdk"
+urls.Homepage = "https://github.com/open-feature/python-sdk"
 
 [dependency-groups]
 dev = [
-    "behave",
-    "coverage[toml]>=6.5",
-    "poethepoet>=0.40.0",
-    "pytest>=9.0.0",
-    "pytest-asyncio>=1.3.0",
-    "pre-commit"
+  "behave>=1.3.0,<2.0.0",
+  "coverage[toml]>=7.10.0,<8.0.0",
+  "poethepoet>=0.40.0,<1.0.0",
+  "pre-commit",
+  "pytest>=9.0.0,<10.0.0",
+  "pytest-asyncio>=1.3.0,<2.0.0",
 ]
 
 [tool.uv]
-required-version = "~=0.9.0"
+required-version = "~=0.10.0"
+build-backend.module-name = "openfeature"
+build-backend.module-root = ""
+build-backend.namespace = true
 
-[tool.uv.build-backend]
-module-name = "openfeature"
-module-root = ""
-namespace = true
+[tool.ruff]
+target-version = "py310"
+exclude = [
+  ".git",
+  ".venv",
+  "__pycache__",
+  "spec",
+  "venv",
+]
+lint.select = [
+  "A",
+  "B",
+  "C4",
+  "C90",
+  "E",
+  "F",
+  "FLY",
+  "FURB",
+  "I",
+  "ICN003",
+  "LOG",
+  "N",
+  "PERF",
+  "PGH",
+  "PLC",
+  "PLR0913",
+  "PLR0915",
+  "RUF",
+  "S",
+  "SIM",
+  "T10",
+  "T20",
+  "TID251",
+  "UP",
+  "W",
+  "YTT",
+]
+lint.ignore = [
+  "E501", # the formatter will handle any too long line
+]
+lint.per-file-ignores."tests/**/*" = [ "PLR0913", "S101" ]
+lint.flake8-import-conventions.banned-from = [ "typing" ]
+lint.flake8-tidy-imports.banned-api."typing.Awaitable".msg = "Use collections.abc.Awaitable instead"
+lint.flake8-tidy-imports.banned-api."typing.Callable".msg = "Use collections.abc.Callable instead"
+lint.flake8-tidy-imports.banned-api."typing.Collection".msg = "Use collections.abc.Collection instead"
+lint.flake8-tidy-imports.banned-api."typing.Mapping".msg = "Use collections.abc.Mapping instead"
+lint.flake8-tidy-imports.banned-api."typing.MutableMapping".msg = "Use collections.abc.MutableMapping instead"
+lint.flake8-tidy-imports.banned-api."typing.MutableSequence".msg = "Use collections.abc.MutableSequence instead"
+lint.flake8-tidy-imports.banned-api."typing.Sequence".msg = "Use collections.abc.Sequence instead"
+lint.pylint.max-args = 6
+lint.pylint.max-statements = 30
+# Preserve types, even if a file imports `from __future__ import annotations`.
+lint.pyupgrade.keep-runtime-typing = true
 
-[tool.mypy]
-files = "openfeature,tests/typechecking"
-
-python_version = "3.10" # should be identical to the minimum supported version
-namespace_packages = true
-explicit_package_bases = true
-local_partial_types = true # will become the new default from version 2
-allow_redefinition_new = true # will become the new default from version 2
-fixed_format_cache = true # new caching mechanism
-pretty = true
-strict = true
-disallow_any_generics = false
+[tool.pyproject-fmt]
+keep_full_version = true
+max_supported_python = "3.14"
 
 [tool.pytest]
 strict = true
 asyncio_default_fixture_loop_scope = "function"
 
-[tool.coverage.report]
-exclude_also = [
-    "if TYPE_CHECKING:",
-    "if typing.TYPE_CHECKING:",
+[tool.coverage]
+report.exclude_also = [
+  "if TYPE_CHECKING:",
+  "if typing.TYPE_CHECKING:",
 ]
 
-[tool.ruff]
-exclude = [
-    ".git",
-    ".venv",
-    "__pycache__",
-    "spec",
-    "venv",
-]
-target-version = "py310"
-
-[tool.ruff.lint]
-select = [
-    "A",
-    "B",
-    "C4",
-    "C90",
-    "E",
-    "F",
-    "FLY",
-    "FURB",
-    "I",
-    "ICN003",
-    "LOG",
-    "N",
-    "PERF",
-    "PGH",
-    "PLC",
-    "PLR0913",
-    "PLR0915",
-    "RUF",
-    "S",
-    "SIM",
-    "T10",
-    "T20",
-    "TID251",
-    "UP",
-    "W",
-    "YTT",
-]
-ignore = [
-    "E501", # the formatter will handle any too long line
-]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/**/*" = ["PLR0913", "S101"]
-
-[tool.ruff.lint.pylint]
-max-args = 6
-max-statements = 30
-
-[tool.ruff.lint.pyupgrade]
-# Preserve types, even if a file imports `from __future__ import annotations`.
-keep-runtime-typing = true
-
-[tool.ruff.lint.flake8-import-conventions]
-banned-from = ["typing"]
-
-[tool.ruff.lint.flake8-tidy-imports.banned-api]
-"typing.Awaitable".msg = "Use collections.abc.Awaitable instead"
-"typing.Callable".msg = "Use collections.abc.Callable instead"
-"typing.Collection".msg = "Use collections.abc.Collection instead"
-"typing.Mapping".msg = "Use collections.abc.Mapping instead"
-"typing.Sequence".msg = "Use collections.abc.Sequence instead"
-"typing.MutableMapping".msg = "Use collections.abc.MutableMapping instead"
-"typing.MutableSequence".msg = "Use collections.abc.MutableSequence instead"
+[tool.mypy]
+files = "openfeature,tests/typechecking"
+python_version = "3.10"  # should be identical to the minimum supported version
+namespace_packages = true
+explicit_package_bases = true
+local_partial_types = true  # will become the new default from version 2
+allow_redefinition_new = true  # will become the new default from version 2
+fixed_format_cache = true  # new caching mechanism
+pretty = true
+strict = true
+disallow_any_generics = false
 
 [tool.poe]
 executor = "uv"
-
-[tool.poe.tasks]
-test = "pytest tests"
-test-cov = "coverage run -m pytest tests"
-cov-report = "coverage xml"
-cov = [
-    "test-cov",
-    "cov-report"
+tasks.test = "pytest tests"
+tasks.test-cov = "coverage run -m pytest tests"
+tasks.cov-report = "coverage xml"
+tasks.cov = [ "test-cov", "cov-report" ]
+tasks.e2e = [
+  { cmd = "git submodule update --init --recursive" },
+  { cmd = "cp spec/specification/assets/gherkin/* tests/features/" },
+  { cmd = "behave tests/features/" },
+  { cmd = "rm tests/features/*.feature" },
 ]
-e2e = [
-    { cmd = "git submodule update --init --recursive" },
-    { cmd = "cp spec/specification/assets/gherkin/* tests/features/" },
-    { cmd = "behave tests/features/" },
-    { cmd = "rm tests/features/*.feature" },
-]
-pre-commit = "pre-commit run -a"
-
-[tool.poe.tasks.test-py310]
-cmd = "pytest tests"
-executor = { python = "3.10", isolated = true, frozen = true }
-
-[tool.poe.tasks.test-py311]
-cmd = "pytest tests"
-executor = { python = "3.11", isolated = true, frozen = true }
-
-[tool.poe.tasks.test-py312]
-cmd = "pytest tests"
-executor = { python = "3.12", isolated = true, frozen = true }
-
-[tool.poe.tasks.test-py313]
-cmd = "pytest tests"
-executor = { python = "3.13", isolated = true, frozen = true }
-
-[tool.poe.tasks.test-py314]
-cmd = "pytest tests"
-executor = { python = "3.14", isolated = true, frozen = true }
-
-[tool.poe.tasks.test-all]
-parallel = ["test-py310", "test-py311", "test-py312", "test-py313", "test-py314"]
+tasks.pre-commit = "pre-commit run -a"
+tasks.test-all.parallel = [ "test-py310", "test-py311", "test-py312", "test-py313", "test-py314" ]
+tasks.test-py310.cmd = "pytest tests"
+tasks.test-py310.executor = { python = "3.10", isolated = true, frozen = true }
+tasks.test-py311.cmd = "pytest tests"
+tasks.test-py311.executor = { python = "3.11", isolated = true, frozen = true }
+tasks.test-py312.cmd = "pytest tests"
+tasks.test-py312.executor = { python = "3.12", isolated = true, frozen = true }
+tasks.test-py313.cmd = "pytest tests"
+tasks.test-py313.executor = { python = "3.13", isolated = true, frozen = true }
+tasks.test-py314.cmd = "pytest tests"
+tasks.test-py314.executor = { python = "3.14", isolated = true, frozen = true }
