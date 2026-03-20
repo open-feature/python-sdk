@@ -202,8 +202,7 @@ async def test_should_resolve_object_flag_from_in_memory():
         assert flag.variant == "obj"
 
 
-@pytest.mark.asyncio
-async def test_should_track_event():
+def test_should_track_event():
     provider = InMemoryProvider(
         {"Key": InMemoryFlag("hundred", {"zero": 0, "hundred": 100})}
     )
