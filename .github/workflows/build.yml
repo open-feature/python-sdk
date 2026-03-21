@@ -16,6 +16,10 @@ on:
 permissions:
   contents: read
 
+env:
+  PREK_VERSION: '0.3.x'
+  TARGET_PYTHON_VERSION: "3.14"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,7 +47,7 @@ jobs:
       - name: Run E2E tests with behave
         run: poe e2e
 
-      - if: matrix.python-version == '3.13'
+      - if: matrix.python-version == env.TARGET_PYTHON_VERSION
         name: Upload coverage to Codecov
         uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
@@ -61,13 +65,11 @@ jobs:
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@e06108dd0aef18192324c70427afc47652e63a82 # v7
         with:
-          python-version: "3.13"
-
-      - name: Install dependencies
-        run: uv sync --frozen
-
-      - name: Run pre-commit
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+          python-version: ${{ env.TARGET_PYTHON_VERSION }}
+      - name: Run prek
+        uses: j178/prek-action@79f765515bd648eb4d6bb1b17277b7cb22cb6468 # v2.0.0
+        with:
+          prek-version: ${{ env.PREK_VERSION }}
 
   sast:
     runs-on: ubuntu-latest
@@ -80,7 +82,7 @@ jobs:
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@e06108dd0aef18192324c70427afc47652e63a82 # v7
         with:
-          python-version: "3.13"
+          python-version: ${{ env.TARGET_PYTHON_VERSION }}
           ignore-nothing-to-cache: true
 
       - name: Initialize CodeQL
