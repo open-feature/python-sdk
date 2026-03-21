@@ -1,27 +1,35 @@
 default_stages: [pre-commit]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.6
+    rev: v0.15.7
     hooks:
       - id: ruff-check
+        priority: 1
         args: [--fix]
       - id: ruff-format
+        priority: 0
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: check-toml
+        priority: 0
       - id: check-yaml
+        priority: 0
       - id: trailing-whitespace
+        priority: 0
       - id: check-merge-conflict
+        priority: 0
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.18.1
+    rev: v2.20.0
     hooks:
       - id: pyproject-fmt
+        priority: 0
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1
     hooks:
       - id: mypy
+        priority: 1
         files: openfeature|tests/typechecking
