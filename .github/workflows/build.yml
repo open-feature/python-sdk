@@ -66,6 +66,7 @@ jobs:
         uses: astral-sh/setup-uv@e06108dd0aef18192324c70427afc47652e63a82 # v7
         with:
           python-version: ${{ env.TARGET_PYTHON_VERSION }}
+          ignore-nothing-to-cache: true
       - name: Run prek
         uses: j178/prek-action@79f765515bd648eb4d6bb1b17277b7cb22cb6468 # v2.0.0
         with:
