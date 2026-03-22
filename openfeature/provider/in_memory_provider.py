@@ -203,14 +203,11 @@ class InMemoryProvider(AbstractProvider):
         evaluation_context: EvaluationContext | None = None,
         tracking_event_details: TrackingEventDetails | None = None,
     ) -> None:
-        value = (
-            tracking_event_details.value if tracking_event_details is not None else None
-        )
-        details = (
-            tracking_event_details.attributes
-            if tracking_event_details is not None
-            else {}
-        )
+        details = {}
+        value = None
+        if tracking_event_details:
+            details = tracking_event_details.attributes
+            value = tracking_event_details.value
         eval_context_attributes = (
             evaluation_context.attributes if evaluation_context is not None else {}
         )
