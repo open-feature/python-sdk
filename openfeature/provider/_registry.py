@@ -5,7 +5,7 @@ from openfeature.event import (
     ProviderEventDetails,
 )
 from openfeature.exception import ErrorCode, GeneralError, OpenFeatureError
-from openfeature.provider import FeatureProvider, ProviderStatus
+from openfeature.provider import FeatureProvider, InternalHookProvider, ProviderStatus
 from openfeature.provider.no_op_provider import NoOpProvider
 
 
@@ -80,23 +80,30 @@ class ProviderRegistry:
         try:
             if hasattr(provider, "initialize"):
                 provider.initialize(self._get_evaluation_context())
-            self.dispatch_event(
-                provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
-            )
+            # InternalHookProvider (e.g. MultiProvider) emits its own events
+            # during initialize(), so only dispatch PROVIDER_READY if the
+            # provider hasn't already transitioned away from NOT_READY.
+            if self.get_provider_status(provider) == ProviderStatus.NOT_READY:
+                self.dispatch_event(
+                    provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
+                )
         except Exception as err:
             error_code = (
                 err.error_code
                 if isinstance(err, OpenFeatureError)
                 else ErrorCode.GENERAL
             )
-            self.dispatch_event(
-                provider,
-                ProviderEvent.PROVIDER_ERROR,
-                ProviderEventDetails(
-                    message=f"Provider initialization failed: {err}",
-                    error_code=error_code,
-                ),
-            )
+            # Same guard: skip if the provider already emitted its own error
+            # event and transitioned out of NOT_READY.
+            if self.get_provider_status(provider) == ProviderStatus.NOT_READY:
+                self.dispatch_event(
+                    provider,
+                    ProviderEvent.PROVIDER_ERROR,
+                    ProviderEventDetails(
+                        message=f"Provider initialization failed: {err}",
+                        error_code=error_code,
+                    ),
+                )
 
     def _shutdown_provider(self, provider: FeatureProvider) -> None:
         try:
@@ -115,6 +122,15 @@ class ProviderRegistry:
         provider.detach()
 
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
+        # Only InternalHookProvider implementations (e.g. MultiProvider) manage
+        # their own status. For all other providers, use the registry's tracking.
+        # We check _is_internal_hook_provider (a concrete class attribute) in
+        # addition to isinstance, because runtime_checkable Protocols match any
+        # object that has the right method names — including Mock objects.
+        if getattr(provider, "_is_internal_hook_provider", False) and isinstance(
+            provider, InternalHookProvider
+        ):
+            return provider.get_status()
         return self._provider_status.get(provider, ProviderStatus.NOT_READY)
 
     def dispatch_event(
