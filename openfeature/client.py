@@ -32,6 +32,7 @@ from openfeature.hook._hook_support import (
 )
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider._registry import provider_registry
+from openfeature.track import TrackingEventDetails
 from openfeature.transaction_context import get_transaction_context
 
 __all__ = [
@@ -954,6 +955,33 @@ class OpenFeatureClient:
 
     def remove_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
         _event_support.remove_client_handler(self, event, handler)
+
+    def track(
+        self,
+        tracking_event_name: str,
+        evaluation_context: EvaluationContext | None = None,
+        tracking_event_details: TrackingEventDetails | None = None,
+    ) -> None:
+        """
+        Tracks the occurrence of a particular action or application state.
+
+        :param tracking_event_name: the name of the tracking event
+        :param evaluation_context: the evaluation context
+        :param tracking_event_details: Optional data relevant to the tracking event
+        """
+
+        if evaluation_context is None:
+            evaluation_context = EvaluationContext()
+
+        merged_eval_context = (
+            get_evaluation_context()
+            .merge(get_transaction_context())
+            .merge(self.context)
+            .merge(evaluation_context)
+        )
+        self.provider.track(
+            tracking_event_name, merged_eval_context, tracking_event_details
+        )
 
 
 def _typecheck_flag_value(
