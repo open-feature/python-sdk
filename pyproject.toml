@@ -34,7 +34,7 @@ dev = [
   "behave>=1.3.0,<2.0.0",
   "coverage[toml]>=7.10.0,<8.0.0",
   "poethepoet>=0.40.0,<1.0.0",
-  "pre-commit",
+  "prek>=0.3.0,<0.4.0",
   "pytest>=9.0.0,<10.0.0",
   "pytest-asyncio>=1.3.0,<2.0.0",
 ]
@@ -103,16 +103,6 @@ lint.pyupgrade.keep-runtime-typing = true
 keep_full_version = true
 max_supported_python = "3.14"
 
-[tool.pytest]
-strict = true
-asyncio_default_fixture_loop_scope = "function"
-
-[tool.coverage]
-report.exclude_also = [
-  "if TYPE_CHECKING:",
-  "if typing.TYPE_CHECKING:",
-]
-
 [tool.mypy]
 files = "openfeature,tests/typechecking"
 python_version = "3.10"  # should be identical to the minimum supported version
@@ -124,6 +114,16 @@ fixed_format_cache = true  # new caching mechanism
 pretty = true
 strict = true
 disallow_any_generics = false
+
+[tool.pytest]
+strict = true
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage]
+report.exclude_also = [
+  "if TYPE_CHECKING:",
+  "if typing.TYPE_CHECKING:",
+]
 
 [tool.poe]
 executor = "uv"
