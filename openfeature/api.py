@@ -31,6 +31,7 @@ __all__ = [
     "remove_handler",
     "set_evaluation_context",
     "set_provider",
+    "set_provider_and_wait",
     "set_transaction_context",
     "set_transaction_context_propagator",
     "shutdown",
@@ -44,10 +45,34 @@ def get_client(
 
 
 def set_provider(provider: FeatureProvider, domain: str | None = None) -> None:
+    """Set the provider, calling initialize() synchronously.
+
+    Note: In a future major version, this function should run initialize()
+    in a background thread to match the non-blocking semantics of
+    set_provider() in the Java, Go, and Node.js SDKs. Callers who need
+    blocking behavior should migrate to set_provider_and_wait().
+    """
     if domain is None:
         provider_registry.set_default_provider(provider)
     else:
         provider_registry.set_provider(domain, provider)
+
+
+def set_provider_and_wait(provider: FeatureProvider, domain: str | None = None) -> None:
+    """Set the provider and wait for initialization to complete.
+
+    Blocks the calling thread until the provider's initialize() method
+    returns successfully or raises an exception. If initialization fails,
+    the exception is re-raised to the caller.
+
+    Spec reference: Requirement 1.1.2.4 - "The API SHOULD provide functions
+    to set a provider and wait for the initialize function to return or
+    abnormally terminate."
+    """
+    if domain is None:
+        provider_registry.set_default_provider_and_wait(provider)
+    else:
+        provider_registry.set_provider_and_wait(domain, provider)
 
 
 def clear_providers() -> None:
