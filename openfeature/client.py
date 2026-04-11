@@ -97,6 +97,12 @@ class OpenFeatureClient:
     def get_metadata(self) -> ClientMetadata:
         return ClientMetadata(domain=self.domain)
 
+    def set_evaluation_context(self, context: EvaluationContext) -> None:
+        self.context = context
+
+    def get_evaluation_context(self) -> EvaluationContext:
+        return self.context
+
     def add_hooks(self, hooks: list[Hook]) -> None:
         self.hooks = self.hooks + hooks
 
