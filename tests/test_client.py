@@ -666,3 +666,159 @@ def test_should_noop_if_provider_does_not_support_tracking(monkeypatch):
     set_provider(provider)
     client = get_client()
     client.track(tracking_event_name="test")
+
+
+def test_client_set_evaluation_context():
+    """Test that set_evaluation_context sets the client-level context."""
+    client = OpenFeatureClient(domain=None, version=None)
+    ctx = EvaluationContext(
+        targeting_key="user-123", attributes={"env": "production"}
+    )
+    client.set_evaluation_context(ctx)
+    assert client.get_evaluation_context() == ctx
+    assert client.context is ctx
+
+
+def test_client_get_evaluation_context_default():
+    """Test that a new client has an empty evaluation context by default."""
+    client = OpenFeatureClient(domain=None, version=None)
+    ctx = client.get_evaluation_context()
+    assert ctx is not None
+    assert ctx.targeting_key is None
+    assert ctx.attributes == {}
+
+
+def test_client_set_evaluation_context_replaces_previous():
+    """Test that set_evaluation_context replaces any previously set context."""
+    client = OpenFeatureClient(domain=None, version=None)
+    ctx1 = EvaluationContext(targeting_key="first", attributes={"a": "1"})
+    ctx2 = EvaluationContext(targeting_key="second", attributes={"b": "2"})
+    client.set_evaluation_context(ctx1)
+    assert client.get_evaluation_context().targeting_key == "first"
+    client.set_evaluation_context(ctx2)
+    assert client.get_evaluation_context().targeting_key == "second"
+    assert client.get_evaluation_context().attributes == {"b": "2"}
+
+
+def test_client_evaluation_context_merging_with_api_and_invocation():
+    """Test context merging order: API -> client -> invocation (invocation wins)."""
+    api.clear_hooks()
+    api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
+
+    provider = NoOpProvider()
+    provider.resolve_boolean_details = MagicMock(wraps=provider.resolve_boolean_details)
+    api.set_provider(provider)
+
+    # API-level context
+    api.set_evaluation_context(
+        EvaluationContext(
+            targeting_key="api",
+            attributes={"shared": "api_value", "api_only": "from_api"},
+        )
+    )
+
+    # Client-level context (set via set_evaluation_context)
+    client = OpenFeatureClient(domain=None, version=None)
+    client.set_evaluation_context(
+        EvaluationContext(
+            targeting_key="client",
+            attributes={"shared": "client_value", "client_only": "from_client"},
+        )
+    )
+
+    # Invocation-level context
+    invocation_context = EvaluationContext(
+        targeting_key="invocation",
+        attributes={"shared": "invocation_value", "invocation_only": "from_invocation"},
+    )
+
+    client.get_boolean_details("flag", False, invocation_context)
+
+    _, kwargs = provider.resolve_boolean_details.call_args
+    context = kwargs["evaluation_context"]
+
+    # Invocation targeting_key wins (last in merge chain)
+    assert context.targeting_key == "invocation"
+    # Invocation attribute wins for shared key
+    assert context.attributes["shared"] == "invocation_value"
+    # All levels contribute their unique attributes
+    assert context.attributes["api_only"] == "from_api"
+    assert context.attributes["client_only"] == "from_client"
+    assert context.attributes["invocation_only"] == "from_invocation"
+
+
+def test_client_evaluation_context_merging_without_invocation():
+    """Test context merging when no invocation context is provided."""
+    api.clear_hooks()
+
+    provider = NoOpProvider()
+    provider.resolve_boolean_details = MagicMock(wraps=provider.resolve_boolean_details)
+    api.set_provider(provider)
+
+    api.set_evaluation_context(
+        EvaluationContext(
+            targeting_key="api",
+            attributes={"shared": "api_value", "api_only": "from_api"},
+        )
+    )
+
+    client = OpenFeatureClient(domain=None, version=None)
+    client.set_evaluation_context(
+        EvaluationContext(
+            targeting_key="client",
+            attributes={"shared": "client_value", "client_only": "from_client"},
+        )
+    )
+
+    # No invocation context
+    client.get_boolean_details("flag", False)
+
+    _, kwargs = provider.resolve_boolean_details.call_args
+    context = kwargs["evaluation_context"]
+
+    # Client targeting_key wins over API
+    assert context.targeting_key == "client"
+    assert context.attributes["shared"] == "client_value"
+    assert context.attributes["api_only"] == "from_api"
+    assert context.attributes["client_only"] == "from_client"
+
+
+@pytest.mark.asyncio
+async def test_client_evaluation_context_merging_async():
+    """Test context merging works correctly for async evaluation."""
+    api.clear_hooks()
+
+    provider = NoOpProvider()
+    provider.resolve_boolean_details_async = MagicMock(
+        wraps=provider.resolve_boolean_details_async
+    )
+    api.set_provider(provider)
+
+    api.set_evaluation_context(
+        EvaluationContext(
+            targeting_key="api",
+            attributes={"level": "api"},
+        )
+    )
+
+    client = OpenFeatureClient(domain=None, version=None)
+    client.set_evaluation_context(
+        EvaluationContext(
+            targeting_key="client",
+            attributes={"level": "client", "client_attr": "yes"},
+        )
+    )
+
+    invocation_context = EvaluationContext(
+        targeting_key="invocation",
+        attributes={"level": "invocation"},
+    )
+
+    await client.get_boolean_details_async("flag", False, invocation_context)
+
+    _, kwargs = provider.resolve_boolean_details_async.call_args
+    context = kwargs["evaluation_context"]
+
+    assert context.targeting_key == "invocation"
+    assert context.attributes["level"] == "invocation"
+    assert context.attributes["client_attr"] == "yes"
