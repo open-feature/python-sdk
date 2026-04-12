@@ -98,7 +98,7 @@ class OpenFeatureClient:
         return ClientMetadata(domain=self.domain)
 
     def set_evaluation_context(self, context: EvaluationContext) -> None:
-        self.context = context
+        self.context = context or EvaluationContext()
 
     def get_evaluation_context(self) -> EvaluationContext:
         return self.context
