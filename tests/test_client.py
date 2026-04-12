@@ -23,6 +23,7 @@ from openfeature.exception import ErrorCode, OpenFeatureError
 from openfeature.flag_evaluation import FlagResolutionDetails, FlagType, Reason
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, ProviderStatus
+from openfeature.provider._registry import provider_registry
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 from openfeature.provider.no_op_provider import NoOpProvider
 from openfeature.transaction_context import ContextVarsTransactionContextPropagator
@@ -348,7 +349,7 @@ def test_provider_should_return_not_ready_status_after_shutdown(monkeypatch):
     monkeypatch.setattr(provider, "shutdown", types.MethodType(_shutdown, provider))
 
     # When
-    api.shutdown()
+    provider_registry.shutdown()
 
     status = client.get_provider_status()
 
