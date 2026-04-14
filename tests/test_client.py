@@ -666,3 +666,51 @@ def test_should_noop_if_provider_does_not_support_tracking(monkeypatch):
     set_provider(provider)
     client = get_client()
     client.track(tracking_event_name="test")
+
+
+def test_client_set_evaluation_context_updates_context():
+    """set_evaluation_context replaces the client-level context."""
+    client = OpenFeatureClient(domain=None, version=None)
+    new_ctx = EvaluationContext(targeting_key="new", attributes={"k": "v"})
+
+    client.set_evaluation_context(new_ctx)
+
+    assert client.get_evaluation_context() == new_ctx
+    assert client.context.targeting_key == "new"
+    assert client.context.attributes["k"] == "v"
+
+
+def test_client_get_evaluation_context_returns_current_context():
+    """get_evaluation_context returns the context set at construction time."""
+    ctx = EvaluationContext(targeting_key="t", attributes={"x": "1"})
+    client = OpenFeatureClient(domain=None, version=None, context=ctx)
+
+    assert client.get_evaluation_context() == ctx
+
+
+def test_client_set_evaluation_context_invalid_type_raises():
+    """set_evaluation_context raises GeneralError for non-EvaluationContext values."""
+    from openfeature.exception import GeneralError
+
+    client = OpenFeatureClient(domain=None, version=None)
+
+    with pytest.raises(GeneralError):
+        client.set_evaluation_context("not-a-context")  # type: ignore[arg-type]
+
+
+def test_client_set_evaluation_context_is_used_in_flag_evaluation():
+    """Client context set via set_evaluation_context is merged during flag evaluation."""
+    api.clear_hooks()
+    provider = NoOpProvider()
+    provider.resolve_boolean_details = MagicMock(wraps=provider.resolve_boolean_details)
+    api.set_provider(provider)
+
+    client = OpenFeatureClient(domain=None, version=None)
+    ctx = EvaluationContext(targeting_key="t", attributes={"from_setter": "yes"})
+    client.set_evaluation_context(ctx)
+
+    client.get_boolean_details("flag", False)
+
+    _, kwargs = provider.resolve_boolean_details.call_args
+    merged = kwargs["evaluation_context"]
+    assert merged.attributes.get("from_setter") == "yes"

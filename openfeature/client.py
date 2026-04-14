@@ -100,6 +100,23 @@ class OpenFeatureClient:
     def add_hooks(self, hooks: list[Hook]) -> None:
         self.hooks = self.hooks + hooks
 
+    def get_evaluation_context(self) -> EvaluationContext:
+        """Return the client-level evaluation context."""
+        return self.context
+
+    def set_evaluation_context(self, evaluation_context: EvaluationContext) -> None:
+        """Set a client-level evaluation context.
+
+        The client context is merged after the global and transaction contexts
+        but before any per-call context, per the OpenFeature specification
+        (requirement 3.2.2).
+        """
+        if not isinstance(evaluation_context, EvaluationContext):
+            raise GeneralError(
+                error_message="evaluation_context must be an EvaluationContext instance"
+            )
+        self.context = evaluation_context
+
     def get_boolean_value(
         self,
         flag_key: str,
