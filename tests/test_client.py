@@ -549,13 +549,13 @@ def test_run_client_handlers_without_registered_handlers_is_noop():
     client = get_client("client-without-handlers")
     details = EventDetails(provider_name=provider.get_metadata().name)
 
-    assert client not in _event_support._client_handlers
+    assert client not in _event_support._default_event_support._client_handlers
 
     _event_support.run_client_handlers(
         client, ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, details
     )
 
-    assert client not in _event_support._client_handlers
+    assert client not in _event_support._default_event_support._client_handlers
 
 
 # Requirement 5.1.4, Requirement 5.1.5
