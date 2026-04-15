@@ -23,8 +23,6 @@ __all__ = [
     "get_hooks",
 ]
 
-_hooks: list[Hook] = []
-
 
 # https://openfeature.dev/specification/sections/hooks/#requirement-461
 HookData = MutableMapping[str, typing.Any]
@@ -152,14 +150,18 @@ class Hook:
 
 
 def add_hooks(hooks: list[Hook]) -> None:
-    global _hooks
-    _hooks = _hooks + hooks
+    from openfeature._api import _default_api  # noqa: PLC0415
+
+    _default_api.add_hooks(hooks)
 
 
 def clear_hooks() -> None:
-    global _hooks
-    _hooks = []
+    from openfeature._api import _default_api  # noqa: PLC0415
+
+    _default_api.clear_hooks()
 
 
 def get_hooks() -> list[Hook]:
-    return _hooks
+    from openfeature._api import _default_api  # noqa: PLC0415
+
+    return _default_api.get_hooks()
