@@ -7,7 +7,7 @@ from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import EventHandler, ProviderEvent
 from openfeature.exception import GeneralError
 from openfeature.hook import Hook
-from openfeature.provider import FeatureProvider
+from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider._registry import ProviderRegistry
 from openfeature.provider.metadata import Metadata
 from openfeature.transaction_context import (
@@ -68,6 +68,12 @@ class OpenFeatureAPI:
 
     def get_provider_metadata(self, domain: str | None = None) -> Metadata:
         return self._provider_registry.get_provider(domain).get_metadata()
+
+    def get_provider(self, domain: str | None = None) -> FeatureProvider:
+        return self._provider_registry.get_provider(domain)
+
+    def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
+        return self._provider_registry.get_provider_status(provider)
 
     def clear_providers(self) -> None:
         self._provider_registry.clear_providers()
