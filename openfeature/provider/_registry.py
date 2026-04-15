@@ -1,4 +1,8 @@
-from openfeature._event_support import run_handlers_for_provider
+from __future__ import annotations
+
+import typing
+from collections.abc import Callable
+
 from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
 from openfeature.event import (
     ProviderEvent,
@@ -8,18 +12,29 @@ from openfeature.exception import ErrorCode, GeneralError, OpenFeatureError
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider.no_op_provider import NoOpProvider
 
+if typing.TYPE_CHECKING:
+    from openfeature._event_support import EventSupport
+
 
 class ProviderRegistry:
     _default_provider: FeatureProvider
     _providers: dict[str, FeatureProvider]
     _provider_status: dict[FeatureProvider, ProviderStatus]
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        event_support: EventSupport | None = None,
+        evaluation_context_getter: Callable[[], EvaluationContext] | None = None,
+    ) -> None:
         self._default_provider = NoOpProvider()
         self._providers = {}
         self._provider_status = {
             self._default_provider: ProviderStatus.READY,
         }
+        self._event_support = event_support
+        self._evaluation_context_getter = (
+            evaluation_context_getter or get_evaluation_context
+        )
 
     def set_provider(self, domain: str, provider: FeatureProvider) -> None:
         if provider is None:
@@ -73,7 +88,7 @@ class ProviderRegistry:
             self._shutdown_provider(provider)
 
     def _get_evaluation_context(self) -> EvaluationContext:
-        return get_evaluation_context()
+        return self._evaluation_context_getter()
 
     def _initialize_provider(self, provider: FeatureProvider) -> None:
         provider.attach(self.dispatch_event)
@@ -124,7 +139,8 @@ class ProviderRegistry:
         details: ProviderEventDetails,
     ) -> None:
         self._update_provider_status(provider, event, details)
-        run_handlers_for_provider(provider, event, details)
+        if self._event_support is not None:
+            self._event_support.run_handlers_for_provider(provider, event, details)
 
     def _update_provider_status(
         self,
