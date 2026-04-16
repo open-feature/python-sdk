@@ -60,6 +60,12 @@ class OpenFeatureAPI:
 
     def get_provider_metadata(self, domain: str | None = None) -> Metadata:
         return self._provider_registry.get_provider(domain).get_metadata()
+    def get_provider(self, domain: str | None = None) -> FeatureProvider:
+        return self._provider_registry.get_provider(domain)
+
+    def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
+        return self._provider_registry.get_provider_status(provider)
+
 
     def clear_providers(self) -> None:
         self._provider_registry.clear_providers()
