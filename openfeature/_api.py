@@ -67,7 +67,6 @@ class OpenFeatureAPI:
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
         return self._provider_registry.get_provider_status(provider)
 
-
     def clear_providers(self) -> None:
         self._provider_registry.clear_providers()
         self._event_support.clear()
