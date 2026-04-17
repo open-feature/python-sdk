@@ -21,7 +21,13 @@ from openfeature.event import EventDetails, ProviderEvent, ProviderEventDetails
 from openfeature.exception import ErrorCode, GeneralError, ProviderFatalError
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, Metadata, ProviderStatus
+from openfeature.provider._registry import provider_registry
 from openfeature.provider.no_op_provider import NoOpProvider
+from openfeature.transaction_context import (
+    ContextVarsTransactionContextPropagator,
+    get_transaction_context,
+    set_transaction_context_propagator,
+)
 
 
 def test_should_not_raise_exception_with_noop_client():
@@ -198,6 +204,7 @@ def test_should_not_shutdown_provider_bound_to_another_domain():
     provider.shutdown.assert_not_called()
 
 
+# Requirement 1.6.1
 def test_shutdown_should_shutdown_every_registered_provider_once():
     # Given
     provider_1 = MagicMock(spec=FeatureProvider)
@@ -213,6 +220,35 @@ def test_shutdown_should_shutdown_every_registered_provider_once():
     # Then
     provider_1.shutdown.assert_called_once()
     provider_2.shutdown.assert_called_once()
+
+
+# Requirement 1.6.2
+def test_shutdown_should_reset_api_state():
+    # Given
+    set_provider(MagicMock(spec=FeatureProvider))
+    add_hooks([MagicMock(spec=Hook)])
+    set_evaluation_context(EvaluationContext("targeting_key", {"attr1": "val1"}))
+    set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
+
+    # When
+    shutdown()
+
+    # Then
+    provider = provider_registry.get_default_provider()
+    assert isinstance(provider, NoOpProvider)
+
+    hooks = get_hooks()
+    assert not hooks
+
+    evaluation_context = get_evaluation_context()
+    assert evaluation_context.targeting_key is None
+    assert not evaluation_context.attributes
+
+    transaction_context = (
+        get_transaction_context()
+    )  # NoOpTransactionContextPropagator returns a default context
+    assert transaction_context.targeting_key is None
+    assert not transaction_context.attributes
 
 
 def test_clear_providers_shutdowns_every_provider_and_resets_default_provider():

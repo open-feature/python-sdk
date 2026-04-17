@@ -12,6 +12,7 @@ from openfeature.transaction_context.transaction_context_propagator import (
 __all__ = [
     "ContextVarsTransactionContextPropagator",
     "TransactionContextPropagator",
+    "clear_transaction_context_propagator",
     "get_transaction_context",
     "set_transaction_context",
     "set_transaction_context_propagator",
@@ -27,6 +28,10 @@ def set_transaction_context_propagator(
 ) -> None:
     global _evaluation_transaction_context_propagator
     _evaluation_transaction_context_propagator = transaction_context_propagator
+
+
+def clear_transaction_context_propagator() -> None:
+    set_transaction_context_propagator(NoOpTransactionContextPropagator())
 
 
 def get_transaction_context() -> EvaluationContext:

@@ -1,6 +1,7 @@
 from openfeature import _event_support
 from openfeature.client import OpenFeatureClient
 from openfeature.evaluation_context import (
+    clear_evaluation_context,
     get_evaluation_context,
     set_evaluation_context,
 )
@@ -13,6 +14,7 @@ from openfeature.provider import FeatureProvider
 from openfeature.provider._registry import provider_registry
 from openfeature.provider.metadata import Metadata
 from openfeature.transaction_context import (
+    clear_transaction_context_propagator,
     get_transaction_context,
     set_transaction_context,
     set_transaction_context_propagator,
@@ -60,7 +62,14 @@ def get_provider_metadata(domain: str | None = None) -> Metadata:
 
 
 def shutdown() -> None:
-    provider_registry.shutdown()
+    # shutdown -> remove providers -> set default provider to NoOp -> remove event handlers
+    clear_providers()
+    # remove hooks
+    clear_hooks()
+    # set evaluation context to default
+    clear_evaluation_context()
+    # set propagator to NoOp
+    clear_transaction_context_propagator()
 
 
 def add_handler(event: ProviderEvent, handler: EventHandler) -> None:
