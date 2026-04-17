@@ -1,4 +1,4 @@
-from openfeature import _event_support
+from openfeature._api import _default_api
 from openfeature.client import OpenFeatureClient
 from openfeature.evaluation_context import (
     get_evaluation_context,
@@ -10,7 +10,6 @@ from openfeature.event import (
 )
 from openfeature.hook import add_hooks, clear_hooks, get_hooks
 from openfeature.provider import FeatureProvider
-from openfeature.provider._registry import provider_registry
 from openfeature.provider.metadata import Metadata
 from openfeature.transaction_context import (
     get_transaction_context,
@@ -40,32 +39,28 @@ __all__ = [
 def get_client(
     domain: str | None = None, version: str | None = None
 ) -> OpenFeatureClient:
-    return OpenFeatureClient(domain=domain, version=version)
+    return _default_api.get_client(domain=domain, version=version)
 
 
 def set_provider(provider: FeatureProvider, domain: str | None = None) -> None:
-    if domain is None:
-        provider_registry.set_default_provider(provider)
-    else:
-        provider_registry.set_provider(domain, provider)
+    _default_api.set_provider(provider, domain)
 
 
 def clear_providers() -> None:
-    provider_registry.clear_providers()
-    _event_support.clear()
+    _default_api.clear_providers()
 
 
 def get_provider_metadata(domain: str | None = None) -> Metadata:
-    return provider_registry.get_provider(domain).get_metadata()
+    return _default_api.get_provider_metadata(domain)
 
 
 def shutdown() -> None:
-    provider_registry.shutdown()
+    _default_api.shutdown()
 
 
 def add_handler(event: ProviderEvent, handler: EventHandler) -> None:
-    _event_support.add_global_handler(event, handler)
+    _default_api.add_handler(event, handler)
 
 
 def remove_handler(event: ProviderEvent, handler: EventHandler) -> None:
-    _event_support.remove_global_handler(event, handler)
+    _default_api.remove_handler(event, handler)

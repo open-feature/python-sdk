@@ -7,9 +7,10 @@ from openfeature.transaction_context.transaction_context_propagator import (
 
 
 class ContextVarsTransactionContextPropagator(TransactionContextPropagator):
-    _transaction_context_var: ContextVar[EvaluationContext | None] = ContextVar(
-        "transaction_context", default=None
-    )
+    def __init__(self) -> None:
+        self._transaction_context_var: ContextVar[EvaluationContext | None] = (
+            ContextVar(f"transaction_context_{id(self)}", default=None)
+        )
 
     def get_transaction_context(self) -> EvaluationContext:
         context = self._transaction_context_var.get()

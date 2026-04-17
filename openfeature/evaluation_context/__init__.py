@@ -5,8 +5,6 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from openfeature.exception import GeneralError
-
 __all__ = ["EvaluationContext", "get_evaluation_context", "set_evaluation_context"]
 
 # https://openfeature.dev/specification/sections/evaluation-context#requirement-312
@@ -37,15 +35,16 @@ class EvaluationContext:
 
 
 def get_evaluation_context() -> EvaluationContext:
-    return _evaluation_context
+    from openfeature._api import _default_api  # noqa: PLC0415
+
+    return _default_api.get_evaluation_context()
 
 
 def set_evaluation_context(evaluation_context: EvaluationContext) -> None:
-    global _evaluation_context
-    if evaluation_context is None:
-        raise GeneralError(error_message="No api level evaluation context")
-    _evaluation_context = evaluation_context
+    from openfeature._api import _default_api  # noqa: PLC0415
+
+    _default_api.set_evaluation_context(evaluation_context)
 
 
-# need to be at the bottom, because of the definition order
+# Kept for backward compatibility but no longer used; state lives in _default_api.
 _evaluation_context = EvaluationContext()

@@ -1,11 +1,12 @@
+from __future__ import annotations
+
 import logging
 import typing
 from collections.abc import Awaitable, Mapping, Sequence
 from dataclasses import dataclass
 from itertools import chain
 
-from openfeature import _event_support
-from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
+from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import EventHandler, ProviderEvent
 from openfeature.exception import (
     ErrorCode,
@@ -23,7 +24,7 @@ from openfeature.flag_evaluation import (
     FlagValueType,
     Reason,
 )
-from openfeature.hook import Hook, HookContext, HookHints, get_hooks
+from openfeature.hook import Hook, HookContext, HookHints
 from openfeature.hook._hook_support import (
     after_all_hooks,
     after_hooks,
@@ -31,9 +32,10 @@ from openfeature.hook._hook_support import (
     error_hooks,
 )
 from openfeature.provider import FeatureProvider, ProviderStatus
-from openfeature.provider._registry import provider_registry
 from openfeature.track import TrackingEventDetails
-from openfeature.transaction_context import get_transaction_context
+
+if typing.TYPE_CHECKING:
+    from openfeature._api import OpenFeatureAPI
 
 __all__ = [
     "ClientMetadata",
@@ -81,18 +83,25 @@ class OpenFeatureClient:
         version: str | None,
         context: EvaluationContext | None = None,
         hooks: list[Hook] | None = None,
+        api: OpenFeatureAPI | None = None,
     ) -> None:
         self.domain = domain
         self.version = version
         self.context = context or EvaluationContext()
         self.hooks = hooks or []
+        if api is not None:
+            self._api = api
+        else:
+            from openfeature._api import _default_api  # noqa: PLC0415
+
+            self._api = _default_api
 
     @property
     def provider(self) -> FeatureProvider:
-        return provider_registry.get_provider(self.domain)
+        return self._api.get_provider(self.domain)
 
     def get_provider_status(self) -> ProviderStatus:
-        return provider_registry.get_provider_status(self.provider)
+        return self._api.get_provider_status(self.provider)
 
     def get_metadata(self) -> ClientMetadata:
         return ClientMetadata(domain=self.domain)
@@ -422,8 +431,8 @@ class OpenFeatureClient:
         # Merge transaction context into evaluation context before creating hook_context
         # This ensures hooks have access to the complete context including transaction context
         merged_eval_context = (
-            get_evaluation_context()
-            .merge(get_transaction_context())
+            self._api.get_evaluation_context()
+            .merge(self._api.get_transaction_context())
             .merge(self.context)
             .merge(evaluation_context)
         )
@@ -448,7 +457,7 @@ class OpenFeatureClient:
                 ),
             )
             for hook in chain(
-                get_hooks(),
+                self._api.get_hooks(),
                 self.hooks,
                 evaluation_hooks,
                 provider.get_provider_hooks(),
@@ -540,20 +549,20 @@ class OpenFeatureClient:
         self,
         flag_type: FlagType,
         flag_key: str,
-        default_value: Sequence["FlagValueType"],
+        default_value: Sequence[FlagValueType],
         evaluation_context: EvaluationContext | None = None,
         flag_evaluation_options: FlagEvaluationOptions | None = None,
-    ) -> FlagEvaluationDetails[Sequence["FlagValueType"]]: ...
+    ) -> FlagEvaluationDetails[Sequence[FlagValueType]]: ...
 
     @typing.overload
     async def evaluate_flag_details_async(
         self,
         flag_type: FlagType,
         flag_key: str,
-        default_value: Mapping[str, "FlagValueType"],
+        default_value: Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
         flag_evaluation_options: FlagEvaluationOptions | None = None,
-    ) -> FlagEvaluationDetails[Mapping[str, "FlagValueType"]]: ...
+    ) -> FlagEvaluationDetails[Mapping[str, FlagValueType]]: ...
 
     async def evaluate_flag_details_async(
         self,
@@ -716,20 +725,20 @@ class OpenFeatureClient:
         self,
         flag_type: FlagType,
         flag_key: str,
-        default_value: Sequence["FlagValueType"],
+        default_value: Sequence[FlagValueType],
         evaluation_context: EvaluationContext | None = None,
         flag_evaluation_options: FlagEvaluationOptions | None = None,
-    ) -> FlagEvaluationDetails[Sequence["FlagValueType"]]: ...
+    ) -> FlagEvaluationDetails[Sequence[FlagValueType]]: ...
 
     @typing.overload
     def evaluate_flag_details(
         self,
         flag_type: FlagType,
         flag_key: str,
-        default_value: Mapping[str, "FlagValueType"],
+        default_value: Mapping[str, FlagValueType],
         evaluation_context: EvaluationContext | None = None,
         flag_evaluation_options: FlagEvaluationOptions | None = None,
-    ) -> FlagEvaluationDetails[Mapping[str, "FlagValueType"]]: ...
+    ) -> FlagEvaluationDetails[Mapping[str, FlagValueType]]: ...
 
     def evaluate_flag_details(
         self,
@@ -951,10 +960,10 @@ class OpenFeatureClient:
         return resolution.to_flag_evaluation_details(flag_key)
 
     def add_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
-        _event_support.add_client_handler(self, event, handler)
+        self._api._event_support.add_client_handler(self, event, handler)
 
     def remove_handler(self, event: ProviderEvent, handler: EventHandler) -> None:
-        _event_support.remove_client_handler(self, event, handler)
+        self._api._event_support.remove_client_handler(self, event, handler)
 
     def track(
         self,
@@ -974,8 +983,8 @@ class OpenFeatureClient:
             evaluation_context = EvaluationContext()
 
         merged_eval_context = (
-            get_evaluation_context()
-            .merge(get_transaction_context())
+            self._api.get_evaluation_context()
+            .merge(self._api.get_transaction_context())
             .merge(self.context)
             .merge(evaluation_context)
         )
