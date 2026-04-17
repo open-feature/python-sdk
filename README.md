@@ -142,11 +142,11 @@ If the flag management system you're using supports targeting, you can provide t
 ```python
 from openfeature.api import (
     get_client,
-    get_provider,
     set_provider,
     get_evaluation_context,
     set_evaluation_context,
 )
+from openfeature.evaluation_context import EvaluationContext
 
 global_context = EvaluationContext(
     targeting_key="targeting_key1", attributes={"application": "value1"}
@@ -159,7 +159,7 @@ request_context = EvaluationContext(
 set_evaluation_context(global_context)
 
 # merge second context
-client = get_client(name="No-op Provider")
+client = get_client(domain="No-op Provider")
 client.get_string_value("email", "fallback", request_context)
 ```
 
@@ -172,6 +172,7 @@ If the hook you're looking for hasn't been created yet, see the [develop a hook]
 Once you've added a hook as a dependency, it can be registered at the global, client, or flag invocation level.
 
 ```python
+from openfeature import api
 from openfeature.api import add_hooks
 from openfeature.flag_evaluation import FlagEvaluationOptions
 
@@ -179,12 +180,12 @@ from openfeature.flag_evaluation import FlagEvaluationOptions
 add_hooks([MyHook()])
 
 # or configure them in the client
-client = OpenFeatureClient()
+client = api.get_client()
 client.add_hooks([MyHook()])
 
 # or at the invocation-level
 options = FlagEvaluationOptions(hooks=[MyHook()])
-client.get_boolean_flag("my-flag", False, flag_evaluation_options=options)
+client.get_boolean_value("my-flag", False, flag_evaluation_options=options)
 ```
 ### Tracking
 
@@ -254,7 +255,7 @@ Please refer to the documentation of the provider you're using to see what event
 
 ```python
 from openfeature import api
-from openfeature.provider import ProviderEvent
+from openfeature.event import EventDetails, ProviderEvent
 
 def on_provider_ready(event_details: EventDetails):
     print(f"Provider {event_details.provider_name} is ready")
@@ -503,10 +504,11 @@ Implement your own hook by creating a hook that inherits from the `Hook` class.
 Any of the evaluation life-cycle stages (`before`/`after`/`error`/`finally_after`) can be override to add the desired business logic.
 
 ```python
-from openfeature.hook import Hook
+from openfeature.hook import Hook, HookContext, HookHints
+from openfeature.flag_evaluation import FlagEvaluationDetails, FlagValueType
 
 class MyHook(Hook):
-    def after(self, hook_context: HookContext, details: FlagEvaluationDetails, hints: dict):
+    def after(self, hook_context: HookContext, details: FlagEvaluationDetails[FlagValueType], hints: HookHints):
         print("This runs after the flag has been evaluated")
 
 ```
