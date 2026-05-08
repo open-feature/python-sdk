@@ -127,7 +127,7 @@ class ProviderRegistry:
         # We check _is_internal_hook_provider (a concrete class attribute) in
         # addition to isinstance, because runtime_checkable Protocols match any
         # object that has the right method names — including Mock objects.
-        if getattr(provider, "_is_internal_hook_provider", False) and isinstance(
+        if getattr(provider, "_is_internal_hook_provider", False) is True and isinstance(
             provider, InternalHookProvider
         ):
             return provider.get_status()

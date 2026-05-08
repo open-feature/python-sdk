@@ -305,26 +305,26 @@ class ComparisonStrategy:
         # The first provider's result is the "final resolution" (used on agreement).
         # The fallback provider's result is used on mismatch (per JS SDK reference).
         final_evaluation = evaluations[0]
-        fallback_evaluation = self._select_fallback_evaluation(evaluations)
         reference_value = final_evaluation.result.value
-        has_mismatch = any(
+        if not any(
             evaluation.result.value != reference_value for evaluation in evaluations
-        )
-        if has_mismatch:
-            if self.on_mismatch is not None:
-                mismatch_results = {
-                    evaluation.provider_name: evaluation.result
-                    for evaluation in evaluations
-                }
-                try:
-                    self.on_mismatch(flag_key, mismatch_results)
-                except Exception:
-                    logger.exception(
-                        "Comparison strategy mismatch callback failed for flag '%s'",
-                        flag_key,
-                    )
-            return fallback_evaluation.result
-        return final_evaluation.result
+        ):
+            return final_evaluation.result
+
+        fallback_evaluation = self._select_fallback_evaluation(evaluations)
+        if self.on_mismatch is not None:
+            mismatch_results = {
+                evaluation.provider_name: evaluation.result
+                for evaluation in evaluations
+            }
+            try:
+                self.on_mismatch(flag_key, mismatch_results)
+            except Exception:
+                logger.exception(
+                    "Comparison strategy mismatch callback failed for flag '%s'",
+                    flag_key,
+                )
+        return fallback_evaluation.result
 
     def _select_fallback_evaluation(
         self, evaluations: list[_ProviderEvaluation[FlagValueType]]
