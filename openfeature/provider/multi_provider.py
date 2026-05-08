@@ -32,6 +32,7 @@ from openfeature.provider import (
     Metadata,
     ProviderStatus,
 )
+from openfeature.track import TrackingEventDetails
 
 __all__ = [
     "ComparisonStrategy",
@@ -1060,6 +1061,26 @@ class MultiProvider(AbstractProvider):
                 ),
             ),
         )
+
+    def track(
+        self,
+        tracking_event_name: str,
+        evaluation_context: EvaluationContext | None = None,
+        tracking_event_details: TrackingEventDetails | None = None,
+    ) -> None:
+        for provider_name, provider in self._registered_providers:
+            if not self._should_evaluate_provider(provider_name):
+                continue
+            try:
+                provider.track(
+                    tracking_event_name, evaluation_context, tracking_event_details
+                )
+            except Exception:
+                logger.exception(
+                    "Provider '%s' track failed for event '%s'",
+                    provider_name,
+                    tracking_event_name,
+                )
 
     def resolve_boolean_details(
         self,

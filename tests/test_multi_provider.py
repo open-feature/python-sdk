@@ -1,6 +1,6 @@
 import asyncio
 import threading
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -617,3 +617,70 @@ def test_multi_provider_reports_not_ready_after_shutdown():
     api.shutdown()
 
     assert client.get_provider_status() == ProviderStatus.NOT_READY
+
+
+def test_multi_provider_track_delegates_to_all_ready_providers():
+    first_provider = BooleanProvider("first")
+    second_provider = BooleanProvider("second")
+    multi_provider = MultiProvider(
+        [
+            ProviderEntry(first_provider, name="first"),
+            ProviderEntry(second_provider, name="second"),
+        ]
+    )
+    api.set_provider(multi_provider)
+
+    first_provider.track = MagicMock()
+    second_provider.track = MagicMock()
+
+    ctx = EvaluationContext(attributes={"user": "alice"})
+    multi_provider.track("my-event", ctx)
+
+    first_provider.track.assert_called_once_with("my-event", ctx, None)
+    second_provider.track.assert_called_once_with("my-event", ctx, None)
+
+
+def test_multi_provider_track_skips_not_ready_providers():
+    first_provider = BooleanProvider("first")
+    second_provider = BooleanProvider("second")
+    multi_provider = MultiProvider(
+        [
+            ProviderEntry(first_provider, name="first"),
+            ProviderEntry(second_provider, name="second"),
+        ]
+    )
+
+    # Don't initialize — providers stay NOT_READY; mark initialized so status
+    # filtering is active (same pattern as _should_evaluate_provider).
+    multi_provider._initialized = True
+    multi_provider._provider_statuses["first"] = ProviderStatus.NOT_READY
+    multi_provider._provider_statuses["second"] = ProviderStatus.READY
+
+    first_provider.track = MagicMock()
+    second_provider.track = MagicMock()
+
+    multi_provider.track("my-event")
+
+    first_provider.track.assert_not_called()
+    second_provider.track.assert_called_once()
+
+
+def test_multi_provider_track_catches_provider_errors():
+    first_provider = BooleanProvider("first")
+    second_provider = BooleanProvider("second")
+    multi_provider = MultiProvider(
+        [
+            ProviderEntry(first_provider, name="first"),
+            ProviderEntry(second_provider, name="second"),
+        ]
+    )
+    api.set_provider(multi_provider)
+
+    first_provider.track = MagicMock(side_effect=RuntimeError("track boom"))
+    second_provider.track = MagicMock()
+
+    with patch("openfeature.provider.multi_provider.logger") as mock_logger:
+        multi_provider.track("my-event")
+
+    mock_logger.exception.assert_called_once()
+    second_provider.track.assert_called_once()
