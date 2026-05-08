@@ -475,9 +475,9 @@ class OpenFeatureClient:
         self, provider: FeatureProvider
     ) -> InternalHookProvider | None:
         """Return the provider as InternalHookProvider if it opts in, else None."""
-        if getattr(provider, "_is_internal_hook_provider", False) is True and isinstance(
-            provider, InternalHookProvider
-        ):
+        if getattr(
+            provider, "_is_internal_hook_provider", False
+        ) is True and isinstance(provider, InternalHookProvider):
             return provider
         return None
 
