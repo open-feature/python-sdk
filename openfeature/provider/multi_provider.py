@@ -282,6 +282,13 @@ class ComparisonStrategy:
         default_value: FlagValueType,
         evaluations: list[_ProviderEvaluation[FlagValueType]],
     ) -> FlagResolutionDetails[FlagValueType]:
+        """Determine the final result from parallel provider evaluations.
+
+        If any provider returns an error, returns an aggregated error result.
+        On agreement (all providers return the same value), returns the first
+        provider's result. On mismatch, calls the optional ``on_mismatch``
+        callback and returns the fallback provider's result.
+        """
         failed_evaluations = [
             evaluation
             for evaluation in evaluations
