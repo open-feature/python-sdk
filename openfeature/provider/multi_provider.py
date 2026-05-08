@@ -289,6 +289,13 @@ class ComparisonStrategy:
         provider's result. On mismatch, calls the optional ``on_mismatch``
         callback and returns the fallback provider's result.
         """
+        if not evaluations:
+            return _build_aggregated_error(
+                flag_key,
+                default_value,
+                [],
+                "No providers were eligible for evaluation",
+            )
         failed_evaluations = [
             evaluation
             for evaluation in evaluations
