@@ -678,7 +678,7 @@ def test_multi_provider_track_catches_provider_errors():
     first_provider.track = MagicMock(side_effect=RuntimeError("track boom"))
     second_provider.track = MagicMock()
 
-    with patch("openfeature.provider.multi_provider.logger") as mock_logger:
+    with patch("openfeature.provider.multi_provider._provider.logger") as mock_logger:
         multi_provider.track("my-event")
 
     mock_logger.exception.assert_called_once()
