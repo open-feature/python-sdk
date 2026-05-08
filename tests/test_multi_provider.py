@@ -612,11 +612,10 @@ def test_multi_provider_reports_not_ready_after_shutdown():
     )
 
     api.set_provider(multi_provider)
-    client = api.get_client()
 
     api.shutdown()
 
-    assert client.get_provider_status() == ProviderStatus.NOT_READY
+    assert multi_provider.get_status() == ProviderStatus.NOT_READY
 
 
 def test_multi_provider_track_delegates_to_all_ready_providers():
