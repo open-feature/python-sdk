@@ -53,9 +53,7 @@ def set_provider(provider: FeatureProvider, domain: str | None = None) -> None:
         provider_registry.set_provider(domain, provider)
 
 
-def set_provider_and_wait(
-    provider: FeatureProvider, domain: str | None = None
-) -> None:
+def set_provider_and_wait(provider: FeatureProvider, domain: str | None = None) -> None:
     if domain is None:
         provider_registry.set_default_provider(provider, wait_for_init=True)
     else:
