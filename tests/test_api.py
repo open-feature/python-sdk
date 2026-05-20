@@ -475,6 +475,7 @@ def test_set_provider_and_wait_reraises_on_failure():
 def test_set_provider_swallows_error_and_emits_provider_error_event():
     # Given
     provider = MagicMock(spec=FeatureProvider)
+    error_fired = threading.Event()
 
     def failing_initialize(ctx):
         raise ProviderFatalError()
@@ -482,19 +483,16 @@ def test_set_provider_swallows_error_and_emits_provider_error_event():
     provider.initialize.side_effect = failing_initialize
 
     spy = MagicMock()
-    add_handler(ProviderEvent.PROVIDER_ERROR, spy.on_error)
+
+    def on_error(details):
+        spy.on_error(details)
+        error_fired.set()
+
+    add_handler(ProviderEvent.PROVIDER_ERROR, on_error)
 
     # When: non-blocking set_provider — must not raise
     set_provider(provider)
 
-    # Allow background thread to complete
-    def wait_for_event():
-        for _ in range(50):
-            if spy.on_error.called:
-                return
-            threading.Event().wait(0.01)
-
-    wait_for_event()
-
     # Then: error event fired, exception was not propagated
+    assert error_fired.wait(timeout=2), "PROVIDER_ERROR event was never fired"
     spy.on_error.assert_called_once()
