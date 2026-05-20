@@ -1,3 +1,5 @@
+import threading
+
 from openfeature._event_support import run_handlers_for_provider
 from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
 from openfeature.event import (
@@ -21,7 +23,9 @@ class ProviderRegistry:
             self._default_provider: ProviderStatus.READY,
         }
 
-    def set_provider(self, domain: str, provider: FeatureProvider) -> None:
+    def set_provider(
+        self, domain: str, provider: FeatureProvider, wait_for_init: bool = False
+    ) -> None:
         if provider is None:
             raise GeneralError(error_message="No provider")
         if domain is None:
@@ -36,7 +40,7 @@ class ProviderRegistry:
             ):
                 self._shutdown_provider(old_provider)
         if provider != self._default_provider and provider not in providers.values():
-            self._initialize_provider(provider)
+            self._initialize_provider(provider, wait_for_init=wait_for_init)
         providers[domain] = provider
 
     def get_provider(self, domain: str | None) -> FeatureProvider:
@@ -44,7 +48,9 @@ class ProviderRegistry:
             return self._default_provider
         return self._providers.get(domain, self._default_provider)
 
-    def set_default_provider(self, provider: FeatureProvider) -> None:
+    def set_default_provider(
+        self, provider: FeatureProvider, wait_for_init: bool = False
+    ) -> None:
         if provider is None:
             raise GeneralError(error_message="No provider")
         if (
@@ -55,7 +61,7 @@ class ProviderRegistry:
         self._default_provider = provider
 
         if self._default_provider not in self._providers.values():
-            self._initialize_provider(provider)
+            self._initialize_provider(provider, wait_for_init=wait_for_init)
 
     def get_default_provider(self) -> FeatureProvider:
         return self._default_provider
@@ -75,8 +81,24 @@ class ProviderRegistry:
     def _get_evaluation_context(self) -> EvaluationContext:
         return get_evaluation_context()
 
-    def _initialize_provider(self, provider: FeatureProvider) -> None:
+    def _initialize_provider(
+        self, provider: FeatureProvider, wait_for_init: bool = False
+    ) -> None:
         provider.attach(self.dispatch_event)
+        if wait_for_init:
+            self._run_initialize(provider, raise_on_error=True)
+        else:
+            thread = threading.Thread(
+                target=self._run_initialize,
+                args=(provider,),
+                kwargs={"raise_on_error": False},
+                daemon=True,
+            )
+            thread.start()
+
+    def _run_initialize(
+        self, provider: FeatureProvider, raise_on_error: bool = False
+    ) -> None:
         try:
             if hasattr(provider, "initialize"):
                 provider.initialize(self._get_evaluation_context())
@@ -97,6 +119,8 @@ class ProviderRegistry:
                     error_code=error_code,
                 ),
             )
+            if raise_on_error:
+                raise
 
     def _shutdown_provider(self, provider: FeatureProvider) -> None:
         try:

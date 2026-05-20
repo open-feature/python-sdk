@@ -33,6 +33,7 @@ __all__ = [
     "remove_handler",
     "set_evaluation_context",
     "set_provider",
+    "set_provider_and_wait",
     "set_transaction_context",
     "set_transaction_context_propagator",
     "shutdown",
@@ -50,6 +51,15 @@ def set_provider(provider: FeatureProvider, domain: str | None = None) -> None:
         provider_registry.set_default_provider(provider)
     else:
         provider_registry.set_provider(domain, provider)
+
+
+def set_provider_and_wait(
+    provider: FeatureProvider, domain: str | None = None
+) -> None:
+    if domain is None:
+        provider_registry.set_default_provider(provider, wait_for_init=True)
+    else:
+        provider_registry.set_provider(domain, provider, wait_for_init=True)
 
 
 def clear_providers() -> None:

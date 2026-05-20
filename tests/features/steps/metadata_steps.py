@@ -1,13 +1,13 @@
 from behave import given, then
 
-from openfeature.api import get_client, set_provider
+from openfeature.api import get_client, set_provider_and_wait
 from openfeature.provider.in_memory_provider import InMemoryProvider
 from tests.features.data import IN_MEMORY_FLAGS
 
 
 @given("a stable provider")
 def step_impl_stable_provider(context):
-    set_provider(InMemoryProvider(IN_MEMORY_FLAGS))
+    set_provider_and_wait(InMemoryProvider(IN_MEMORY_FLAGS))
     context.client = get_client()
 
 

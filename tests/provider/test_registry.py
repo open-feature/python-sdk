@@ -1,8 +1,9 @@
+import threading
 from unittest.mock import Mock
 
 import pytest
 
-from openfeature.exception import GeneralError
+from openfeature.exception import GeneralError, ProviderFatalError
 from openfeature.provider import ProviderStatus
 from openfeature.provider._registry import ProviderRegistry
 from openfeature.provider.no_op_provider import NoOpProvider
@@ -67,8 +68,8 @@ def test_registering_provider_for_first_time_initializes_it():
     registry = ProviderRegistry()
     provider = Mock()
 
-    registry.set_provider("domain1", provider)
-    registry.set_provider("domain2", provider)
+    registry.set_provider("domain1", provider, wait_for_init=True)
+    registry.set_provider("domain2", provider, wait_for_init=True)
 
     provider.initialize.assert_called_once()
 
@@ -103,7 +104,7 @@ def test_setting_default_provider_initializes_it():
     registry = ProviderRegistry()
     provider = Mock()
 
-    registry.set_default_provider(provider)
+    registry.set_default_provider(provider, wait_for_init=True)
 
     provider.initialize.assert_called_once()
 
@@ -114,8 +115,8 @@ def test_registering_provider_as_default_then_domain_only_initializes_once():
     registry = ProviderRegistry()
     provider = Mock()
 
-    registry.set_default_provider(provider)
-    registry.set_provider("domain", provider)
+    registry.set_default_provider(provider, wait_for_init=True)
+    registry.set_provider("domain", provider, wait_for_init=True)
 
     provider.initialize.assert_called_once()
 
@@ -126,8 +127,8 @@ def test_registering_provider_as_domain_then_default_only_initializes_once():
     registry = ProviderRegistry()
     provider = Mock()
 
-    registry.set_provider("domain", provider)
-    registry.set_default_provider(provider)
+    registry.set_provider("domain", provider, wait_for_init=True)
+    registry.set_default_provider(provider, wait_for_init=True)
 
     provider.initialize.assert_called_once()
 
@@ -191,7 +192,7 @@ def test_initializing_provider_sets_status_ready():
 
     assert registry.get_provider_status(provider) == ProviderStatus.NOT_READY
 
-    registry.set_provider("domain", provider)
+    registry.set_provider("domain", provider, wait_for_init=True)
 
     provider.initialize.assert_called_once()
     assert registry.get_provider_status(provider) == ProviderStatus.READY
@@ -203,7 +204,7 @@ def test_shutting_down_provider_sets_status_not_ready():
     registry = ProviderRegistry()
     provider = Mock()
 
-    registry.set_provider("domain", provider)
+    registry.set_provider("domain", provider, wait_for_init=True)
     assert registry.get_provider_status(provider) == ProviderStatus.READY
 
     registry.shutdown()
@@ -216,8 +217,8 @@ def test_clearing_registry_resets_providers_and_default():
     registry = ProviderRegistry()
     provider = Mock()
 
-    registry.set_provider("domain", provider)
-    registry.set_default_provider(provider)
+    registry.set_provider("domain", provider, wait_for_init=True)
+    registry.set_default_provider(provider, wait_for_init=True)
 
     registry.clear_providers()
 
@@ -228,3 +229,53 @@ def test_clearing_registry_resets_providers_and_default():
 
     provider.initialize.assert_called_once()
     provider.shutdown.assert_called_once()
+
+
+def test_set_provider_returns_before_initialization_completes():
+    """Test that set_provider (non-blocking) returns before initialize finishes."""
+
+    registry = ProviderRegistry()
+    init_started = threading.Event()
+    init_may_proceed = threading.Event()
+    provider = Mock()
+
+    def slow_initialize(ctx):
+        init_started.set()
+        init_may_proceed.wait()
+
+    provider.initialize.side_effect = slow_initialize
+
+    registry.set_provider("domain", provider)
+
+    assert init_started.wait(timeout=2), "initialize was never called in background"
+    assert registry.get_provider_status(provider) == ProviderStatus.NOT_READY
+
+    init_may_proceed.set()  # unblock the background thread
+
+
+def test_set_provider_and_wait_blocks_until_ready():
+    """Test that set_provider with wait_for_init=True blocks until READY."""
+
+    registry = ProviderRegistry()
+    initialized = threading.Event()
+    provider = Mock()
+
+    def tracking_initialize(ctx):
+        initialized.set()
+
+    provider.initialize.side_effect = tracking_initialize
+
+    registry.set_provider("domain", provider, wait_for_init=True)
+
+    assert initialized.is_set()
+    assert registry.get_provider_status(provider) == ProviderStatus.READY
+
+
+def test_set_provider_and_wait_reraises_on_error():
+    """Test that set_provider with wait_for_init=True re-raises initialization errors."""
+    registry = ProviderRegistry()
+    provider = Mock()
+    provider.initialize.side_effect = ProviderFatalError()
+
+    with pytest.raises(ProviderFatalError):
+        registry.set_provider("domain", provider, wait_for_init=True)
