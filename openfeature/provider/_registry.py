@@ -132,16 +132,26 @@ class ProviderRegistry:
         try:
             provider.initialize(self._get_evaluation_context())
             # stale init: provider was replaced/shut down during initialize(); drop event.
+            # Check active registration, not _provider_status, since replaced providers
+            # remain in _provider_status until async shutdown pops them.
             with self._lock:
-                if provider not in self._provider_status:
+                if (
+                    provider is not self._default_provider
+                    and provider not in self._providers.values()
+                ):
                     return
             self.dispatch_event(
                 provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
             )
         except Exception as err:
             # stale init: provider was replaced/shut down during initialize(); drop event.
+            # Check active registration, not _provider_status, since replaced providers
+            # remain in _provider_status until async shutdown pops them.
             with self._lock:
-                if provider not in self._provider_status:
+                if (
+                    provider is not self._default_provider
+                    and provider not in self._providers.values()
+                ):
                     return
             error_code = (
                 err.error_code
