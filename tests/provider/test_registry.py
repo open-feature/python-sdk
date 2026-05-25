@@ -1,4 +1,5 @@
 import threading
+import time
 from unittest.mock import Mock
 
 import pytest
@@ -279,3 +280,99 @@ def test_set_provider_and_wait_reraises_on_error():
 
     with pytest.raises(ProviderFatalError):
         registry.set_provider("domain", provider, wait_for_init=True)
+
+
+def test_concurrent_set_provider_for_same_provider_initializes_once():
+    """Concurrent set_provider calls for different domains using the same
+    provider instance must only initialize the provider once."""
+
+    registry = ProviderRegistry()
+    init_count = 0
+    start_gate = threading.Event()
+
+    def slow_initialize(ctx):
+        nonlocal init_count
+        # widen the window in which two threads can both observe "not bound"
+        start_gate.wait(timeout=2)
+        init_count += 1
+
+    provider = Mock()
+    provider.initialize.side_effect = slow_initialize
+
+    def call(domain):
+        registry.set_provider(domain, provider, wait_for_init=True)
+
+    t1 = threading.Thread(target=call, args=("d1",))
+    t2 = threading.Thread(target=call, args=("d2",))
+    t1.start()
+    t2.start()
+    start_gate.set()
+    t1.join(timeout=5)
+    t2.join(timeout=5)
+
+    assert init_count == 1
+
+
+def test_provider_replaced_during_async_init_does_not_set_ready_status():
+    """If a provider is replaced while its async initialize is still running,
+    the late PROVIDER_READY event must not resurrect its status."""
+
+    registry = ProviderRegistry()
+    init_started = threading.Event()
+    init_may_proceed = threading.Event()
+
+    slow_provider = Mock()
+
+    def slow_initialize(ctx):
+        init_started.set()
+        init_may_proceed.wait(timeout=2)
+
+    slow_provider.initialize.side_effect = slow_initialize
+
+    registry.set_provider("domain", slow_provider)
+    assert init_started.wait(timeout=2)
+
+    # replace with a different provider before the slow init finishes
+    replacement = Mock()
+    registry.set_provider("domain", replacement, wait_for_init=True)
+
+    # now let the slow init complete
+    init_may_proceed.set()
+    # give the background thread a moment to attempt its (stale) dispatch
+    time.sleep(0.1)
+
+    # stale event must not have set READY on the replaced provider
+    assert registry.get_provider_status(slow_provider) == ProviderStatus.NOT_READY
+    assert registry.get_provider_status(replacement) == ProviderStatus.READY
+
+
+def test_set_provider_does_not_block_on_hanging_old_shutdown():
+    """If the previously-registered provider's shutdown() hangs, a subsequent
+    set_provider call must not be blocked by it."""
+
+    registry = ProviderRegistry()
+
+    hanging = Mock()
+    hang = threading.Event()
+    hanging.shutdown.side_effect = lambda: hang.wait(timeout=5)
+
+    replacement = Mock()
+
+    registry.set_provider("domain", hanging, wait_for_init=True)
+
+    completed = threading.Event()
+
+    def replace():
+        registry.set_provider("domain", replacement, wait_for_init=True)
+        completed.set()
+
+    threading.Thread(target=replace, daemon=True).start()
+
+    # the swap+init of replacement must complete even though `hanging.shutdown`
+    # is still blocked.
+    assert completed.wait(timeout=2), (
+        "set_provider was blocked by old provider's hanging shutdown()"
+    )
+
+    # release the hung shutdown so the test can clean up
+    hang.set()

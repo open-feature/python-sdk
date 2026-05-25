@@ -15,8 +15,10 @@ class ProviderRegistry:
     _default_provider: FeatureProvider
     _providers: dict[str, FeatureProvider]
     _provider_status: dict[FeatureProvider, ProviderStatus]
+    _lock: threading.RLock
 
     def __init__(self) -> None:
+        self._lock = threading.RLock()
         self._default_provider = NoOpProvider()
         self._providers = {}
         self._provider_status = {
@@ -30,18 +32,26 @@ class ProviderRegistry:
             raise GeneralError(error_message="No provider")
         if domain is None:
             raise GeneralError(error_message="No domain")
-        providers = self._providers
-        if domain in providers:
-            old_provider = providers[domain]
-            del providers[domain]
-            if (
-                old_provider != self._default_provider
-                and old_provider not in providers.values()
-            ):
-                self._shutdown_provider(old_provider)
-        if provider != self._default_provider and provider not in providers.values():
+
+        old_provider: FeatureProvider | None = None
+        needs_init = False
+        with self._lock:
+            old_provider = self._providers.get(domain)
+            self._providers[domain] = provider
+            already_bound = provider is self._default_provider or any(
+                p is provider for d, p in self._providers.items() if d != domain
+            )
+            if not already_bound:
+                needs_init = True
+                self._provider_status[provider] = ProviderStatus.NOT_READY
+
+        if needs_init:
             self._initialize_provider(provider, wait_for_init=wait_for_init)
-        providers[domain] = provider
+
+        # old-provider shutdown is always async so a hanging shutdown() cannot
+        # block set_provider.
+        if old_provider is not None and old_provider is not provider:
+            self._shutdown_if_unused(old_provider)
 
     def get_provider(self, domain: str | None) -> FeatureProvider:
         if domain is None:
@@ -53,59 +63,86 @@ class ProviderRegistry:
     ) -> None:
         if provider is None:
             raise GeneralError(error_message="No provider")
-        if (
-            self._default_provider
-            and self._default_provider not in self._providers.values()
-        ):
-            self._shutdown_provider(self._default_provider)
-        self._default_provider = provider
 
-        if self._default_provider not in self._providers.values():
+        old_provider: FeatureProvider | None = None
+        needs_init = False
+        with self._lock:
+            old_provider = self._default_provider
+            self._default_provider = provider
+            if (
+                provider is not old_provider
+                and provider not in self._providers.values()
+            ):
+                needs_init = True
+                self._provider_status[provider] = ProviderStatus.NOT_READY
+
+        if needs_init:
             self._initialize_provider(provider, wait_for_init=wait_for_init)
+
+        if old_provider is not None and old_provider is not provider:
+            self._shutdown_if_unused(old_provider)
 
     def get_default_provider(self) -> FeatureProvider:
         return self._default_provider
 
     def clear_providers(self) -> None:
         self.shutdown()
-        self._providers.clear()
-        self._default_provider = NoOpProvider()
-        self._provider_status = {
-            self._default_provider: ProviderStatus.READY,
-        }
+        with self._lock:
+            self._providers.clear()
+            self._default_provider = NoOpProvider()
+            self._provider_status = {
+                self._default_provider: ProviderStatus.READY,
+            }
 
     def shutdown(self) -> None:
-        for provider in {self._default_provider, *self._providers.values()}:
+        with self._lock:
+            providers = {self._default_provider, *self._providers.values()}
+
+        for provider in providers:
             self._shutdown_provider(provider)
 
     def _get_evaluation_context(self) -> EvaluationContext:
         return get_evaluation_context()
 
     def _initialize_provider(
-        self, provider: FeatureProvider, wait_for_init: bool = False
+        self, provider: FeatureProvider, wait_for_init: bool
     ) -> None:
         provider.attach(self.dispatch_event)
+        if not hasattr(provider, "initialize"):
+            # nothing async to do; dispatch READY synchronously.
+            self.dispatch_event(
+                provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
+            )
+            return
         if wait_for_init:
             self._run_initialize(provider, raise_on_error=True)
-        else:
-            thread = threading.Thread(
-                target=self._run_initialize,
-                args=(provider,),
-                kwargs={"raise_on_error": False},
-                daemon=True,
-            )
-            thread.start()
+            return
+
+        thread = threading.Thread(
+            target=self._run_initialize,
+            args=(provider,),
+            kwargs={"raise_on_error": False},
+            daemon=True,
+        )
+        thread.start()
 
     def _run_initialize(
         self, provider: FeatureProvider, raise_on_error: bool = False
     ) -> None:
         try:
-            if hasattr(provider, "initialize"):
-                provider.initialize(self._get_evaluation_context())
+            provider.initialize(self._get_evaluation_context())
+            # stale init: provider was replaced/shut down during initialize(); drop event.
+            with self._lock:
+                if provider not in self._provider_status:
+                    return
             self.dispatch_event(
                 provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
             )
         except Exception as err:
+            # stale init: provider was replaced/shut down during initialize(); drop event.
+            with self._lock:
+                if provider not in self._provider_status:
+                    return
             error_code = (
                 err.error_code
                 if isinstance(err, OpenFeatureError)
@@ -122,11 +159,26 @@ class ProviderRegistry:
             if raise_on_error:
                 raise
 
+    def _shutdown_if_unused(self, provider: FeatureProvider) -> None:
+        # only shut down if no longer referenced. shutdown runs on a daemon
+        # thread so a hanging shutdown() cannot block the caller.
+        with self._lock:
+            if provider is self._default_provider:
+                return
+            if provider in self._providers.values():
+                return
+
+        thread = threading.Thread(
+            target=self._shutdown_provider, args=(provider,), daemon=True
+        )
+        thread.start()
+
     def _shutdown_provider(self, provider: FeatureProvider) -> None:
         try:
             if hasattr(provider, "shutdown"):
                 provider.shutdown()
-            del self._provider_status[provider]
+            with self._lock:
+                self._provider_status.pop(provider, None)
         except Exception as err:
             self.dispatch_event(
                 provider,
@@ -156,17 +208,18 @@ class ProviderRegistry:
         event: ProviderEvent,
         details: ProviderEventDetails,
     ) -> None:
-        if event == ProviderEvent.PROVIDER_READY:
-            self._provider_status[provider] = ProviderStatus.READY
-        elif event == ProviderEvent.PROVIDER_STALE:
-            self._provider_status[provider] = ProviderStatus.STALE
-        elif event == ProviderEvent.PROVIDER_ERROR:
-            status = (
-                ProviderStatus.FATAL
-                if details.error_code == ErrorCode.PROVIDER_FATAL
-                else ProviderStatus.ERROR
-            )
-            self._provider_status[provider] = status
+        with self._lock:
+            if event == ProviderEvent.PROVIDER_READY:
+                self._provider_status[provider] = ProviderStatus.READY
+            elif event == ProviderEvent.PROVIDER_STALE:
+                self._provider_status[provider] = ProviderStatus.STALE
+            elif event == ProviderEvent.PROVIDER_ERROR:
+                status = (
+                    ProviderStatus.FATAL
+                    if details.error_code == ErrorCode.PROVIDER_FATAL
+                    else ProviderStatus.ERROR
+                )
+                self._provider_status[provider] = status
 
 
 provider_registry = ProviderRegistry()
