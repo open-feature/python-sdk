@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import logging
 import threading
 import typing
 from collections import defaultdict
+
+logger = logging.getLogger(__name__)
 
 from openfeature.event import (
     EventDetails,
@@ -30,13 +33,29 @@ def run_client_handlers(
 ) -> None:
     with _client_lock:
         for handler in _client_handlers[client][event]:
-            handler(details)
+            try:
+                handler(details)
+            except Exception:
+                logger.warning(
+                    "Error in client handler %s for event %s",
+                    getattr(handler, "__name__", repr(handler)),
+                    event,
+                    exc_info=True,
+                )
 
 
 def run_global_handlers(event: ProviderEvent, details: EventDetails) -> None:
     with _global_lock:
         for handler in _global_handlers[event]:
-            handler(details)
+            try:
+                handler(details)
+            except Exception:
+                logger.warning(
+                    "Error in global handler %s for event %s",
+                    getattr(handler, "__name__", repr(handler)),
+                    event,
+                    exc_info=True,
+                )
 
 
 def add_client_handler(
@@ -98,7 +117,15 @@ def _run_immediate_handler(
         ProviderStatus.STALE: ProviderEvent.PROVIDER_STALE,
     }
     if event == status_to_event.get(client.get_provider_status()):
-        handler(EventDetails(provider_name=client.provider.get_metadata().name))
+        try:
+            handler(EventDetails(provider_name=client.provider.get_metadata().name))
+        except Exception:
+            logger.warning(
+                "Error in immediate handler %s for event %s",
+                getattr(handler, "__name__", repr(handler)),
+                event,
+                exc_info=True,
+            )
 
 
 def clear() -> None:
