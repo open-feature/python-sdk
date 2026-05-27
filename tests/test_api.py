@@ -393,3 +393,49 @@ def test_provider_status_is_updated_after_provider_emits_event():
     provider.emit_provider_ready(ProviderEventDetails())
     # Then
     assert client.get_provider_status() == ProviderStatus.READY
+
+
+# Requirement 5.2.5 – handler error isolation
+def test_failing_handler_does_not_prevent_subsequent_handlers_from_running():
+    """If a handler raises, subsequent handlers MUST still run (spec 5.2.5)."""
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+
+    failing_handler = MagicMock(side_effect=RuntimeError("boom"))
+    succeeding_handler = MagicMock()
+
+    add_handler(ProviderEvent.PROVIDER_READY, failing_handler)
+    add_handler(ProviderEvent.PROVIDER_READY, succeeding_handler)
+
+    # Reset because both were called immediately on subscribe (provider already READY)
+    failing_handler.reset_mock()
+    succeeding_handler.reset_mock()
+
+    # When – emit a ready event to trigger handlers again
+    provider.emit_provider_ready(ProviderEventDetails())
+
+    # Then – both handlers should have been called despite the first one raising
+    assert failing_handler.call_count == 1
+    assert succeeding_handler.call_count == 1
+
+
+def test_failing_client_handler_does_not_prevent_subsequent_handlers():
+    """If a client-level handler raises, subsequent handlers MUST still run."""
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+    client = get_client()
+
+    failing_handler = MagicMock(side_effect=RuntimeError("boom"))
+    succeeding_handler = MagicMock()
+
+    client.add_handler(ProviderEvent.PROVIDER_ERROR, failing_handler)
+    client.add_handler(ProviderEvent.PROVIDER_ERROR, succeeding_handler)
+
+    # When
+    provider.emit_provider_error(ProviderEventDetails())
+
+    # Then – both handlers should have been called
+    failing_handler.assert_called_once()
+    succeeding_handler.assert_called_once()

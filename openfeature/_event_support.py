@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import threading
 import typing
 from collections import defaultdict
@@ -15,6 +16,7 @@ from openfeature.provider import FeatureProvider, ProviderStatus
 if typing.TYPE_CHECKING:
     from openfeature.client import OpenFeatureClient
 
+logger = logging.getLogger(__name__)
 
 _global_lock = threading.RLock()
 _global_handlers: dict[ProviderEvent, list[EventHandler]] = defaultdict(list)
@@ -25,18 +27,30 @@ _client_handlers: dict[OpenFeatureClient, dict[ProviderEvent, list[EventHandler]
 )
 
 
+def _invoke_handler(handler: EventHandler, details: EventDetails) -> None:
+    """Invoke a single handler, isolating errors so subsequent handlers still run.
+
+    Per spec 5.2.5: if a handler function terminates abnormally, other handler
+    functions MUST run.
+    """
+    try:
+        handler(details)
+    except Exception:
+        logger.exception("Event handler %r raised an exception", handler)
+
+
 def run_client_handlers(
     client: OpenFeatureClient, event: ProviderEvent, details: EventDetails
 ) -> None:
     with _client_lock:
         for handler in _client_handlers[client][event]:
-            handler(details)
+            _invoke_handler(handler, details)
 
 
 def run_global_handlers(event: ProviderEvent, details: EventDetails) -> None:
     with _global_lock:
         for handler in _global_handlers[event]:
-            handler(details)
+            _invoke_handler(handler, details)
 
 
 def add_client_handler(
@@ -98,7 +112,10 @@ def _run_immediate_handler(
         ProviderStatus.STALE: ProviderEvent.PROVIDER_STALE,
     }
     if event == status_to_event.get(client.get_provider_status()):
-        handler(EventDetails(provider_name=client.provider.get_metadata().name))
+        _invoke_handler(
+            handler,
+            EventDetails(provider_name=client.provider.get_metadata().name),
+        )
 
 
 def clear() -> None:
