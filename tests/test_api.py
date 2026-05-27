@@ -1,4 +1,5 @@
 import threading
+import time
 from unittest.mock import MagicMock
 
 import pytest
@@ -30,6 +31,15 @@ from openfeature.transaction_context import (
     get_transaction_context,
     set_transaction_context_propagator,
 )
+
+
+def wait_for_mock_call(mock: MagicMock, timeout: float = 1.0) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if mock.call_count:
+            return
+
+        time.sleep(0.01)
 
 
 def test_should_not_raise_exception_with_noop_client():
@@ -295,6 +305,10 @@ def test_provider_events():
 
     # Then
     # NOTE: provider_ready is called immediately after adding the handler
+    wait_for_mock_call(spy.provider_ready)
+    wait_for_mock_call(spy.provider_configuration_changed)
+    wait_for_mock_call(spy.provider_error)
+    wait_for_mock_call(spy.provider_stale)
     spy.provider_ready.assert_called_once()
     spy.provider_configuration_changed.assert_called_once_with(details)
     spy.provider_error.assert_called_once_with(details)
@@ -335,6 +349,7 @@ def test_handlers_attached_to_provider_already_in_associated_state_should_run_im
     add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
 
     # Then
+    wait_for_mock_call(spy.provider_ready)
     spy.provider_ready.assert_called_once()
 
 
@@ -344,12 +359,14 @@ def test_provider_ready_handlers_run_if_provider_initialize_function_terminates_
 
     spy = MagicMock()
     add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
+    wait_for_mock_call(spy.provider_ready)
     spy.reset_mock()  # reset the mock to avoid counting the immediate call on subscribe
 
     # When
     set_provider_and_wait(provider)
 
     # Then
+    wait_for_mock_call(spy.provider_ready)
     spy.provider_ready.assert_called_once()
 
 
@@ -366,6 +383,7 @@ def test_provider_error_handlers_run_if_provider_initialize_function_terminates_
         set_provider_and_wait(provider)
 
     # Then
+    wait_for_mock_call(spy.provider_error)
     spy.provider_error.assert_called_once()
 
 
