@@ -3,7 +3,7 @@ import time
 import types
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 import pytest
 
@@ -27,6 +27,19 @@ from openfeature.provider._registry import provider_registry
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 from openfeature.provider.no_op_provider import NoOpProvider
 from openfeature.transaction_context import ContextVarsTransactionContextPropagator
+
+
+def _wait_for_call(mock: MagicMock, *args):
+    deadline = time.monotonic() + 1
+    expected_call = call(*args)
+    while time.monotonic() < deadline:
+        if mock.call_count == 1 and (not args or mock.call_args == expected_call):
+            return
+        time.sleep(0.01)
+    if args:
+        mock.assert_called_once_with(*args)
+    else:
+        mock.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -467,10 +480,10 @@ def test_provider_events():
 
     # Then
     # NOTE: provider_ready is called immediately after adding the handler
-    spy.provider_ready.assert_called_once()
-    spy.provider_configuration_changed.assert_called_once_with(details)
-    spy.provider_error.assert_called_once_with(details)
-    spy.provider_stale.assert_called_once_with(details)
+    _wait_for_call(spy.provider_ready)
+    _wait_for_call(spy.provider_configuration_changed, details)
+    _wait_for_call(spy.provider_error, details)
+    _wait_for_call(spy.provider_stale, details)
 
 
 def test_add_remove_event_handler():
@@ -525,7 +538,7 @@ def test_provider_event_late_binding():
     other_provider.emit_provider_configuration_changed(other_provider_details)
 
     # Then
-    spy.provider_configuration_changed.assert_called_once_with(details)
+    _wait_for_call(spy.provider_configuration_changed, details)
 
 
 # Requirement 5.1.4, Requirement 5.1.5
@@ -545,14 +558,15 @@ def test_provider_event_handler_exception():
     )
 
     # Then
-    spy.provider_error.assert_called_once_with(
+    _wait_for_call(
+        spy.provider_error,
         EventDetails(
             flags_changed=None,
             message="some_error",
             error_code=ErrorCode.GENERAL,
             metadata={},
             provider_name="No-op Provider",
-        )
+        ),
     )
 
 

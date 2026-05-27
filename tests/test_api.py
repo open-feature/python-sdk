@@ -1,4 +1,6 @@
-from unittest.mock import MagicMock
+import time
+from threading import Event
+from unittest.mock import MagicMock, call
 
 import pytest
 
@@ -28,6 +30,19 @@ from openfeature.transaction_context import (
     get_transaction_context,
     set_transaction_context_propagator,
 )
+
+
+def _wait_for_call(mock: MagicMock, *args):
+    deadline = time.monotonic() + 1
+    expected_call = call(*args)
+    while time.monotonic() < deadline:
+        if mock.call_count == 1 and (not args or mock.call_args == expected_call):
+            return
+        time.sleep(0.01)
+    if args:
+        mock.assert_called_once_with(*args)
+    else:
+        mock.assert_called_once()
 
 
 def test_should_not_raise_exception_with_noop_client():
@@ -293,10 +308,60 @@ def test_provider_events():
 
     # Then
     # NOTE: provider_ready is called immediately after adding the handler
-    spy.provider_ready.assert_called_once()
-    spy.provider_configuration_changed.assert_called_once_with(details)
-    spy.provider_error.assert_called_once_with(details)
-    spy.provider_stale.assert_called_once_with(details)
+    _wait_for_call(spy.provider_ready)
+    _wait_for_call(spy.provider_configuration_changed, details)
+    _wait_for_call(spy.provider_error, details)
+    _wait_for_call(spy.provider_stale, details)
+
+
+def test_event_handler_error_does_not_stop_other_handlers():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+    called = set()
+    second_handler_called = Event()
+
+    def raising_handler(details):
+        called.add("raising")
+        raise RuntimeError("boom")
+
+    def second_handler(details):
+        called.add("second")
+        second_handler_called.set()
+
+    add_handler(ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, raising_handler)
+    add_handler(ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, second_handler)
+
+    # When
+    provider.emit_provider_configuration_changed(ProviderEventDetails())
+
+    # Then
+    assert second_handler_called.wait(timeout=1)
+    assert called == {"raising", "second"}
+
+
+def test_event_handlers_do_not_block_event_emitter():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+    handler_started = Event()
+    release_handler = Event()
+
+    def slow_handler(details):
+        handler_started.set()
+        release_handler.wait(timeout=1)
+
+    add_handler(ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, slow_handler)
+
+    # When
+    start = time.monotonic()
+    provider.emit_provider_configuration_changed(ProviderEventDetails())
+    elapsed = time.monotonic() - start
+
+    # Then
+    assert elapsed < 0.1
+    assert handler_started.wait(timeout=1)
+    release_handler.set()
 
 
 def test_add_remove_event_handler():
@@ -333,7 +398,7 @@ def test_handlers_attached_to_provider_already_in_associated_state_should_run_im
     add_handler(ProviderEvent.PROVIDER_READY, spy.provider_ready)
 
     # Then
-    spy.provider_ready.assert_called_once()
+    _wait_for_call(spy.provider_ready)
 
 
 def test_provider_ready_handlers_run_if_provider_initialize_function_terminates_normally():
@@ -348,7 +413,7 @@ def test_provider_ready_handlers_run_if_provider_initialize_function_terminates_
     set_provider(provider)
 
     # Then
-    spy.provider_ready.assert_called_once()
+    _wait_for_call(spy.provider_ready)
 
 
 def test_provider_error_handlers_run_if_provider_initialize_function_terminates_abnormally():
@@ -363,7 +428,7 @@ def test_provider_error_handlers_run_if_provider_initialize_function_terminates_
     set_provider(provider)
 
     # Then
-    spy.provider_error.assert_called_once()
+    _wait_for_call(spy.provider_error)
 
 
 def test_provider_status_is_updated_after_provider_emits_event():
