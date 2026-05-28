@@ -580,8 +580,7 @@ def test_provider_event_handler_exception_does_not_stop_subsequent_handlers():
     spy = MagicMock()
     handler_called = threading.Event()
 
-    def raising_handler(details):
-        raise RuntimeError("handler failed")
+    raising_handler = MagicMock(side_effect=RuntimeError("handler failed"))
 
     def recording_handler(details):
         spy.provider_error(details)
@@ -601,6 +600,7 @@ def test_provider_event_handler_exception_does_not_stop_subsequent_handlers():
 
     # Then
     assert handler_called.wait(timeout=1)
+    raising_handler.assert_called_once_with(expected_details)
     spy.provider_error.assert_called_once_with(expected_details)
 
 

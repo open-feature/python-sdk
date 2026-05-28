@@ -18,7 +18,7 @@ if typing.TYPE_CHECKING:
     from openfeature.client import OpenFeatureClient
 
 
-_logger = getLogger(__name__)
+logger = getLogger("openfeature")
 _event_executor = ThreadPoolExecutor(thread_name_prefix="openfeature-event-handler")
 
 _global_lock = threading.RLock()
@@ -127,7 +127,7 @@ def _run_handler(handler: EventHandler, details: EventDetails) -> None:
     try:
         handler(details)
     except Exception:
-        _logger.exception("Unhandled exception in OpenFeature event handler")
+        logger.exception("Unhandled exception in OpenFeature event handler")
 
 
 def clear() -> None:
