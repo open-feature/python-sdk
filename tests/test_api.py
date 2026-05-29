@@ -1,3 +1,4 @@
+import threading
 from unittest.mock import MagicMock
 
 import pytest
@@ -14,6 +15,7 @@ from openfeature.api import (
     remove_handler,
     set_evaluation_context,
     set_provider,
+    set_provider_and_wait,
     shutdown,
 )
 from openfeature.evaluation_context import EvaluationContext
@@ -69,7 +71,7 @@ def test_should_invoke_provider_initialize_function_on_newly_registered_provider
 
     # When
     set_evaluation_context(evaluation_context)
-    set_provider(provider)
+    set_provider_and_wait(provider)
 
     # Then
     provider.initialize.assert_called_with(evaluation_context)
@@ -170,10 +172,10 @@ def test_should_provide_a_function_to_bind_provider_through_domain():
 def test_should_not_initialize_provider_already_bound_to_another_domain():
     # Given
     provider = MagicMock(spec=FeatureProvider)
-    set_provider(provider, "foo")
+    set_provider_and_wait(provider, "foo")
 
     # When
-    set_provider(provider, "bar")
+    set_provider_and_wait(provider, "bar")
 
     # Then
     provider.initialize.assert_called_once()
@@ -326,7 +328,7 @@ def test_add_remove_event_handler():
 def test_handlers_attached_to_provider_already_in_associated_state_should_run_immediately():
     # Given
     provider = NoOpProvider()
-    set_provider(provider)
+    set_provider_and_wait(provider)
     spy = MagicMock()
 
     # When
@@ -345,7 +347,7 @@ def test_provider_ready_handlers_run_if_provider_initialize_function_terminates_
     spy.reset_mock()  # reset the mock to avoid counting the immediate call on subscribe
 
     # When
-    set_provider(provider)
+    set_provider_and_wait(provider)
 
     # Then
     spy.provider_ready.assert_called_once()
@@ -360,7 +362,8 @@ def test_provider_error_handlers_run_if_provider_initialize_function_terminates_
     add_handler(ProviderEvent.PROVIDER_ERROR, spy.provider_error)
 
     # When
-    set_provider(provider)
+    with pytest.raises(ProviderFatalError):
+        set_provider_and_wait(provider)
 
     # Then
     spy.provider_error.assert_called_once()
@@ -369,7 +372,7 @@ def test_provider_error_handlers_run_if_provider_initialize_function_terminates_
 def test_provider_status_is_updated_after_provider_emits_event():
     # Given
     provider = NoOpProvider()
-    set_provider(provider)
+    set_provider_and_wait(provider)
     client = get_client()
 
     # When
@@ -393,3 +396,103 @@ def test_provider_status_is_updated_after_provider_emits_event():
     provider.emit_provider_ready(ProviderEventDetails())
     # Then
     assert client.get_provider_status() == ProviderStatus.READY
+
+
+# Non-blocking set_provider tests
+
+
+def test_set_provider_returns_before_initialization_completes():
+    # Given: a provider whose initialize blocks until signalled
+    init_started = threading.Event()
+    init_may_proceed = threading.Event()
+
+    provider = MagicMock(spec=FeatureProvider)
+
+    def slow_initialize(ctx):
+        init_started.set()
+        init_may_proceed.wait()
+
+    provider.initialize.side_effect = slow_initialize
+
+    # When
+    set_provider(provider)
+
+    # Then: set_provider returned before initialize completed (we reached this line
+    # while the background thread is still blocked inside initialize)
+    assert init_started.wait(timeout=2), "initialize was never called"
+    init_may_proceed.set()  # unblock the background thread
+
+
+def test_provider_status_is_not_ready_during_async_initialization():
+    # Given: a provider whose initialize blocks until signalled
+    init_may_proceed = threading.Event()
+    provider = MagicMock(spec=FeatureProvider)
+
+    def slow_initialize(ctx):
+        init_may_proceed.wait()
+
+    provider.initialize.side_effect = slow_initialize
+
+    # When
+    set_provider(provider)
+    client = get_client()
+
+    # Then: status is NOT_READY while init is still running
+    assert client.get_provider_status() == ProviderStatus.NOT_READY
+
+    # Cleanup: let the background thread finish
+    init_may_proceed.set()
+
+
+def test_set_provider_and_wait_blocks_until_initialization_completes():
+    # Given
+    initialized = threading.Event()
+    provider = MagicMock(spec=FeatureProvider)
+
+    def slow_initialize(ctx):
+        initialized.set()
+
+    provider.initialize.side_effect = slow_initialize
+
+    # When
+    set_provider_and_wait(provider)
+
+    # Then: initialize was called before set_provider_and_wait returned
+    assert initialized.is_set()
+    assert get_client().get_provider_status() == ProviderStatus.READY
+
+
+def test_set_provider_and_wait_reraises_on_failure():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    provider.initialize.side_effect = ProviderFatalError()
+
+    # When / Then
+    with pytest.raises(ProviderFatalError):
+        set_provider_and_wait(provider)
+
+
+def test_set_provider_swallows_error_and_emits_provider_error_event():
+    # Given
+    provider = MagicMock(spec=FeatureProvider)
+    error_fired = threading.Event()
+
+    def failing_initialize(ctx):
+        raise ProviderFatalError()
+
+    provider.initialize.side_effect = failing_initialize
+
+    spy = MagicMock()
+
+    def on_error(details):
+        spy.on_error(details)
+        error_fired.set()
+
+    add_handler(ProviderEvent.PROVIDER_ERROR, on_error)
+
+    # When: non-blocking set_provider — must not raise
+    set_provider(provider)
+
+    # Then: error event fired, exception was not propagated
+    assert error_fired.wait(timeout=2), "PROVIDER_ERROR event was never fired"
+    spy.on_error.assert_called_once()

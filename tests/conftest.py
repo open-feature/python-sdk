@@ -15,5 +15,5 @@ def clear_providers():
 
 @pytest.fixture()
 def no_op_provider_client():
-    api.set_provider(NoOpProvider())
+    api.set_provider_and_wait(NoOpProvider())
     return api.get_client()

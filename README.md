@@ -130,6 +130,15 @@ api.set_provider(NoOpProvider())
 open_feature_client = api.get_client()
 ```
 
+`set_provider()` is non-blocking: it registers the provider immediately and runs initialization in a background thread.
+Flag evaluations during the initialization window return the default value with a `PROVIDER_NOT_READY` error code.
+Use `set_provider_and_wait()` if you need to ensure the provider is ready before proceeding:
+
+```python
+# blocks until the provider is initialized (or raises on failure)
+api.set_provider_and_wait(NoOpProvider())
+```
+
 In some situations, it may be beneficial to register multiple providers in the same application.
 This is possible using [domains](#domains), which is covered in more detail below.
 
