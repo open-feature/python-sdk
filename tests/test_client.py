@@ -1,4 +1,5 @@
 import inspect
+import threading
 import time
 import types
 import uuid
@@ -7,7 +8,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from openfeature import api
+from openfeature import _event_support, api
 from openfeature.api import (
     add_hooks,
     clear_hooks,
@@ -27,6 +28,15 @@ from openfeature.provider._registry import provider_registry
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 from openfeature.provider.no_op_provider import NoOpProvider
 from openfeature.transaction_context import ContextVarsTransactionContextPropagator
+
+
+def wait_for_mock_call(mock: MagicMock, timeout: float = 1.0) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if mock.call_count:
+            return
+
+        time.sleep(0.01)
 
 
 @pytest.mark.parametrize(
@@ -467,6 +477,10 @@ def test_provider_events():
 
     # Then
     # NOTE: provider_ready is called immediately after adding the handler
+    wait_for_mock_call(spy.provider_ready)
+    wait_for_mock_call(spy.provider_configuration_changed)
+    wait_for_mock_call(spy.provider_error)
+    wait_for_mock_call(spy.provider_stale)
     spy.provider_ready.assert_called_once()
     spy.provider_configuration_changed.assert_called_once_with(details)
     spy.provider_error.assert_called_once_with(details)
@@ -525,7 +539,23 @@ def test_provider_event_late_binding():
     other_provider.emit_provider_configuration_changed(other_provider_details)
 
     # Then
+    wait_for_mock_call(spy.provider_configuration_changed)
     spy.provider_configuration_changed.assert_called_once_with(details)
+
+
+def test_run_client_handlers_without_registered_handlers_is_noop():
+    provider = NoOpProvider()
+    set_provider(provider)
+    client = get_client("client-without-handlers")
+    details = EventDetails(provider_name=provider.get_metadata().name)
+
+    assert client not in _event_support._client_handlers
+
+    _event_support.run_client_handlers(
+        client, ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, details
+    )
+
+    assert client not in _event_support._client_handlers
 
 
 # Requirement 5.1.4, Requirement 5.1.5
@@ -545,6 +575,7 @@ def test_provider_event_handler_exception():
     )
 
     # Then
+    wait_for_mock_call(spy.provider_error)
     spy.provider_error.assert_called_once_with(
         EventDetails(
             flags_changed=None,
@@ -554,6 +585,68 @@ def test_provider_event_handler_exception():
             provider_name="No-op Provider",
         )
     )
+
+
+def test_provider_event_handler_exception_does_not_stop_subsequent_handlers():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+
+    spy = MagicMock()
+    handler_called = threading.Event()
+
+    raising_handler = MagicMock(side_effect=RuntimeError("handler failed"))
+
+    def recording_handler(details):
+        spy.provider_error(details)
+        handler_called.set()
+
+    client = get_client()
+    client.add_handler(ProviderEvent.PROVIDER_ERROR, raising_handler)
+    client.add_handler(ProviderEvent.PROVIDER_ERROR, recording_handler)
+
+    details = ProviderEventDetails(error_code=ErrorCode.GENERAL, message="some_error")
+    expected_details = EventDetails.from_provider_event_details(
+        provider.get_metadata().name, details
+    )
+
+    # When
+    provider.emit_provider_error(details)
+
+    # Then
+    assert handler_called.wait(timeout=1)
+    raising_handler.assert_called_once_with(expected_details)
+    spy.provider_error.assert_called_once_with(expected_details)
+
+
+def test_provider_event_handlers_do_not_block_emitter():
+    # Given
+    provider = NoOpProvider()
+    set_provider(provider)
+
+    handler_started = threading.Event()
+    release_handler = threading.Event()
+    handler_finished = threading.Event()
+
+    def slow_handler(details):
+        handler_started.set()
+        release_handler.wait(timeout=1)
+        handler_finished.set()
+
+    client = get_client()
+    client.add_handler(ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, slow_handler)
+
+    # When
+    start_time = time.perf_counter()
+    provider.emit_provider_configuration_changed(ProviderEventDetails())
+    elapsed = time.perf_counter() - start_time
+
+    # Then
+    assert handler_started.wait(timeout=1)
+    # emit must return well before the handler's blocking wait (1s) would finish
+    assert elapsed < 0.5
+    release_handler.set()
+    assert handler_finished.wait(timeout=1)
 
 
 def test_client_handlers_thread_safety():
