@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 env:
-  PREK_VERSION: '0.3.x'
+  PREK_VERSION: '0.4.x'
   TARGET_PYTHON_VERSION: "3.14"
 
 jobs:
