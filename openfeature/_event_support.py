@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import atexit
 import threading
 import typing
 from collections import defaultdict
@@ -20,6 +21,7 @@ if typing.TYPE_CHECKING:
 
 logger = getLogger("openfeature")
 _event_executor = ThreadPoolExecutor(thread_name_prefix="openfeature-event-handler")
+atexit.register(_event_executor.shutdown, wait=True)
 
 _global_lock = threading.RLock()
 _global_handlers: dict[ProviderEvent, list[EventHandler]] = defaultdict(list)

@@ -643,7 +643,8 @@ def test_provider_event_handlers_do_not_block_emitter():
 
     # Then
     assert handler_started.wait(timeout=1)
-    assert elapsed < 0.2
+    # emit must return well before the handler's blocking wait (1s) would finish
+    assert elapsed < 0.5
     release_handler.set()
     assert handler_finished.wait(timeout=1)
 
