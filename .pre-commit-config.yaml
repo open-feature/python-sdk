@@ -22,7 +22,7 @@ repos:
         priority: 0
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.20.0
+    rev: v2.21.2
     hooks:
       - id: pyproject-fmt
         priority: 0
