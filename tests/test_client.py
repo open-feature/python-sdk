@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from openfeature import api
+from openfeature import _event_support, api
 from openfeature.api import (
     add_hooks,
     clear_hooks,
@@ -541,6 +541,21 @@ def test_provider_event_late_binding():
     # Then
     wait_for_mock_call(spy.provider_configuration_changed)
     spy.provider_configuration_changed.assert_called_once_with(details)
+
+
+def test_run_client_handlers_without_registered_handlers_is_noop():
+    provider = NoOpProvider()
+    set_provider(provider)
+    client = get_client("client-without-handlers")
+    details = EventDetails(provider_name=provider.get_metadata().name)
+
+    assert client not in _event_support._client_handlers
+
+    _event_support.run_client_handlers(
+        client, ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, details
+    )
+
+    assert client not in _event_support._client_handlers
 
 
 # Requirement 5.1.4, Requirement 5.1.5
