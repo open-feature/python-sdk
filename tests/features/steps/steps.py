@@ -4,7 +4,7 @@ from time import sleep
 
 from behave import given, then, when
 
-from openfeature.api import get_client, set_provider
+from openfeature.api import get_client, set_provider_and_wait
 from openfeature.client import OpenFeatureClient
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import ErrorCode
@@ -28,13 +28,13 @@ def step_impl_resolved_should_be(context, flag_type, key, expected_reason):
 
 @given("a provider is registered with cache disabled")
 def step_impl_provider_without_cache(context):
-    set_provider(InMemoryProvider(IN_MEMORY_FLAGS))
+    set_provider_and_wait(InMemoryProvider(IN_MEMORY_FLAGS))
     context.client = get_client()
 
 
 @given("a provider is registered")
 def step_impl_provider(context):
-    set_provider(InMemoryProvider(IN_MEMORY_FLAGS))
+    set_provider_and_wait(InMemoryProvider(IN_MEMORY_FLAGS))
     context.client = get_client()
 
 
