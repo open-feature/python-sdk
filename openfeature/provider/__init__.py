@@ -11,12 +11,25 @@ from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.hook import Hook
 from openfeature.track import TrackingEventDetails
 
+from ._protocols import InternalHookProvider
 from .metadata import Metadata
 
 if typing.TYPE_CHECKING:
     from openfeature.flag_evaluation import FlagValueType
 
-__all__ = ["AbstractProvider", "FeatureProvider", "Metadata", "ProviderStatus"]
+__all__ = [
+    "AbstractProvider",
+    "ComparisonStrategy",
+    "EvaluationStrategy",
+    "FeatureProvider",
+    "FirstMatchStrategy",
+    "FirstSuccessfulStrategy",
+    "InternalHookProvider",
+    "Metadata",
+    "MultiProvider",
+    "ProviderEntry",
+    "ProviderStatus",
+]
 
 
 class ProviderStatus(Enum):
@@ -263,3 +276,13 @@ class AbstractProvider(FeatureProvider):
     def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
         if hasattr(self, "_on_emit"):
             self._on_emit(self, event, details)
+
+
+from .multi_provider import (  # noqa: E402
+    ComparisonStrategy,
+    EvaluationStrategy,
+    FirstMatchStrategy,
+    FirstSuccessfulStrategy,
+    MultiProvider,
+    ProviderEntry,
+)
