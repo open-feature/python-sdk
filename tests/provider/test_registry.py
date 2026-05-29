@@ -376,3 +376,51 @@ def test_set_provider_does_not_block_on_hanging_old_shutdown():
 
     # release the hung shutdown so the test can clean up
     hang.set()
+
+
+def test_stale_shutdown_does_not_clobber_re_registered_provider():
+    """If a provider is replaced and then re-registered while its previous
+    (background) shutdown is still finishing, the stale shutdown must not
+    pop its status or detach() the freshly-registered instance."""
+
+    registry = ProviderRegistry()
+
+    shutdown_started = threading.Event()
+    shutdown_may_proceed = threading.Event()
+
+    provider_a = Mock()
+
+    def slow_shutdown():
+        shutdown_started.set()
+        shutdown_may_proceed.wait(timeout=5)
+
+    provider_a.shutdown.side_effect = slow_shutdown
+
+    provider_b = Mock()
+
+    # step 1: register A
+    registry.set_provider("domain", provider_a, wait_for_init=True)
+    assert registry.get_provider_status(provider_a) == ProviderStatus.READY
+
+    # step 2: replace A with B; spawns background shutdown of A which will
+    # block inside provider_a.shutdown() until we signal it.
+    registry.set_provider("domain", provider_b, wait_for_init=True)
+    assert shutdown_started.wait(timeout=2), "A's shutdown thread never started"
+
+    # step 3: re-register A while its previous shutdown is mid-flight
+    registry.set_provider("domain", provider_a, wait_for_init=True)
+    assert registry.get_provider_status(provider_a) == ProviderStatus.READY
+
+    # step 4: let the stale shutdown of A complete
+    shutdown_may_proceed.set()
+    # give the background thread a moment to run pop/detach
+    time.sleep(0.2)
+
+    # after the stale shutdown completes, A should still be registered and
+    # its status should still be READY. If the race triggers, status will
+    # fall back to NOT_READY (default for missing entry) and detach was called.
+    assert registry.get_provider("domain") is provider_a
+    assert registry.get_provider_status(provider_a) == ProviderStatus.READY, (
+        "stale shutdown of A clobbered the fresh registration's status"
+    )
+    provider_a.detach.assert_not_called()

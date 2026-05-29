@@ -179,14 +179,27 @@ class ProviderRegistry:
                 return
 
         thread = threading.Thread(
-            target=self._shutdown_provider, args=(provider,), daemon=True
+            target=self._shutdown_provider,
+            args=(provider,),
+            kwargs={"abort_if_re_registered": True},
+            daemon=True,
         )
         thread.start()
 
-    def _shutdown_provider(self, provider: FeatureProvider) -> None:
+    def _shutdown_provider(
+        self, provider: FeatureProvider, abort_if_re_registered: bool = False
+    ) -> None:
         try:
             if hasattr(provider, "shutdown"):
                 provider.shutdown()
+            # if provider is being re-registered, leave its status and event wiring intact
+            if abort_if_re_registered:
+                with self._lock:
+                    if (
+                        provider is self._default_provider
+                        or provider in self._providers.values()
+                    ):
+                        return
             with self._lock:
                 self._provider_status.pop(provider, None)
         except Exception as err:
