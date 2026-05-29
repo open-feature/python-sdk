@@ -39,6 +39,24 @@ class ProviderRegistry:
             self._initialize_provider(provider)
         providers[domain] = provider
 
+    def set_provider_and_wait(self, domain: str, provider: FeatureProvider) -> None:
+        if provider is None:
+            raise GeneralError(error_message="No provider")
+        if domain is None:
+            raise GeneralError(error_message="No domain")
+        providers = self._providers
+        if domain in providers:
+            old_provider = providers[domain]
+            del providers[domain]
+            if (
+                old_provider != self._default_provider
+                and old_provider not in providers.values()
+            ):
+                self._shutdown_provider(old_provider)
+        if provider != self._default_provider and provider not in providers.values():
+            self._initialize_provider_and_wait(provider)
+        providers[domain] = provider
+
     def get_provider(self, domain: str | None) -> FeatureProvider:
         if domain is None:
             return self._default_provider
@@ -56,6 +74,19 @@ class ProviderRegistry:
 
         if self._default_provider not in self._providers.values():
             self._initialize_provider(provider)
+
+    def set_default_provider_and_wait(self, provider: FeatureProvider) -> None:
+        if provider is None:
+            raise GeneralError(error_message="No provider")
+        if (
+            self._default_provider
+            and self._default_provider not in self._providers.values()
+        ):
+            self._shutdown_provider(self._default_provider)
+        self._default_provider = provider
+
+        if self._default_provider not in self._providers.values():
+            self._initialize_provider_and_wait(provider)
 
     def get_default_provider(self) -> FeatureProvider:
         return self._default_provider
@@ -76,6 +107,11 @@ class ProviderRegistry:
         return get_evaluation_context()
 
     def _initialize_provider(self, provider: FeatureProvider) -> None:
+        """Initialize the provider synchronously. Errors are dispatched as
+        PROVIDER_ERROR events but not re-raised to the caller.
+
+        This is the original behavior of set_provider().
+        """
         provider.attach(self.dispatch_event)
         try:
             if hasattr(provider, "initialize"):
@@ -97,6 +133,35 @@ class ProviderRegistry:
                     error_code=error_code,
                 ),
             )
+
+    def _initialize_provider_and_wait(self, provider: FeatureProvider) -> None:
+        """Initialize the provider synchronously and re-raise on failure.
+
+        Same as _initialize_provider but propagates exceptions to the caller,
+        used by set_provider_and_wait() / set_default_provider_and_wait().
+        """
+        provider.attach(self.dispatch_event)
+        try:
+            if hasattr(provider, "initialize"):
+                provider.initialize(self._get_evaluation_context())
+            self.dispatch_event(
+                provider, ProviderEvent.PROVIDER_READY, ProviderEventDetails()
+            )
+        except Exception as err:
+            error_code = (
+                err.error_code
+                if isinstance(err, OpenFeatureError)
+                else ErrorCode.GENERAL
+            )
+            self.dispatch_event(
+                provider,
+                ProviderEvent.PROVIDER_ERROR,
+                ProviderEventDetails(
+                    message=f"Provider initialization failed: {err}",
+                    error_code=error_code,
+                ),
+            )
+            raise
 
     def _shutdown_provider(self, provider: FeatureProvider) -> None:
         try:
