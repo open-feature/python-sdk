@@ -760,3 +760,29 @@ def test_should_noop_if_provider_does_not_support_tracking(monkeypatch):
     set_provider(provider)
     client = get_client()
     client.track(tracking_event_name="test")
+
+
+def test_client_should_allow_getting_and_setting_evaluation_context():
+    # Given
+    client = get_client()
+    initial_context = client.evaluation_context
+    assert isinstance(initial_context, EvaluationContext)
+
+    new_context = EvaluationContext(
+        targeting_key="user_123", attributes={"beta_user": True}
+    )
+
+    # When
+    client.evaluation_context = new_context
+
+    # Then
+    assert client.evaluation_context == new_context
+    assert client.context == new_context
+
+    # When setting to None (resetting)
+    client.evaluation_context = None
+
+    # Then it should default to an empty EvaluationContext
+    assert isinstance(client.evaluation_context, EvaluationContext)
+    assert client.evaluation_context.targeting_key is None
+    assert not client.evaluation_context.attributes
