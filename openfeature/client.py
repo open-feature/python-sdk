@@ -91,6 +91,14 @@ class OpenFeatureClient:
     def provider(self) -> FeatureProvider:
         return provider_registry.get_provider(self.domain)
 
+    @property
+    def evaluation_context(self) -> EvaluationContext:
+        return self.context
+
+    @evaluation_context.setter
+    def evaluation_context(self, evaluation_context: EvaluationContext | None) -> None:
+        self.context = evaluation_context or EvaluationContext()
+
     def get_provider_status(self) -> ProviderStatus:
         return provider_registry.get_provider_status(self.provider)
 
