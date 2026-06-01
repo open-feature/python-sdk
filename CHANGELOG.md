@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.10.0](https://github.com/open-feature/python-sdk/compare/v0.9.0...v0.10.0) (2026-06-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* make set_provider non-blocking, add set_provider_and_wait ([#595](https://github.com/open-feature/python-sdk/issues/595))
+
+### 🐛 Bug Fixes
+
+* isolate provider event handler dispatch ([#599](https://github.com/open-feature/python-sdk/issues/599)) ([0a96426](https://github.com/open-feature/python-sdk/commit/0a96426a3e1df497f376c08a499cfa9227c7e2c2))
+
+
+### ✨ New Features
+
+* make set_provider non-blocking, add set_provider_and_wait ([#595](https://github.com/open-feature/python-sdk/issues/595)) ([cbacef0](https://github.com/open-feature/python-sdk/commit/cbacef0093c0ef44bc2ba8ad36de1c5497cf0cff))
+
+
+### 🧹 Chore
+
+* **deps:** update astral-sh/setup-uv action to v8 ([#603](https://github.com/open-feature/python-sdk/issues/603)) ([4422fad](https://github.com/open-feature/python-sdk/commit/4422fad635199d11bfd820425bf8938a68cec1ee))
+* **deps:** update codecov/codecov-action action to v6 ([#604](https://github.com/open-feature/python-sdk/issues/604)) ([e00fab3](https://github.com/open-feature/python-sdk/commit/e00fab3f04d52b3d35258d87c68e3c8d3954af31))
+* **deps:** update dependency prek to &gt;=0.4.3,&lt;0.5.0 ([#607](https://github.com/open-feature/python-sdk/issues/607)) ([760d808](https://github.com/open-feature/python-sdk/commit/760d808009e4eddd2984723d8bb3e3382df180ec))
+* **deps:** update googleapis/release-please-action action to v5 ([#605](https://github.com/open-feature/python-sdk/issues/605)) ([aa1366a](https://github.com/open-feature/python-sdk/commit/aa1366abeccf8d4463e933fbba035891e0531125))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.15.15 ([#608](https://github.com/open-feature/python-sdk/issues/608)) ([5f4e42d](https://github.com/open-feature/python-sdk/commit/5f4e42dee5fad734a39b459b08b94045a7210ec3))
+* **deps:** update pre-commit hook pre-commit/mirrors-mypy to v2 ([#606](https://github.com/open-feature/python-sdk/issues/606)) ([d18beef](https://github.com/open-feature/python-sdk/commit/d18beefeaebb717102c40b02acbedf6b3c0c16a8))
+* **deps:** update pre-commit hook tox-dev/pyproject-fmt to v2.21.2 ([#601](https://github.com/open-feature/python-sdk/issues/601)) ([5cc9534](https://github.com/open-feature/python-sdk/commit/5cc9534661a1901c5d3a0b328d65df6495c46b92))
+
 ## [0.9.0](https://github.com/open-feature/python-sdk/compare/v0.8.4...v0.9.0) (2026-04-17)
 
 
