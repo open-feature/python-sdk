@@ -592,18 +592,25 @@ def test_provider_event_handler_exception_does_not_stop_subsequent_handlers():
     provider = NoOpProvider()
     set_provider(provider)
 
-    spy = MagicMock()
-    handler_called = threading.Event()
+    raising_handler_called = threading.Event()
+    recording_handler_called = threading.Event()
 
     raising_handler = MagicMock(side_effect=RuntimeError("handler failed"))
+    recording_handler = MagicMock()
 
-    def recording_handler(details):
-        spy.provider_error(details)
-        handler_called.set()
+    def raising_handler_wrap(details):
+        try:
+            raising_handler(details)
+        finally:
+            raising_handler_called.set()
+
+    def recording_handler_wrap(details):
+        recording_handler(details)
+        recording_handler_called.set()
 
     client = get_client()
-    client.add_handler(ProviderEvent.PROVIDER_ERROR, raising_handler)
-    client.add_handler(ProviderEvent.PROVIDER_ERROR, recording_handler)
+    client.add_handler(ProviderEvent.PROVIDER_ERROR, raising_handler_wrap)
+    client.add_handler(ProviderEvent.PROVIDER_ERROR, recording_handler_wrap)
 
     details = ProviderEventDetails(error_code=ErrorCode.GENERAL, message="some_error")
     expected_details = EventDetails.from_provider_event_details(
@@ -614,9 +621,10 @@ def test_provider_event_handler_exception_does_not_stop_subsequent_handlers():
     provider.emit_provider_error(details)
 
     # Then
-    assert handler_called.wait(timeout=1)
+    assert raising_handler_called.wait(timeout=1)
+    assert recording_handler_called.wait(timeout=1)
     raising_handler.assert_called_once_with(expected_details)
-    spy.provider_error.assert_called_once_with(expected_details)
+    recording_handler.assert_called_once_with(expected_details)
 
 
 def test_provider_event_handlers_do_not_block_emitter():
