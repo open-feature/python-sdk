@@ -7,6 +7,9 @@
 
 * make set_provider non-blocking, add set_provider_and_wait ([#595](https://github.com/open-feature/python-sdk/issues/595))
 
+> [!IMPORTANT]
+> `set_provider()` no longer blocks until the provider is ready; provider initialization runs in the background. If your workload needs to wait until the `PROVIDER_READY` event has fired before proceeding (for example, to avoid `PROVIDER_NOT_READY` evaluations during startup), use `set_provider_and_wait()` instead.
+
 ### 🐛 Bug Fixes
 
 * isolate provider event handler dispatch ([#599](https://github.com/open-feature/python-sdk/issues/599)) ([0a96426](https://github.com/open-feature/python-sdk/commit/0a96426a3e1df497f376c08a499cfa9227c7e2c2))
