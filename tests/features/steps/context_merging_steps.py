@@ -119,40 +119,18 @@ def _add_entry_at_level(
     _ensure_state(context)
     if level not in _LEVELS:
         raise ValueError(f"Unknown level: {level!r}")
+    
+    new_ctx = EvaluationContext(attributes={key: value})
     if level == "API":
-        current = api.get_evaluation_context()
-        api.set_evaluation_context(
-            EvaluationContext(
-                targeting_key=current.targeting_key,
-                attributes={**current.attributes, key: value},
-            )
-        )
+        api.set_evaluation_context(api.get_evaluation_context().merge(new_ctx))
     elif level == "Transaction":
-        current = api.get_transaction_context()
-        set_transaction_context(
-            EvaluationContext(
-                targeting_key=current.targeting_key,
-                attributes={**current.attributes, key: value},
-            )
-        )
+        set_transaction_context(api.get_transaction_context().merge(new_ctx))
     elif level == "Client":
-        current = context.client.context
-        context.client.context = EvaluationContext(
-            targeting_key=current.targeting_key,
-            attributes={**current.attributes, key: value},
-        )
+        context.client.context = context.client.context.merge(new_ctx)
     elif level == "Invocation":
-        current = context.invocation_context
-        context.invocation_context = EvaluationContext(
-            targeting_key=current.targeting_key,
-            attributes={**current.attributes, key: value},
-        )
+        context.invocation_context = context.invocation_context.merge(new_ctx)
     elif level == "Before Hooks":
-        current = context.before_hook_context
-        context.before_hook_context = EvaluationContext(
-            targeting_key=current.targeting_key,
-            attributes={**current.attributes, key: value},
-        )
+        context.before_hook_context = context.before_hook_context.merge(new_ctx)
 
 
 @given(
@@ -181,7 +159,9 @@ def step_impl_entries_down_to(
     context: typing.Any, level: str, key: str, value: str
 ) -> None:
     _ensure_state(context)
-    levels = context.precedence_levels
+    levels = getattr(context, "precedence_levels", None)
+    if not levels:
+        raise ValueError("Precedence levels table has not been initialized. Ensure 'A table with levels of increasing precedence' step is run first.")
     if level not in levels:
         raise ValueError(f"Level {level!r} not in precedence table {levels!r}")
     for current_level in levels:
@@ -205,7 +185,9 @@ def step_impl_evaluate(context: typing.Any) -> None:
 
 @then('The merged context contains an entry with key "{key}" and value "{value}"')
 def step_impl_merged_contains(context: typing.Any, key: str, value: str) -> None:
-    assert context.provider.last_context is not None, (
+    provider = getattr(context, "provider", None)
+    assert provider is not None, "Provider is not initialized in context"
+    assert provider.last_context is not None, (
         "provider did not receive an evaluation context"
     )
     attributes = context.provider.last_context.attributes
