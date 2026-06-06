@@ -11,9 +11,7 @@ from openfeature.flag_evaluation import FlagResolutionDetails, FlagValueType, Re
 from openfeature.hook import Hook, HookContext, HookHints
 from openfeature.provider import AbstractProvider, Metadata
 from openfeature.transaction_context import (
-    ContextVarsTransactionContextPropagator,
     set_transaction_context,
-    set_transaction_context_propagator,
 )
 
 
@@ -94,9 +92,6 @@ _LEVELS = {"API", "Transaction", "Client", "Invocation", "Before Hooks"}
 def _ensure_state(context: typing.Any) -> None:
     if getattr(context, "_merging_initialized", False):
         return
-
-    api.shutdown()
-    set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
 
     provider = RetrievableContextProvider()
     api.set_provider(provider)
