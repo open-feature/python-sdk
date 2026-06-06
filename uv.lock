@@ -197,7 +197,7 @@ wheels = [
 
 [[package]]
 name = "openfeature-sdk"
-version = "0.10.0"
+version = "0.9.0"
 source = { editable = "." }
 
 [package.dev-dependencies]
