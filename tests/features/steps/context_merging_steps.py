@@ -20,7 +20,9 @@ from openfeature.transaction_context import (
 class RetrievableContextProvider(AbstractProvider):
     """Stores the last merged evaluation context it was asked to resolve."""
 
-    def __init__(self) -> None:
+    def __init__(self, *args: typing.Any, **kwargs: typing.Any) -> None:
+        super().__init__(*args, **kwargs)
+
         self.last_context: EvaluationContext | None = None
 
     def get_metadata(self) -> Metadata:
@@ -92,11 +94,9 @@ _LEVELS = {"API", "Transaction", "Client", "Invocation", "Before Hooks"}
 def _ensure_state(context: typing.Any) -> None:
     if getattr(context, "_merging_initialized", False):
         return
-    api.clear_providers()
-    api.clear_hooks()
-    api.set_evaluation_context(EvaluationContext())
+
+    api.shutdown()
     set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
-    set_transaction_context(EvaluationContext())
 
     provider = RetrievableContextProvider()
     api.set_provider(provider)
@@ -116,43 +116,24 @@ def step_impl_retrievable_provider(context: typing.Any) -> None:
 def _add_entry_at_level(
     context: typing.Any, level: str, key: str, value: typing.Any
 ) -> None:
-    _ensure_state(context)
     if level not in _LEVELS:
         raise ValueError(f"Unknown level: {level!r}")
+
+    new_entry = (
+        EvaluationContext(targeting_key=value)
+        if key == "targeting_key"
+        else EvaluationContext(attributes={key: value})
+    )
     if level == "API":
-        current = api.get_evaluation_context()
-        api.set_evaluation_context(
-            EvaluationContext(
-                targeting_key=current.targeting_key,
-                attributes={**current.attributes, key: value},
-            )
-        )
+        api.set_evaluation_context(api.get_evaluation_context().merge(new_entry))
     elif level == "Transaction":
-        current = api.get_transaction_context()
-        set_transaction_context(
-            EvaluationContext(
-                targeting_key=current.targeting_key,
-                attributes={**current.attributes, key: value},
-            )
-        )
+        set_transaction_context(api.get_transaction_context().merge(new_entry))
     elif level == "Client":
-        current = context.client.context
-        context.client.context = EvaluationContext(
-            targeting_key=current.targeting_key,
-            attributes={**current.attributes, key: value},
-        )
+        context.client.context = context.client.context.merge(new_entry)
     elif level == "Invocation":
-        current = context.invocation_context
-        context.invocation_context = EvaluationContext(
-            targeting_key=current.targeting_key,
-            attributes={**current.attributes, key: value},
-        )
+        context.invocation_context = context.invocation_context.merge(new_entry)
     elif level == "Before Hooks":
-        current = context.before_hook_context
-        context.before_hook_context = EvaluationContext(
-            targeting_key=current.targeting_key,
-            attributes={**current.attributes, key: value},
-        )
+        context.before_hook_context = context.before_hook_context.merge(new_entry)
 
 
 @given(
@@ -165,7 +146,6 @@ def step_impl_add_entry(context: typing.Any, key: str, value: str, level: str) -
 
 @given("A table with levels of increasing precedence")
 def step_impl_levels_table(context: typing.Any) -> None:
-    _ensure_state(context)
     # The feature table is a single-column list of levels. Behave treats the
     # first row as the heading, so recombine heading + body rows.
     levels = [context.table.headings[0]]
@@ -180,7 +160,6 @@ def step_impl_levels_table(context: typing.Any) -> None:
 def step_impl_entries_down_to(
     context: typing.Any, level: str, key: str, value: str
 ) -> None:
-    _ensure_state(context)
     levels = context.precedence_levels
     if level not in levels:
         raise ValueError(f"Level {level!r} not in precedence table {levels!r}")
@@ -192,15 +171,10 @@ def step_impl_entries_down_to(
 
 @when("Some flag was evaluated")
 def step_impl_evaluate(context: typing.Any) -> None:
-    _ensure_state(context)
-    hook = _BeforeHookContextInjector(context.before_hook_context)
-    context.client.add_hooks([hook])
-    try:
-        context.client.get_boolean_details(
-            "some-flag", False, context.invocation_context
-        )
-    finally:
-        context.client.hooks = [h for h in context.client.hooks if h is not hook]
+    context.client.add_hooks(
+        [(_BeforeHookContextInjector(context.before_hook_context))]
+    )
+    context.client.get_boolean_details("some-flag", False, context.invocation_context)
 
 
 @then('The merged context contains an entry with key "{key}" and value "{value}"')
@@ -208,8 +182,10 @@ def step_impl_merged_contains(context: typing.Any, key: str, value: str) -> None
     assert context.provider.last_context is not None, (
         "provider did not receive an evaluation context"
     )
-    attributes = context.provider.last_context.attributes
-    assert key in attributes, f"key {key!r} missing from merged context: {attributes!r}"
-    assert attributes[key] == value, (
-        f"expected {key!r}={value!r}, got {attributes[key]!r}"
+    last_context = context.provider.last_context
+    actual_value = (
+        last_context.targeting_key
+        if key == "targeting_key"
+        else last_context.attributes.get(key)
     )
+    assert actual_value == value, f"expected {key!r}={value!r}, got {actual_value!r}"
