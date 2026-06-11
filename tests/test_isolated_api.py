@@ -12,7 +12,7 @@ from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import ProviderEvent, ProviderEventDetails
 from openfeature.hook import Hook
 from openfeature.isolated import OpenFeatureAPI, create_api
-from openfeature.provider import FeatureProvider, ProviderStatus
+from openfeature.provider import FeatureProvider, Metadata, ProviderStatus
 from openfeature.provider.no_op_provider import NoOpProvider
 from openfeature.transaction_context import ContextVarsTransactionContextPropagator
 
@@ -46,8 +46,10 @@ def test_isolated_instance_is_openfeature_api():
 _ISOLATED_API_PUBLIC_METHODS = (
     "add_handler",
     "add_hooks",
+    "clear_evaluation_context",
     "clear_hooks",
     "clear_providers",
+    "clear_transaction_context_propagator",
     "get_client",
     "get_evaluation_context",
     "get_hooks",
@@ -187,6 +189,37 @@ def test_provider_can_be_rebound_after_being_released():
     api2.set_provider(provider)
 
     assert api2.get_provider() is provider
+
+
+def test_set_provider_rejects_non_weak_referenceable_provider():
+    """Providers must be weak-referenceable so the SDK can track bindings
+    without leaking memory; surfacing this requirement up front (rather than
+    silently skipping the spec 1.8.4 check) avoids hard-to-diagnose bugs."""
+
+    # A direct ``object`` subclass with ``__slots__`` and no ``__weakref__``
+    # entry; instances are not weak-referenceable. Implements the
+    # ``FeatureProvider`` protocol structurally rather than via inheritance
+    # (which would inherit ``__weakref__`` from the parent class).
+    class NotWeakReferenceable:
+        __slots__ = ()
+
+        def attach(self, on_emit):
+            pass
+
+        def detach(self):
+            pass
+
+        def get_metadata(self):
+            return Metadata(name="not-weak-referenceable")
+
+        def get_provider_hooks(self):
+            return []
+
+    provider = NotWeakReferenceable()
+    api_instance = create_api()
+
+    with pytest.raises(TypeError, match="weak-referenceable"):
+        api_instance.set_provider(provider)  # type: ignore[arg-type]
 
 
 # --- Isolated state: hooks ---

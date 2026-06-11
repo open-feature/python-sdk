@@ -104,12 +104,18 @@ class OpenFeatureAPI:
             raise GeneralError(error_message="No api level evaluation context")
         self._evaluation_context = evaluation_context
 
+    def clear_evaluation_context(self) -> None:
+        self.set_evaluation_context(EvaluationContext())
+
     # --- Transaction context ---
 
     def set_transaction_context_propagator(
         self, transaction_context_propagator: TransactionContextPropagator
     ) -> None:
         self._transaction_context_propagator = transaction_context_propagator
+
+    def clear_transaction_context_propagator(self) -> None:
+        self.set_transaction_context_propagator(NoOpTransactionContextPropagator())
 
     def get_transaction_context(self) -> EvaluationContext:
         return self._transaction_context_propagator.get_transaction_context()

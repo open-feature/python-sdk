@@ -9,9 +9,6 @@ from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
 from openfeature.provider.metadata import Metadata
 from openfeature.transaction_context import TransactionContextPropagator
-from openfeature.transaction_context.no_op_transaction_context_propagator import (
-    NoOpTransactionContextPropagator,
-)
 
 __all__ = [
     "add_handler",
@@ -90,7 +87,7 @@ def set_evaluation_context(evaluation_context: EvaluationContext) -> None:
 
 
 def clear_evaluation_context() -> None:
-    set_evaluation_context(EvaluationContext())
+    _default_api.clear_evaluation_context()
 
 
 def set_transaction_context_propagator(
@@ -100,7 +97,7 @@ def set_transaction_context_propagator(
 
 
 def clear_transaction_context_propagator() -> None:
-    set_transaction_context_propagator(NoOpTransactionContextPropagator())
+    _default_api.clear_transaction_context_propagator()
 
 
 def get_transaction_context() -> EvaluationContext:

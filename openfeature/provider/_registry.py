@@ -27,6 +27,14 @@ _provider_bindings: weakref.WeakKeyDictionary[FeatureProvider, ProviderRegistry]
 
 
 def _register_binding(provider: FeatureProvider, owner: ProviderRegistry) -> None:
+    try:
+        weakref.ref(provider)
+    except TypeError as exc:
+        raise TypeError(
+            f"Provider {type(provider).__name__!r} cannot be tracked because "
+            "it is not weak-referenceable. If your provider class uses "
+            "__slots__, add '__weakref__' to the slots list."
+        ) from exc
     with _binding_lock:
         existing = _provider_bindings.get(provider)
         if existing is not None and existing is not owner:
