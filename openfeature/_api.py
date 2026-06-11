@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import typing
-
 from openfeature._event_support import EventSupport
+from openfeature.client import OpenFeatureClient
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import EventHandler, ProviderEvent
 from openfeature.exception import GeneralError
@@ -10,20 +9,17 @@ from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider._registry import ProviderRegistry
 from openfeature.provider.metadata import Metadata
-from openfeature.transaction_context import (
+from openfeature.transaction_context import TransactionContextPropagator
+from openfeature.transaction_context.no_op_transaction_context_propagator import (
     NoOpTransactionContextPropagator,
-    TransactionContextPropagator,
 )
-
-if typing.TYPE_CHECKING:
-    from openfeature.client import OpenFeatureClient
 
 
 class OpenFeatureAPI:
     """An independent OpenFeature API instance with its own isolated state.
 
     Each instance maintains its own providers, evaluation context, hooks,
-    event handlers, and transaction context propagator — fully separate from
+    event handlers, and transaction context propagator; fully separate from
     the global singleton and from other instances.
     """
 
@@ -44,8 +40,6 @@ class OpenFeatureAPI:
     def get_client(
         self, domain: str | None = None, version: str | None = None
     ) -> OpenFeatureClient:
-        from openfeature.client import OpenFeatureClient  # noqa: PLC0415
-
         return OpenFeatureClient(domain=domain, version=version, api=self)
 
     # --- Provider management ---
@@ -132,28 +126,4 @@ class OpenFeatureAPI:
         self._event_support.remove_global_handler(event, handler)
 
 
-def _create_default_api() -> OpenFeatureAPI:
-    """Create the default global API instance, wired to legacy module-level singletons.
-
-    The default API reuses the module-level ``_default_event_support`` and
-    ``provider_registry`` so that backward-compatible module-level functions
-    continue to work against the same state.
-    """
-    from openfeature._event_support import _default_event_support  # noqa: PLC0415
-    from openfeature.provider._registry import provider_registry  # noqa: PLC0415
-
-    api = OpenFeatureAPI.__new__(OpenFeatureAPI)
-    api._hooks = []
-    api._evaluation_context = EvaluationContext()
-    api._transaction_context_propagator = NoOpTransactionContextPropagator()
-    api._event_support = _default_event_support
-    api._provider_registry = provider_registry
-
-    # Wire the registry to this API's event support and context getter
-    provider_registry._event_support = _default_event_support
-    provider_registry._evaluation_context_getter = api.get_evaluation_context
-
-    return api
-
-
-_default_api = _create_default_api()
+_default_api = OpenFeatureAPI()

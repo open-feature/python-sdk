@@ -5,7 +5,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 
-__all__ = ["EvaluationContext", "get_evaluation_context", "set_evaluation_context"]
+__all__ = ["EvaluationContext"]
 
 # https://openfeature.dev/specification/sections/evaluation-context#requirement-312
 EvaluationContextAttribute: typing.TypeAlias = (
@@ -32,19 +32,3 @@ class EvaluationContext:
         targeting_key = ctx2.targeting_key or self.targeting_key
 
         return EvaluationContext(targeting_key=targeting_key, attributes=attributes)
-
-
-def get_evaluation_context() -> EvaluationContext:
-    from openfeature._api import _default_api  # noqa: PLC0415
-
-    return _default_api.get_evaluation_context()
-
-
-def set_evaluation_context(evaluation_context: EvaluationContext) -> None:
-    from openfeature._api import _default_api  # noqa: PLC0415
-
-    _default_api.set_evaluation_context(evaluation_context)
-
-
-# Kept for backward compatibility but no longer used; state lives in _default_api.
-_evaluation_context = EvaluationContext()

@@ -1,9 +1,9 @@
 from openfeature.api import (
+    get_client,
     set_provider,
     set_transaction_context,
     set_transaction_context_propagator,
 )
-from openfeature.client import OpenFeatureClient
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.hook import Hook
 from openfeature.provider.no_op_provider import NoOpProvider
@@ -32,7 +32,7 @@ def test_transaction_context_merged_into_hook_context():
     provider = NoOpProvider()
     set_provider(provider)
 
-    client = OpenFeatureClient(domain=None, version=None)
+    client = get_client()
 
     hook = TransactionContextHook()
     client.add_hooks([hook])

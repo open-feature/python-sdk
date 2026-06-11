@@ -6,11 +6,8 @@ from openfeature.provider.no_op_provider import NoOpProvider
 
 @pytest.fixture(autouse=True)
 def clear_providers():
-    """
-    For tests that use set_provider(), we need to clear the provider to avoid issues
-    in other tests.
-    """
-    api.clear_providers()
+    """Fully reset the global default API between tests to avoid cross-test pollution."""
+    api.shutdown()
 
 
 @pytest.fixture()

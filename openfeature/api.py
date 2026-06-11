@@ -1,27 +1,25 @@
 from openfeature._api import _default_api
 from openfeature.client import OpenFeatureClient
-from openfeature.evaluation_context import (
-    get_evaluation_context,
-    set_evaluation_context,
-)
+from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import (
     EventHandler,
     ProviderEvent,
 )
-from openfeature.hook import add_hooks, clear_hooks, get_hooks
+from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
 from openfeature.provider.metadata import Metadata
-from openfeature.transaction_context import (
-    get_transaction_context,
-    set_transaction_context,
-    set_transaction_context_propagator,
+from openfeature.transaction_context import TransactionContextPropagator
+from openfeature.transaction_context.no_op_transaction_context_propagator import (
+    NoOpTransactionContextPropagator,
 )
 
 __all__ = [
     "add_handler",
     "add_hooks",
+    "clear_evaluation_context",
     "clear_hooks",
     "clear_providers",
+    "clear_transaction_context_propagator",
     "get_client",
     "get_evaluation_context",
     "get_hooks",
@@ -69,3 +67,45 @@ def add_handler(event: ProviderEvent, handler: EventHandler) -> None:
 
 def remove_handler(event: ProviderEvent, handler: EventHandler) -> None:
     _default_api.remove_handler(event, handler)
+
+
+def add_hooks(hooks: list[Hook]) -> None:
+    _default_api.add_hooks(hooks)
+
+
+def clear_hooks() -> None:
+    _default_api.clear_hooks()
+
+
+def get_hooks() -> list[Hook]:
+    return _default_api.get_hooks()
+
+
+def get_evaluation_context() -> EvaluationContext:
+    return _default_api.get_evaluation_context()
+
+
+def set_evaluation_context(evaluation_context: EvaluationContext) -> None:
+    _default_api.set_evaluation_context(evaluation_context)
+
+
+def clear_evaluation_context() -> None:
+    set_evaluation_context(EvaluationContext())
+
+
+def set_transaction_context_propagator(
+    transaction_context_propagator: TransactionContextPropagator,
+) -> None:
+    _default_api.set_transaction_context_propagator(transaction_context_propagator)
+
+
+def clear_transaction_context_propagator() -> None:
+    set_transaction_context_propagator(NoOpTransactionContextPropagator())
+
+
+def get_transaction_context() -> EvaluationContext:
+    return _default_api.get_transaction_context()
+
+
+def set_transaction_context(evaluation_context: EvaluationContext) -> None:
+    _default_api.set_transaction_context(evaluation_context)

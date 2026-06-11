@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import threading
 import typing
+import weakref
 from collections.abc import Callable
 
-from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
+from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import (
     ProviderEvent,
     ProviderEventDetails,
@@ -16,6 +17,30 @@ from openfeature.provider.no_op_provider import NoOpProvider
 if typing.TYPE_CHECKING:
     from openfeature._event_support import EventSupport
 
+# spec 1.8.4: a provider should not be bound to more than one OpenFeature API
+# instance simultaneously. We track the owning registry per provider; rebinding
+# to a different registry raises. WeakKeyDictionary lets providers be GC'd.
+_binding_lock = threading.Lock()
+_provider_bindings: weakref.WeakKeyDictionary[FeatureProvider, ProviderRegistry] = (
+    weakref.WeakKeyDictionary()
+)
+
+
+def _register_binding(provider: FeatureProvider, owner: ProviderRegistry) -> None:
+    with _binding_lock:
+        existing = _provider_bindings.get(provider)
+        if existing is not None and existing is not owner:
+            raise RuntimeError(
+                "Provider is already bound to another OpenFeature API instance."
+            )
+        _provider_bindings[provider] = owner
+
+
+def _unregister_binding(provider: FeatureProvider, owner: ProviderRegistry) -> None:
+    with _binding_lock:
+        if _provider_bindings.get(provider) is owner:
+            del _provider_bindings[provider]
+
 
 class ProviderRegistry:
     _default_provider: FeatureProvider
@@ -25,8 +50,8 @@ class ProviderRegistry:
 
     def __init__(
         self,
-        event_support: EventSupport | None = None,
-        evaluation_context_getter: Callable[[], EvaluationContext] | None = None,
+        event_support: EventSupport,
+        evaluation_context_getter: Callable[[], EvaluationContext],
     ) -> None:
         self._lock = threading.RLock()
         self._default_provider = NoOpProvider()
@@ -35,9 +60,7 @@ class ProviderRegistry:
             self._default_provider: ProviderStatus.READY,
         }
         self._event_support = event_support
-        self._evaluation_context_getter = (
-            evaluation_context_getter or get_evaluation_context
-        )
+        self._evaluation_context_getter = evaluation_context_getter
 
     def set_provider(
         self, domain: str, provider: FeatureProvider, wait_for_init: bool = False
@@ -46,6 +69,8 @@ class ProviderRegistry:
             raise GeneralError(error_message="No provider")
         if domain is None:
             raise GeneralError(error_message="No domain")
+
+        _register_binding(provider, self)
 
         old_provider: FeatureProvider | None = None
         needs_init = False
@@ -77,6 +102,8 @@ class ProviderRegistry:
     ) -> None:
         if provider is None:
             raise GeneralError(error_message="No provider")
+
+        _register_binding(provider, self)
 
         old_provider: FeatureProvider | None = None
         needs_init = False
@@ -226,6 +253,7 @@ class ProviderRegistry:
                 ),
             )
         provider.detach()
+        _unregister_binding(provider, self)
 
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
         return self._provider_status.get(provider, ProviderStatus.NOT_READY)
@@ -237,8 +265,7 @@ class ProviderRegistry:
         details: ProviderEventDetails,
     ) -> None:
         self._update_provider_status(provider, event, details)
-        if self._event_support is not None:
-            self._event_support.run_handlers_for_provider(provider, event, details)
+        self._event_support.run_handlers_for_provider(provider, event, details)
 
     def _update_provider_status(
         self,
@@ -258,6 +285,3 @@ class ProviderRegistry:
                     else ProviderStatus.ERROR
                 )
                 self._provider_status[provider] = status
-
-
-provider_registry = ProviderRegistry()

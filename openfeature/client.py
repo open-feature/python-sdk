@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import typing
 from collections.abc import Awaitable, Mapping, Sequence
@@ -39,7 +37,6 @@ if typing.TYPE_CHECKING:
 
 __all__ = [
     "ClientMetadata",
-    "OpenFeatureClient",
 ]
 
 logger = logging.getLogger("openfeature")
@@ -77,24 +74,27 @@ class ClientMetadata:
 
 
 class OpenFeatureClient:
+    """Client for evaluating feature flags against a specific OpenFeatureAPI.
+
+    Clients should be obtained via ``OpenFeatureAPI.get_client()`` (or the
+    module-level ``openfeature.api.get_client()`` for the default API);
+    direct construction is supported only for advanced use cases and requires
+    passing the owning ``OpenFeatureAPI`` instance.
+    """
+
     def __init__(
         self,
         domain: str | None,
         version: str | None,
+        api: "OpenFeatureAPI",
         context: EvaluationContext | None = None,
         hooks: list[Hook] | None = None,
-        api: OpenFeatureAPI | None = None,
     ) -> None:
         self.domain = domain
         self.version = version
         self.context = context or EvaluationContext()
         self.hooks = hooks or []
-        if api is not None:
-            self._api = api
-        else:
-            from openfeature._api import _default_api  # noqa: PLC0415
-
-            self._api = _default_api
+        self._api = api
 
     @property
     def provider(self) -> FeatureProvider:
@@ -549,20 +549,20 @@ class OpenFeatureClient:
         self,
         flag_type: FlagType,
         flag_key: str,
-        default_value: Sequence[FlagValueType],
+        default_value: Sequence["FlagValueType"],
         evaluation_context: EvaluationContext | None = None,
         flag_evaluation_options: FlagEvaluationOptions | None = None,
-    ) -> FlagEvaluationDetails[Sequence[FlagValueType]]: ...
+    ) -> FlagEvaluationDetails[Sequence["FlagValueType"]]: ...
 
     @typing.overload
     async def evaluate_flag_details_async(
         self,
         flag_type: FlagType,
         flag_key: str,
-        default_value: Mapping[str, FlagValueType],
+        default_value: Mapping[str, "FlagValueType"],
         evaluation_context: EvaluationContext | None = None,
         flag_evaluation_options: FlagEvaluationOptions | None = None,
-    ) -> FlagEvaluationDetails[Mapping[str, FlagValueType]]: ...
+    ) -> FlagEvaluationDetails[Mapping[str, "FlagValueType"]]: ...
 
     async def evaluate_flag_details_async(
         self,
@@ -725,20 +725,20 @@ class OpenFeatureClient:
         self,
         flag_type: FlagType,
         flag_key: str,
-        default_value: Sequence[FlagValueType],
+        default_value: Sequence["FlagValueType"],
         evaluation_context: EvaluationContext | None = None,
         flag_evaluation_options: FlagEvaluationOptions | None = None,
-    ) -> FlagEvaluationDetails[Sequence[FlagValueType]]: ...
+    ) -> FlagEvaluationDetails[Sequence["FlagValueType"]]: ...
 
     @typing.overload
     def evaluate_flag_details(
         self,
         flag_type: FlagType,
         flag_key: str,
-        default_value: Mapping[str, FlagValueType],
+        default_value: Mapping[str, "FlagValueType"],
         evaluation_context: EvaluationContext | None = None,
         flag_evaluation_options: FlagEvaluationOptions | None = None,
-    ) -> FlagEvaluationDetails[Mapping[str, FlagValueType]]: ...
+    ) -> FlagEvaluationDetails[Mapping[str, "FlagValueType"]]: ...
 
     def evaluate_flag_details(
         self,

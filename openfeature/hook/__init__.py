@@ -18,9 +18,6 @@ __all__ = [
     "HookData",
     "HookHints",
     "HookType",
-    "add_hooks",
-    "clear_hooks",
-    "get_hooks",
 ]
 
 
@@ -147,21 +144,3 @@ class Hook:
         or not (False)
         """
         return True
-
-
-def add_hooks(hooks: list[Hook]) -> None:
-    from openfeature._api import _default_api  # noqa: PLC0415
-
-    _default_api.add_hooks(hooks)
-
-
-def clear_hooks() -> None:
-    from openfeature._api import _default_api  # noqa: PLC0415
-
-    _default_api.clear_hooks()
-
-
-def get_hooks() -> list[Hook]:
-    from openfeature._api import _default_api  # noqa: PLC0415
-
-    return _default_api.get_hooks()
