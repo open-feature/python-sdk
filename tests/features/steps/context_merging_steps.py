@@ -6,13 +6,11 @@ from collections.abc import Mapping, Sequence
 from behave import given, then, when
 
 from openfeature import api
+from openfeature.api import set_transaction_context
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagResolutionDetails, FlagValueType, Reason
 from openfeature.hook import Hook, HookContext, HookHints
 from openfeature.provider import AbstractProvider, Metadata
-from openfeature.transaction_context import (
-    set_transaction_context,
-)
 
 
 class RetrievableContextProvider(AbstractProvider):

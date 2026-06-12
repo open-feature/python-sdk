@@ -1,7 +1,6 @@
 import typing
 
-from openfeature.api import set_provider
-from openfeature.client import OpenFeatureClient
+from openfeature.api import get_client, set_provider
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagValueType
 from openfeature.hook import Hook, HookContext, HookHints
@@ -46,7 +45,7 @@ def test_hook_data_is_not_shared_between_hooks():
     provider = NoOpProvider()
     set_provider(provider)
 
-    client = OpenFeatureClient(domain=None, version=None)
+    client = get_client()
 
     hook_1 = HookWithData({"key": "value"})
     hook_2 = HookWithData({"key": Example()})

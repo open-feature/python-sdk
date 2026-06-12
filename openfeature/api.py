@@ -1,30 +1,22 @@
-from openfeature import _event_support
+from openfeature._api import _default_api
 from openfeature.client import OpenFeatureClient
-from openfeature.evaluation_context import (
-    clear_evaluation_context,
-    get_evaluation_context,
-    set_evaluation_context,
-)
+from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import (
     EventHandler,
     ProviderEvent,
 )
-from openfeature.hook import add_hooks, clear_hooks, get_hooks
+from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider
-from openfeature.provider._registry import provider_registry
 from openfeature.provider.metadata import Metadata
-from openfeature.transaction_context import (
-    clear_transaction_context_propagator,
-    get_transaction_context,
-    set_transaction_context,
-    set_transaction_context_propagator,
-)
+from openfeature.transaction_context import TransactionContextPropagator
 
 __all__ = [
     "add_handler",
     "add_hooks",
+    "clear_evaluation_context",
     "clear_hooks",
     "clear_providers",
+    "clear_transaction_context_propagator",
     "get_client",
     "get_evaluation_context",
     "get_hooks",
@@ -43,46 +35,74 @@ __all__ = [
 def get_client(
     domain: str | None = None, version: str | None = None
 ) -> OpenFeatureClient:
-    return OpenFeatureClient(domain=domain, version=version)
+    return _default_api.get_client(domain=domain, version=version)
 
 
 def set_provider(provider: FeatureProvider, domain: str | None = None) -> None:
-    if domain is None:
-        provider_registry.set_default_provider(provider)
-    else:
-        provider_registry.set_provider(domain, provider)
+    _default_api.set_provider(provider, domain)
 
 
 def set_provider_and_wait(provider: FeatureProvider, domain: str | None = None) -> None:
-    if domain is None:
-        provider_registry.set_default_provider(provider, wait_for_init=True)
-    else:
-        provider_registry.set_provider(domain, provider, wait_for_init=True)
+    _default_api.set_provider_and_wait(provider, domain)
 
 
 def clear_providers() -> None:
-    provider_registry.clear_providers()
-    _event_support.clear()
+    _default_api.clear_providers()
 
 
 def get_provider_metadata(domain: str | None = None) -> Metadata:
-    return provider_registry.get_provider(domain).get_metadata()
+    return _default_api.get_provider_metadata(domain)
 
 
 def shutdown() -> None:
-    # shutdown -> remove providers -> set default provider to NoOp -> remove event handlers
-    clear_providers()
-    # remove hooks
-    clear_hooks()
-    # set evaluation context to default
-    clear_evaluation_context()
-    # set propagator to NoOp
-    clear_transaction_context_propagator()
+    _default_api.shutdown()
 
 
 def add_handler(event: ProviderEvent, handler: EventHandler) -> None:
-    _event_support.add_global_handler(event, handler)
+    _default_api.add_handler(event, handler)
 
 
 def remove_handler(event: ProviderEvent, handler: EventHandler) -> None:
-    _event_support.remove_global_handler(event, handler)
+    _default_api.remove_handler(event, handler)
+
+
+def add_hooks(hooks: list[Hook]) -> None:
+    _default_api.add_hooks(hooks)
+
+
+def clear_hooks() -> None:
+    _default_api.clear_hooks()
+
+
+def get_hooks() -> list[Hook]:
+    return _default_api.get_hooks()
+
+
+def get_evaluation_context() -> EvaluationContext:
+    return _default_api.get_evaluation_context()
+
+
+def set_evaluation_context(evaluation_context: EvaluationContext) -> None:
+    _default_api.set_evaluation_context(evaluation_context)
+
+
+def clear_evaluation_context() -> None:
+    _default_api.clear_evaluation_context()
+
+
+def set_transaction_context_propagator(
+    transaction_context_propagator: TransactionContextPropagator,
+) -> None:
+    _default_api.set_transaction_context_propagator(transaction_context_propagator)
+
+
+def clear_transaction_context_propagator() -> None:
+    _default_api.clear_transaction_context_propagator()
+
+
+def get_transaction_context() -> EvaluationContext:
+    return _default_api.get_transaction_context()
+
+
+def set_transaction_context(evaluation_context: EvaluationContext) -> None:
+    _default_api.set_transaction_context(evaluation_context)

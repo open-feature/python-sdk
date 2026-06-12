@@ -5,14 +5,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from openfeature.exception import GeneralError
-
-__all__ = [
-    "EvaluationContext",
-    "clear_evaluation_context",
-    "get_evaluation_context",
-    "set_evaluation_context",
-]
+__all__ = ["EvaluationContext"]
 
 # https://openfeature.dev/specification/sections/evaluation-context#requirement-312
 EvaluationContextAttribute: typing.TypeAlias = (
@@ -39,22 +32,3 @@ class EvaluationContext:
         targeting_key = ctx2.targeting_key or self.targeting_key
 
         return EvaluationContext(targeting_key=targeting_key, attributes=attributes)
-
-
-def get_evaluation_context() -> EvaluationContext:
-    return _evaluation_context
-
-
-def set_evaluation_context(evaluation_context: EvaluationContext) -> None:
-    global _evaluation_context
-    if evaluation_context is None:
-        raise GeneralError(error_message="No api level evaluation context")
-    _evaluation_context = evaluation_context
-
-
-def clear_evaluation_context() -> None:
-    set_evaluation_context(EvaluationContext())
-
-
-# need to be at the bottom, because of the definition order
-_evaluation_context = EvaluationContext()

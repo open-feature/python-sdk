@@ -8,7 +8,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from openfeature import _event_support, api
+from openfeature import api
+from openfeature._api import _default_api
 from openfeature.api import (
     add_hooks,
     clear_hooks,
@@ -24,7 +25,6 @@ from openfeature.exception import ErrorCode, OpenFeatureError
 from openfeature.flag_evaluation import FlagResolutionDetails, FlagType, Reason
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, ProviderStatus
-from openfeature.provider._registry import provider_registry
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 from openfeature.provider.no_op_provider import NoOpProvider
 from openfeature.transaction_context import ContextVarsTransactionContextPropagator
@@ -188,7 +188,7 @@ def test_should_pass_flag_metadata_from_resolution_to_evaluation_details():
     )
     set_provider(provider, "my-client")
 
-    client = OpenFeatureClient("my-client", None)
+    client = get_client("my-client")
 
     # When
     details = client.get_boolean_details(flag_key="Key", default_value=False)
@@ -239,7 +239,7 @@ def test_should_handle_an_open_feature_exception_thrown_by_a_provider(
 
 def test_should_return_client_metadata_with_domain():
     # Given
-    client = OpenFeatureClient("my-client", None, NoOpProvider())
+    client = get_client("my-client")
     # When
     metadata = client.get_metadata()
     # Then
@@ -359,7 +359,7 @@ def test_provider_should_return_not_ready_status_after_shutdown(monkeypatch):
     monkeypatch.setattr(provider, "shutdown", types.MethodType(_shutdown, provider))
 
     # When
-    provider_registry.shutdown()
+    _default_api._provider_registry.shutdown()
 
     status = client.get_provider_status()
 
@@ -549,13 +549,13 @@ def test_run_client_handlers_without_registered_handlers_is_noop():
     client = get_client("client-without-handlers")
     details = EventDetails(provider_name=provider.get_metadata().name)
 
-    assert client not in _event_support._client_handlers
+    assert client not in _default_api._event_support._client_handlers
 
-    _event_support.run_client_handlers(
+    _default_api._event_support.run_client_handlers(
         client, ProviderEvent.PROVIDER_CONFIGURATION_CHANGED, details
     )
 
-    assert client not in _event_support._client_handlers
+    assert client not in _default_api._event_support._client_handlers
 
 
 # Requirement 5.1.4, Requirement 5.1.5
@@ -707,7 +707,9 @@ def test_client_should_merge_contexts():
     client_context = EvaluationContext(
         targeting_key="client", attributes={"client_attr": "client_value"}
     )
-    client = OpenFeatureClient(domain=None, version=None, context=client_context)
+    client = OpenFeatureClient(
+        domain=None, version=None, api=_default_api, context=client_context
+    )
 
     # Invocation-specific context
     invocation_context = EvaluationContext(
@@ -743,6 +745,7 @@ def test_client_should_track_event():
 
 
 def test_tracking_merges_evaluation_contexts():
+    api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
     spy_provider = MagicMock(spec=NoOpProvider)
     api.set_provider(spy_provider)
     client = get_client()

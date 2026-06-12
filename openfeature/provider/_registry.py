@@ -1,7 +1,11 @@
-import threading
+from __future__ import annotations
 
-from openfeature._event_support import run_handlers_for_provider
-from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
+import threading
+import typing
+import weakref
+from collections.abc import Callable
+
+from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import (
     ProviderEvent,
     ProviderEventDetails,
@@ -10,6 +14,39 @@ from openfeature.exception import ErrorCode, GeneralError, OpenFeatureError
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider.no_op_provider import NoOpProvider
 
+if typing.TYPE_CHECKING:
+    from openfeature._event_support import EventSupport
+
+# spec 1.8.4: provider must not bind to more than one API; we track owning registry per provider, rebinding raises. WeakKeyDictionary lets providers be GC'd
+_binding_lock = threading.Lock()
+_provider_bindings: weakref.WeakKeyDictionary[FeatureProvider, ProviderRegistry] = (
+    weakref.WeakKeyDictionary()
+)
+
+
+def _register_binding(provider: FeatureProvider, owner: ProviderRegistry) -> None:
+    try:
+        weakref.ref(provider)
+    except TypeError as exc:
+        raise TypeError(
+            f"Provider {type(provider).__name__!r} cannot be tracked because "
+            "it is not weak-referenceable. If your provider class uses "
+            "__slots__, add '__weakref__' to the slots list."
+        ) from exc
+    with _binding_lock:
+        existing = _provider_bindings.get(provider)
+        if existing is not None and existing is not owner:
+            raise RuntimeError(
+                "Provider is already bound to another OpenFeature API instance."
+            )
+        _provider_bindings[provider] = owner
+
+
+def _unregister_binding(provider: FeatureProvider, owner: ProviderRegistry) -> None:
+    with _binding_lock:
+        if _provider_bindings.get(provider) is owner:
+            del _provider_bindings[provider]
+
 
 class ProviderRegistry:
     _default_provider: FeatureProvider
@@ -17,13 +54,19 @@ class ProviderRegistry:
     _provider_status: dict[FeatureProvider, ProviderStatus]
     _lock: threading.RLock
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        event_support: EventSupport,
+        evaluation_context_getter: Callable[[], EvaluationContext],
+    ) -> None:
         self._lock = threading.RLock()
         self._default_provider = NoOpProvider()
         self._providers = {}
         self._provider_status = {
             self._default_provider: ProviderStatus.READY,
         }
+        self._event_support = event_support
+        self._evaluation_context_getter = evaluation_context_getter
 
     def set_provider(
         self, domain: str, provider: FeatureProvider, wait_for_init: bool = False
@@ -32,6 +75,8 @@ class ProviderRegistry:
             raise GeneralError(error_message="No provider")
         if domain is None:
             raise GeneralError(error_message="No domain")
+
+        _register_binding(provider, self)
 
         old_provider: FeatureProvider | None = None
         needs_init = False
@@ -63,6 +108,8 @@ class ProviderRegistry:
     ) -> None:
         if provider is None:
             raise GeneralError(error_message="No provider")
+
+        _register_binding(provider, self)
 
         old_provider: FeatureProvider | None = None
         needs_init = False
@@ -102,7 +149,7 @@ class ProviderRegistry:
             self._shutdown_provider(provider)
 
     def _get_evaluation_context(self) -> EvaluationContext:
-        return get_evaluation_context()
+        return self._evaluation_context_getter()
 
     def _initialize_provider(
         self, provider: FeatureProvider, wait_for_init: bool
@@ -172,11 +219,8 @@ class ProviderRegistry:
     def _shutdown_if_unused(self, provider: FeatureProvider) -> None:
         # only shut down if no longer referenced. shutdown runs on a daemon
         # thread so a hanging shutdown() cannot block the caller.
-        with self._lock:
-            if provider is self._default_provider:
-                return
-            if provider in self._providers.values():
-                return
+        if self._is_active(provider):
+            return
 
         thread = threading.Thread(
             target=self._shutdown_provider,
@@ -186,20 +230,25 @@ class ProviderRegistry:
         )
         thread.start()
 
+    def _is_active(self, provider: FeatureProvider) -> bool:
+        with self._lock:
+            return (
+                provider is self._default_provider
+                or provider in self._providers.values()
+            )
+
     def _shutdown_provider(
         self, provider: FeatureProvider, abort_if_re_registered: bool = False
     ) -> None:
         try:
+            # abort if re-registered before shutdown() to avoid tearing down the freshly-registered instance
+            if abort_if_re_registered and self._is_active(provider):
+                return
             if hasattr(provider, "shutdown"):
                 provider.shutdown()
-            # if provider is being re-registered, leave its status and event wiring intact
-            if abort_if_re_registered:
-                with self._lock:
-                    if (
-                        provider is self._default_provider
-                        or provider in self._providers.values()
-                    ):
-                        return
+            # abort if re-registered during shutdown(); leave status and event wiring intact
+            if abort_if_re_registered and self._is_active(provider):
+                return
             with self._lock:
                 self._provider_status.pop(provider, None)
         except Exception as err:
@@ -212,6 +261,7 @@ class ProviderRegistry:
                 ),
             )
         provider.detach()
+        _unregister_binding(provider, self)
 
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
         return self._provider_status.get(provider, ProviderStatus.NOT_READY)
@@ -223,7 +273,7 @@ class ProviderRegistry:
         details: ProviderEventDetails,
     ) -> None:
         self._update_provider_status(provider, event, details)
-        run_handlers_for_provider(provider, event, details)
+        self._event_support.run_handlers_for_provider(provider, event, details)
 
     def _update_provider_status(
         self,
@@ -243,6 +293,3 @@ class ProviderRegistry:
                     else ProviderStatus.ERROR
                 )
                 self._provider_status[provider] = status
-
-
-provider_registry = ProviderRegistry()

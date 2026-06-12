@@ -13,10 +13,12 @@ from openfeature.api import (
     get_evaluation_context,
     get_hooks,
     get_provider_metadata,
+    get_transaction_context,
     remove_handler,
     set_evaluation_context,
     set_provider,
     set_provider_and_wait,
+    set_transaction_context_propagator,
     shutdown,
 )
 from openfeature.evaluation_context import EvaluationContext
@@ -24,13 +26,8 @@ from openfeature.event import EventDetails, ProviderEvent, ProviderEventDetails
 from openfeature.exception import ErrorCode, GeneralError, ProviderFatalError
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, Metadata, ProviderStatus
-from openfeature.provider._registry import provider_registry
 from openfeature.provider.no_op_provider import NoOpProvider
-from openfeature.transaction_context import (
-    ContextVarsTransactionContextPropagator,
-    get_transaction_context,
-    set_transaction_context_propagator,
-)
+from openfeature.transaction_context import ContextVarsTransactionContextPropagator
 
 
 def wait_for_mock_call(mock: MagicMock, timeout: float = 1.0) -> None:
@@ -93,8 +90,9 @@ def test_should_invoke_provider_shutdown_function_once_provider_is_no_longer_in_
     provider_2 = MagicMock(spec=FeatureProvider)
 
     # When
-    set_provider(provider_1)
-    set_provider(provider_2)
+    set_provider_and_wait(provider_1)
+    set_provider_and_wait(provider_2)
+    wait_for_mock_call(provider_1.shutdown)
 
     # Then
     assert provider_1.shutdown.called
@@ -246,7 +244,7 @@ def test_shutdown_should_reset_api_state():
     shutdown()
 
     # Then
-    provider = provider_registry.get_default_provider()
+    provider = get_client().provider
     assert isinstance(provider, NoOpProvider)
 
     hooks = get_hooks()

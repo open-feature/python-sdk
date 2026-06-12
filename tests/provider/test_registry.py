@@ -4,21 +4,30 @@ from unittest.mock import Mock
 
 import pytest
 
+from openfeature._event_support import EventSupport
+from openfeature.evaluation_context import EvaluationContext
 from openfeature.exception import GeneralError, ProviderFatalError
 from openfeature.provider import ProviderStatus
 from openfeature.provider._registry import ProviderRegistry
 from openfeature.provider.no_op_provider import NoOpProvider
 
 
+def make_registry() -> ProviderRegistry:
+    return ProviderRegistry(
+        event_support=EventSupport(),
+        evaluation_context_getter=lambda: EvaluationContext(),
+    )
+
+
 def test_registry_serves_noop_as_default():
-    registry = ProviderRegistry()
+    registry = make_registry()
 
     assert isinstance(registry.get_default_provider(), NoOpProvider)
     assert isinstance(registry.get_provider("unknown domain"), NoOpProvider)
 
 
 def test_setting_provider_requires_domain():
-    registry = ProviderRegistry()
+    registry = make_registry()
 
     with pytest.raises(GeneralError) as exc_info:
         registry.set_provider(None, NoOpProvider())  # type: ignore[reportArgumentType]
@@ -27,7 +36,7 @@ def test_setting_provider_requires_domain():
 
 
 def test_setting_provider_requires_provider():
-    registry = ProviderRegistry()
+    registry = make_registry()
 
     with pytest.raises(GeneralError) as exc_info:
         registry.set_provider("domain", None)  # type: ignore[reportArgumentType]
@@ -36,7 +45,7 @@ def test_setting_provider_requires_provider():
 
 
 def test_can_register_provider_to_multiple_domains():
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider = NoOpProvider()
 
     registry.set_provider("domain1", provider)
@@ -49,7 +58,7 @@ def test_can_register_provider_to_multiple_domains():
 def test_registering_provider_replaces_previous_provider():
     """Test that registering a provider replaces the previous provider and calls shutdown on the old one."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider1 = Mock()
     provider2 = Mock()
 
@@ -66,7 +75,7 @@ def test_registering_provider_replaces_previous_provider():
 def test_registering_provider_for_first_time_initializes_it():
     """Test that registering a provider for the first time calls its initialize method."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider = Mock()
 
     registry.set_provider("domain1", provider, wait_for_init=True)
@@ -76,7 +85,7 @@ def test_registering_provider_for_first_time_initializes_it():
 
 
 def test_setting_default_provider_requires_provider():
-    registry = ProviderRegistry()
+    registry = make_registry()
 
     with pytest.raises(GeneralError) as exc_info:
         registry.set_default_provider(None)  # type: ignore[reportArgumentType]
@@ -87,7 +96,7 @@ def test_setting_default_provider_requires_provider():
 def test_replacing_default_provider_shuts_down_old_one():
     """Test that replacing the default provider shuts down the old default provider."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     default_provider1 = Mock()
     default_provider2 = Mock()
 
@@ -102,7 +111,7 @@ def test_replacing_default_provider_shuts_down_old_one():
 
 
 def test_setting_default_provider_initializes_it():
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider = Mock()
 
     registry.set_default_provider(provider, wait_for_init=True)
@@ -113,7 +122,7 @@ def test_setting_default_provider_initializes_it():
 def test_registering_provider_as_default_then_domain_only_initializes_once():
     """Test that registering the same provider as default and for a domain only initializes it once."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider = Mock()
 
     registry.set_default_provider(provider, wait_for_init=True)
@@ -125,7 +134,7 @@ def test_registering_provider_as_default_then_domain_only_initializes_once():
 def test_registering_provider_as_domain_then_default_only_initializes_once():
     """Test that registering the same provider as default and for a domain only initializes it once."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider = Mock()
 
     registry.set_provider("domain", provider, wait_for_init=True)
@@ -137,7 +146,7 @@ def test_registering_provider_as_domain_then_default_only_initializes_once():
 def test_replacing_provider_used_as_default_does_not_shutdown():
     """Test that replacing a provider that is also the default does not shut it down twice."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider1 = Mock()
     provider2 = Mock()
 
@@ -153,7 +162,7 @@ def test_replacing_provider_used_as_default_does_not_shutdown():
 def test_replacing_default_provider_used_as_domain_does_not_shutdown():
     """Test that replacing a default provider that is also used for a domain does not shut it down twice."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider1 = Mock()
     provider2 = Mock()
 
@@ -169,7 +178,7 @@ def test_replacing_default_provider_used_as_domain_does_not_shutdown():
 def test_shutting_down_registry_shuts_down_providers_once():
     """Test that shutting down the registry shuts down each provider only once."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider1 = Mock()
     provider2 = Mock()
 
@@ -188,7 +197,7 @@ def test_shutting_down_registry_shuts_down_providers_once():
 def test_initializing_provider_sets_status_ready():
     """Test that initializing a provider sets its status to READY."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider = Mock()
 
     assert registry.get_provider_status(provider) == ProviderStatus.NOT_READY
@@ -202,7 +211,7 @@ def test_initializing_provider_sets_status_ready():
 def test_shutting_down_provider_sets_status_not_ready():
     """Test that shutting down a provider sets its status to NOT_READY."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider = Mock()
 
     registry.set_provider("domain", provider, wait_for_init=True)
@@ -215,7 +224,7 @@ def test_shutting_down_provider_sets_status_not_ready():
 def test_clearing_registry_resets_providers_and_default():
     """Test that clearing the registry resets all providers and the default provider."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider = Mock()
 
     registry.set_provider("domain", provider, wait_for_init=True)
@@ -235,7 +244,7 @@ def test_clearing_registry_resets_providers_and_default():
 def test_set_provider_returns_before_initialization_completes():
     """Test that set_provider (non-blocking) returns before initialize finishes."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     init_started = threading.Event()
     init_may_proceed = threading.Event()
     provider = Mock()
@@ -257,7 +266,7 @@ def test_set_provider_returns_before_initialization_completes():
 def test_set_provider_and_wait_blocks_until_ready():
     """Test that set_provider with wait_for_init=True blocks until READY."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     initialized = threading.Event()
     provider = Mock()
 
@@ -274,7 +283,7 @@ def test_set_provider_and_wait_blocks_until_ready():
 
 def test_set_provider_and_wait_reraises_on_error():
     """Test that set_provider with wait_for_init=True re-raises initialization errors."""
-    registry = ProviderRegistry()
+    registry = make_registry()
     provider = Mock()
     provider.initialize.side_effect = ProviderFatalError()
 
@@ -286,7 +295,7 @@ def test_concurrent_set_provider_for_same_provider_initializes_once():
     """Concurrent set_provider calls for different domains using the same
     provider instance must only initialize the provider once."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     init_count = 0
     start_gate = threading.Event()
 
@@ -317,7 +326,7 @@ def test_provider_replaced_during_async_init_does_not_set_ready_status():
     """If a provider is replaced while its async initialize is still running,
     the late PROVIDER_READY event must not resurrect its status."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
     init_started = threading.Event()
     init_may_proceed = threading.Event()
 
@@ -350,7 +359,7 @@ def test_set_provider_does_not_block_on_hanging_old_shutdown():
     """If the previously-registered provider's shutdown() hangs, a subsequent
     set_provider call must not be blocked by it."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
 
     hanging = Mock()
     hang = threading.Event()
@@ -383,7 +392,7 @@ def test_stale_shutdown_does_not_clobber_re_registered_provider():
     (background) shutdown is still finishing, the stale shutdown must not
     pop its status or detach() the freshly-registered instance."""
 
-    registry = ProviderRegistry()
+    registry = make_registry()
 
     shutdown_started = threading.Event()
     shutdown_may_proceed = threading.Event()
@@ -424,3 +433,30 @@ def test_stale_shutdown_does_not_clobber_re_registered_provider():
         "stale shutdown of A clobbered the fresh registration's status"
     )
     provider_a.detach.assert_not_called()
+
+
+def test_stale_shutdown_skips_shutdown_if_re_registered_first():
+    """If a provider is re-registered before its background shutdown gets to
+    call shutdown() at all, shutdown() must not be invoked on the active
+    provider."""
+
+    registry = make_registry()
+
+    provider_a = Mock()
+    provider_b = Mock()
+
+    # step 1: register A, replace with B, then re-register A. queued background shutdown of A from the A->B swap is racing
+    registry.set_provider("domain", provider_a, wait_for_init=True)
+    registry.set_provider("domain", provider_b, wait_for_init=True)
+    registry.set_provider("domain", provider_a, wait_for_init=True)
+    # let the natural A->B background shutdown complete before we assert
+    time.sleep(0.2)
+    provider_a.shutdown.reset_mock()
+    provider_a.detach.reset_mock()
+
+    # step 2: simulate the late-arriving stale shutdown; abort check must short-circuit before shutdown() is called
+    registry._shutdown_provider(provider_a, abort_if_re_registered=True)
+
+    provider_a.shutdown.assert_not_called()
+    provider_a.detach.assert_not_called()
+    assert registry.get_provider_status(provider_a) == ProviderStatus.READY

@@ -1,10 +1,7 @@
 from openfeature import api
+from openfeature.api import set_transaction_context, set_transaction_context_propagator
 from openfeature.evaluation_context import EvaluationContext
-from openfeature.transaction_context import (
-    ContextVarsTransactionContextPropagator,
-    set_transaction_context,
-    set_transaction_context_propagator,
-)
+from openfeature.transaction_context import ContextVarsTransactionContextPropagator
 
 
 def before_scenario(context, scenario):
