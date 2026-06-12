@@ -17,9 +17,7 @@ from openfeature.provider.no_op_provider import NoOpProvider
 if typing.TYPE_CHECKING:
     from openfeature._event_support import EventSupport
 
-# spec 1.8.4: a provider should not be bound to more than one OpenFeature API
-# instance simultaneously. We track the owning registry per provider; rebinding
-# to a different registry raises. WeakKeyDictionary lets providers be GC'd.
+# spec 1.8.4: provider must not bind to more than one API; we track owning registry per provider, rebinding raises. WeakKeyDictionary lets providers be GC'd
 _binding_lock = threading.Lock()
 _provider_bindings: weakref.WeakKeyDictionary[FeatureProvider, ProviderRegistry] = (
     weakref.WeakKeyDictionary()
@@ -221,11 +219,8 @@ class ProviderRegistry:
     def _shutdown_if_unused(self, provider: FeatureProvider) -> None:
         # only shut down if no longer referenced. shutdown runs on a daemon
         # thread so a hanging shutdown() cannot block the caller.
-        with self._lock:
-            if provider is self._default_provider:
-                return
-            if provider in self._providers.values():
-                return
+        if self._is_active(provider):
+            return
 
         thread = threading.Thread(
             target=self._shutdown_provider,
@@ -235,20 +230,25 @@ class ProviderRegistry:
         )
         thread.start()
 
+    def _is_active(self, provider: FeatureProvider) -> bool:
+        with self._lock:
+            return (
+                provider is self._default_provider
+                or provider in self._providers.values()
+            )
+
     def _shutdown_provider(
         self, provider: FeatureProvider, abort_if_re_registered: bool = False
     ) -> None:
         try:
+            # abort if re-registered before shutdown() to avoid tearing down the freshly-registered instance
+            if abort_if_re_registered and self._is_active(provider):
+                return
             if hasattr(provider, "shutdown"):
                 provider.shutdown()
-            # if provider is being re-registered, leave its status and event wiring intact
-            if abort_if_re_registered:
-                with self._lock:
-                    if (
-                        provider is self._default_provider
-                        or provider in self._providers.values()
-                    ):
-                        return
+            # abort if re-registered during shutdown(); leave status and event wiring intact
+            if abort_if_re_registered and self._is_active(provider):
+                return
             with self._lock:
                 self._provider_status.pop(provider, None)
         except Exception as err:

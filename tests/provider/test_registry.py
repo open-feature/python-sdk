@@ -433,3 +433,30 @@ def test_stale_shutdown_does_not_clobber_re_registered_provider():
         "stale shutdown of A clobbered the fresh registration's status"
     )
     provider_a.detach.assert_not_called()
+
+
+def test_stale_shutdown_skips_shutdown_if_re_registered_first():
+    """If a provider is re-registered before its background shutdown gets to
+    call shutdown() at all, shutdown() must not be invoked on the active
+    provider."""
+
+    registry = make_registry()
+
+    provider_a = Mock()
+    provider_b = Mock()
+
+    # step 1: register A, replace with B, then re-register A. queued background shutdown of A from the A->B swap is racing
+    registry.set_provider("domain", provider_a, wait_for_init=True)
+    registry.set_provider("domain", provider_b, wait_for_init=True)
+    registry.set_provider("domain", provider_a, wait_for_init=True)
+    # let the natural A->B background shutdown complete before we assert
+    time.sleep(0.2)
+    provider_a.shutdown.reset_mock()
+    provider_a.detach.reset_mock()
+
+    # step 2: simulate the late-arriving stale shutdown; abort check must short-circuit before shutdown() is called
+    registry._shutdown_provider(provider_a, abort_if_re_registered=True)
+
+    provider_a.shutdown.assert_not_called()
+    provider_a.detach.assert_not_called()
+    assert registry.get_provider_status(provider_a) == ProviderStatus.READY
