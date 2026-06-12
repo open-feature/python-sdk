@@ -1,4 +1,5 @@
 import logging
+import threading
 import typing
 from collections.abc import Awaitable, Mapping, Sequence
 from dataclasses import dataclass
@@ -86,6 +87,7 @@ class OpenFeatureClient:
         self.version = version
         self.context = context or EvaluationContext()
         self.hooks = hooks or []
+        self._hooks_lock = threading.Lock()
 
     @property
     def provider(self) -> FeatureProvider:
@@ -98,7 +100,8 @@ class OpenFeatureClient:
         return ClientMetadata(domain=self.domain)
 
     def add_hooks(self, hooks: list[Hook]) -> None:
-        self.hooks = self.hooks + hooks
+        with self._hooks_lock:
+            self.hooks = self.hooks + hooks
 
     def get_boolean_value(
         self,
@@ -468,8 +471,9 @@ class OpenFeatureClient:
 
     def _assert_provider_status(
         self,
+        provider: FeatureProvider,
     ) -> OpenFeatureError | None:
-        status = self.get_provider_status()
+        status = provider_registry.get_provider_status(provider)
         if status == ProviderStatus.NOT_READY:
             return ProviderNotReadyError()
         if status == ProviderStatus.FATAL:
@@ -589,7 +593,7 @@ class OpenFeatureClient:
         )
 
         try:
-            if provider_err := self._assert_provider_status():
+            if provider_err := self._assert_provider_status(provider):
                 error_hooks(
                     flag_type,
                     provider_err,
@@ -765,7 +769,7 @@ class OpenFeatureClient:
         )
 
         try:
-            if provider_err := self._assert_provider_status():
+            if provider_err := self._assert_provider_status(provider):
                 error_hooks(
                     flag_type,
                     provider_err,

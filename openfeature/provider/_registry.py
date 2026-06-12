@@ -1,6 +1,6 @@
 import threading
 
-from openfeature._event_support import run_handlers_for_provider
+from openfeature._event_support import run_handlers_for_provider, clear as clear_event_handlers
 from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
 from openfeature.event import (
     ProviderEvent,
@@ -93,6 +93,7 @@ class ProviderRegistry:
             self._provider_status = {
                 self._default_provider: ProviderStatus.READY,
             }
+            clear_event_handlers()
 
     def shutdown(self) -> None:
         with self._lock:

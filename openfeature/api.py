@@ -62,7 +62,6 @@ def set_provider_and_wait(provider: FeatureProvider, domain: str | None = None) 
 
 def clear_providers() -> None:
     provider_registry.clear_providers()
-    _event_support.clear()
 
 
 def get_provider_metadata(domain: str | None = None) -> Metadata:

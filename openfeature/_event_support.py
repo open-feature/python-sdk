@@ -61,6 +61,16 @@ def add_client_handler(
         handlers = _client_handlers[client][event]
         handlers.append(handler)
 
+    # Immediate handler fires outside the lock intentionally: the status check calls
+    # client.get_provider_status() which acquires the registry lock, and the registry
+    # holds its lock when calling run_handlers_for_provider → _client_lock, so checking
+    # under _client_lock would deadlock. As a consequence, a narrow double-fire is
+    # possible if run_handlers_for_provider fires between the append and this check.
+    #
+    # double-fire case: some thread calls add_handler(handler1), which adds the handler and runs it immediately, and
+    # after adding it, the lock is released and a second thread that was waiting on the lock aquires it to run
+    # run_handlers_for_providers which then calls every handler for this client its handler list (including the one
+    # that was just added)
     _run_immediate_handler(client, event, handler)
 
 
@@ -78,6 +88,7 @@ def add_global_handler(event: ProviderEvent, handler: EventHandler) -> None:
 
     from openfeature.api import get_client  # noqa: PLC0415
 
+    # See comment in add_client_handler for why this runs outside the lock.
     _run_immediate_handler(get_client(), event, handler)
 
 
@@ -134,6 +145,6 @@ def _run_handler(handler: EventHandler, details: EventDetails) -> None:
 
 def clear() -> None:
     with _global_lock:
-        _global_handlers.clear()
-    with _client_lock:
-        _client_handlers.clear()
+        with _client_lock:
+            _global_handlers.clear()
+            _client_handlers.clear()

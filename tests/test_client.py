@@ -4,11 +4,12 @@ import time
 import types
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
 import pytest
 
 from openfeature import _event_support, api
+from openfeature import client as client_module
 from openfeature.api import (
     add_hooks,
     clear_hooks,
@@ -20,7 +21,7 @@ from openfeature.api import (
 from openfeature.client import OpenFeatureClient, _typecheck_flag_value
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import EventDetails, ProviderEvent, ProviderEventDetails
-from openfeature.exception import ErrorCode, OpenFeatureError
+from openfeature.exception import ErrorCode, OpenFeatureError, ProviderFatalError
 from openfeature.flag_evaluation import FlagResolutionDetails, FlagType, Reason
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, ProviderStatus
@@ -292,8 +293,12 @@ async def test_should_shortcircuit_if_provider_is_not_ready(
     no_op_provider_client, monkeypatch
 ):
     # Given
+    from openfeature.provider._registry import provider_registry
+
     monkeypatch.setattr(
-        no_op_provider_client, "get_provider_status", lambda: ProviderStatus.NOT_READY
+        provider_registry,
+        "get_provider_status",
+        lambda provider: ProviderStatus.NOT_READY,
     )
     spy_hook = MagicMock(spec=Hook)
     no_op_provider_client.add_hooks([spy_hook])
@@ -322,8 +327,12 @@ async def test_should_shortcircuit_if_provider_is_in_irrecoverable_error_state(
     no_op_provider_client, monkeypatch
 ):
     # Given
+    from openfeature.provider._registry import provider_registry
+
     monkeypatch.setattr(
-        no_op_provider_client, "get_provider_status", lambda: ProviderStatus.FATAL
+        provider_registry,
+        "get_provider_status",
+        lambda provider: ProviderStatus.FATAL,
     )
     spy_hook = MagicMock(spec=Hook)
     no_op_provider_client.add_hooks([spy_hook])
@@ -768,3 +777,44 @@ def test_should_noop_if_provider_does_not_support_tracking(monkeypatch):
     set_provider(provider)
     client = get_client()
     client.track(tracking_event_name="test")
+
+
+def test_assert_provider_status_uses_passed_provider_not_current_registry_state():
+    """
+    Regression: the flag evaluation pipeline captures a provider reference
+    at the start of _establish_hooks_and_provider and uses that same
+    reference for the actual resolution call. The status assertion must
+    use that captured reference too — otherwise a concurrent provider swap
+    between capture and status-check would cause the check to run against
+    a *different* provider than the one actually evaluated, e.g. allowing
+    a FATAL provider's flag to be evaluated as if it were READY.
+
+    This is a direct invariant test: when called with provider X while
+    self.provider returns Y, _assert_provider_status must report X's status.
+    """
+    fatal_provider = NoOpProvider()
+    ready_provider = NoOpProvider()
+
+    registry_mock = Mock()
+    registry_mock.get_provider_status.side_effect = lambda p: (
+        ProviderStatus.FATAL if p is fatal_provider else ProviderStatus.READY
+    )
+    registry_mock.get_provider.return_value = ready_provider
+
+    original = client_module.provider_registry
+    client_module.provider_registry = registry_mock
+    try:
+        c = OpenFeatureClient(domain=None, version=None)
+        assert c.provider is ready_provider, (
+            "test setup: self.provider should resolve via the patched registry"
+        )
+
+        err = c._assert_provider_status(fatal_provider)
+        assert isinstance(err, ProviderFatalError), (
+            "status check used self.provider (READY) instead of the captured "
+            "fatal_provider — TOCTOU regression"
+        )
+        registry_mock.get_provider_status.assert_any_call(fatal_provider)
+        assert c._assert_provider_status(ready_provider) is None
+    finally:
+        client_module.provider_registry = original

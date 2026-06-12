@@ -261,5 +261,6 @@ class AbstractProvider(FeatureProvider):
         self.emit(ProviderEvent.PROVIDER_STALE, details)
 
     def emit(self, event: ProviderEvent, details: ProviderEventDetails) -> None:
-        if hasattr(self, "_on_emit"):
-            self._on_emit(self, event, details)
+        on_emit = getattr(self, "_on_emit", None)
+        if on_emit is not None:
+            on_emit(self, event, details)
