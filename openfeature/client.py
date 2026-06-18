@@ -100,6 +100,8 @@ class OpenFeatureClient:
         return ClientMetadata(domain=self.domain)
 
     def add_hooks(self, hooks: list[Hook]) -> None:
+        # Guards the read-concat-store against a lost update; this practically never races under the default 5ms GIL
+        # switch interval, but is essential under a no-GIL build.
         with self._hooks_lock:
             self.hooks = self.hooks + hooks
 

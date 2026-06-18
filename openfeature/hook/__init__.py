@@ -152,9 +152,9 @@ class Hook:
         """
         return True
 
-# while the lock guarantees safety, even without them there was never a loss within 50.000 runs (with the default GIL
+# while the lock guarantees safety, even without it there was never a loss within 50.000 runs (with the default GIL
 # switch interval of 5ms). only when the switch interval was significantly shortened to 0.1 microseconds, losses were
-# observed without locks every now and then.
+# observed without locks every now and then. with a no-GIL python, the lock would be essential
 
 def add_hooks(hooks: list[Hook]) -> None:
     with  _hooks_lock:

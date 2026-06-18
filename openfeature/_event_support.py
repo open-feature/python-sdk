@@ -61,16 +61,13 @@ def add_client_handler(
         handlers = _client_handlers[client][event]
         handlers.append(handler)
 
-    # Immediate handler fires outside the lock intentionally: the status check calls
-    # client.get_provider_status() which acquires the registry lock, and the registry
-    # holds its lock when calling run_handlers_for_provider → _client_lock, so checking
-    # under _client_lock would deadlock. As a consequence, a narrow double-fire is
-    # possible if run_handlers_for_provider fires between the append and this check.
-    #
-    # double-fire case: some thread calls add_handler(handler1), which adds the handler and runs it immediately, and
-    # after adding it, the lock is released and a second thread that was waiting on the lock aquires it to run
-    # run_handlers_for_providers which then calls every handler for this client its handler list (including the one
-    # that was just added)
+    # outside the lock intentionally: the immediate-fire status check acquires the registry lock, so calling it
+    # under _client_lock risks lock-order inversion against run_handlers_for_provider (registry lock → _client_lock).
+    # As a consequence, a narrow double-fire is possible: if dispatch_event(client's event) runs concurrently, it
+    # sets the matching provider status (enabling the immediate fire below) and then re-runs every handler for this
+    # client. If _run_immediate_handler lands after that status set but before dispatch snapshots the handler list,
+    # the handler fires twice — once here, once from dispatch. Only happens when the registered event matches the event
+    # being dispatched; otherwise the immediate fire is a no-op.
     _run_immediate_handler(client, event, handler)
 
 

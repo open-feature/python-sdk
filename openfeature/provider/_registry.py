@@ -54,9 +54,10 @@ class ProviderRegistry:
             self._shutdown_if_unused(old_provider)
 
     def get_provider(self, domain: str | None) -> FeatureProvider:
-        if domain is None:
-            return self._default_provider
-        return self._providers.get(domain, self._default_provider)
+        with self._lock:
+            if domain is None:
+                return self._default_provider
+            return self._providers.get(domain, self._default_provider)
 
     def set_default_provider(
         self, provider: FeatureProvider, wait_for_init: bool = False
@@ -83,7 +84,8 @@ class ProviderRegistry:
             self._shutdown_if_unused(old_provider)
 
     def get_default_provider(self) -> FeatureProvider:
-        return self._default_provider
+        with self._lock:
+            return self._default_provider
 
     def clear_providers(self) -> None:
         self.shutdown()
@@ -99,6 +101,7 @@ class ProviderRegistry:
         with self._lock:
             providers = {self._default_provider, *self._providers.values()}
 
+        # do we want to move this inside the lock? it allows a narrow double-shutdown window
         for provider in providers:
             self._shutdown_provider(provider)
 
@@ -215,7 +218,8 @@ class ProviderRegistry:
         provider.detach()
 
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
-        return self._provider_status.get(provider, ProviderStatus.NOT_READY)
+        with self._lock:
+            return self._provider_status.get(provider, ProviderStatus.NOT_READY)
 
     def dispatch_event(
         self,
