@@ -54,6 +54,12 @@ class ProviderRegistry:
             self._shutdown_if_unused(old_provider)
 
     def get_provider(self, domain: str | None) -> FeatureProvider:
+        # defensive lock under the GIL as the op is basically atomic
+        # but we might want to keep it so a provider that's about
+        # to be shut down isn't returned
+        # however it contributes to a potential deadlock that is currently
+        # still in place (clear_providers: registry's lock -> _event_support's lock;
+        # run_handlers_for_provider: _event_support's lock -> registry's lock)
         with self._lock:
             if domain is None:
                 return self._default_provider
@@ -218,6 +224,10 @@ class ProviderRegistry:
         provider.detach()
 
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
+        # defensive lock under the GIL as the op is basically atomic
+        # but we might want to keep it so a provider that's about
+        # to be shut down isn't returned
+        # however, removing it would enable moving _run_immediate_handler into the lock i think
         with self._lock:
             return self._provider_status.get(provider, ProviderStatus.NOT_READY)
 
