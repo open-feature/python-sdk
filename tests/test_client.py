@@ -292,9 +292,6 @@ def test_provider_should_return_error_status_if_failed():
 async def test_should_shortcircuit_if_provider_is_not_ready(
     no_op_provider_client, monkeypatch
 ):
-    # Given
-    from openfeature.provider._registry import provider_registry
-
     monkeypatch.setattr(
         provider_registry,
         "get_provider_status",
@@ -326,9 +323,6 @@ async def test_should_shortcircuit_if_provider_is_not_ready(
 async def test_should_shortcircuit_if_provider_is_in_irrecoverable_error_state(
     no_op_provider_client, monkeypatch
 ):
-    # Given
-    from openfeature.provider._registry import provider_registry
-
     monkeypatch.setattr(
         provider_registry,
         "get_provider_status",
@@ -780,18 +774,6 @@ def test_should_noop_if_provider_does_not_support_tracking(monkeypatch):
 
 
 def test_assert_provider_status_uses_passed_provider_not_current_registry_state():
-    """
-    Regression: the flag evaluation pipeline captures a provider reference
-    at the start of _establish_hooks_and_provider and uses that same
-    reference for the actual resolution call. The status assertion must
-    use that captured reference too — otherwise a concurrent provider swap
-    between capture and status-check would cause the check to run against
-    a *different* provider than the one actually evaluated, e.g. allowing
-    a FATAL provider's flag to be evaluated as if it were READY.
-
-    This is a direct invariant test: when called with provider X while
-    self.provider returns Y, _assert_provider_status must report X's status.
-    """
     fatal_provider = NoOpProvider()
     ready_provider = NoOpProvider()
 
