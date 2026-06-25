@@ -23,7 +23,7 @@ __all__ = [
 _evaluation_transaction_context_propagator: TransactionContextPropagator = (
     NoOpTransactionContextPropagator()
 )
-_propagator_lock = threading.Lock()
+_propagator_lock = threading.RLock()
 
 
 def set_transaction_context_propagator(

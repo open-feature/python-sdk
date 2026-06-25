@@ -1,6 +1,7 @@
 import threading
 
-from openfeature._event_support import run_handlers_for_provider, clear as clear_event_handlers
+from openfeature._event_support import clear as clear_event_handlers
+from openfeature._event_support import run_handlers_for_provider
 from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
 from openfeature.event import (
     ProviderEvent,

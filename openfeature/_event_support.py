@@ -141,7 +141,6 @@ def _run_handler(handler: EventHandler, details: EventDetails) -> None:
 
 
 def clear() -> None:
-    with _global_lock:
-        with _client_lock:
-            _global_handlers.clear()
-            _client_handlers.clear()
+    with _global_lock, _client_lock:
+        _global_handlers.clear()
+        _client_handlers.clear()
