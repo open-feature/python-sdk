@@ -87,7 +87,7 @@ class OpenFeatureClient:
         self.version = version
         self.context = context or EvaluationContext()
         self.hooks = hooks or []
-        self._hooks_lock = threading.Lock()
+        self._hooks_lock = threading.RLock()
 
     @property
     def provider(self) -> FeatureProvider:

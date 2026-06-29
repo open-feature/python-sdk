@@ -1,6 +1,5 @@
 import threading
 
-from openfeature._event_support import clear as clear_event_handlers
 from openfeature._event_support import run_handlers_for_provider
 from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
 from openfeature.event import (
@@ -55,16 +54,9 @@ class ProviderRegistry:
             self._shutdown_if_unused(old_provider)
 
     def get_provider(self, domain: str | None) -> FeatureProvider:
-        # defensive lock under the GIL as the op is basically atomic
-        # but we might want to keep it so a provider that's about
-        # to be shut down isn't returned
-        # however it contributes to a potential deadlock that is currently
-        # still in place (clear_providers: registry's lock -> _event_support's lock;
-        # run_handlers_for_provider: _event_support's lock -> registry's lock)
-        with self._lock:
-            if domain is None:
-                return self._default_provider
-            return self._providers.get(domain, self._default_provider)
+        if domain is None:
+            return self._default_provider
+        return self._providers.get(domain, self._default_provider)
 
     def set_default_provider(
         self, provider: FeatureProvider, wait_for_init: bool = False
@@ -91,8 +83,7 @@ class ProviderRegistry:
             self._shutdown_if_unused(old_provider)
 
     def get_default_provider(self) -> FeatureProvider:
-        with self._lock:
-            return self._default_provider
+        return self._default_provider
 
     def clear_providers(self) -> None:
         self.shutdown()
@@ -102,13 +93,11 @@ class ProviderRegistry:
             self._provider_status = {
                 self._default_provider: ProviderStatus.READY,
             }
-            clear_event_handlers()
 
     def shutdown(self) -> None:
         with self._lock:
             providers = {self._default_provider, *self._providers.values()}
 
-        # do we want to move this inside the lock? it allows a narrow double-shutdown window
         for provider in providers:
             self._shutdown_provider(provider)
 
@@ -225,12 +214,7 @@ class ProviderRegistry:
         provider.detach()
 
     def get_provider_status(self, provider: FeatureProvider) -> ProviderStatus:
-        # defensive lock under the GIL as the op is basically atomic
-        # but we might want to keep it so a provider that's about
-        # to be shut down isn't returned
-        # however, removing it would enable moving _run_immediate_handler into the lock i think
-        with self._lock:
-            return self._provider_status.get(provider, ProviderStatus.NOT_READY)
+        return self._provider_status.get(provider, ProviderStatus.NOT_READY)
 
     def dispatch_event(
         self,

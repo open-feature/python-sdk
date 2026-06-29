@@ -25,7 +25,7 @@ __all__ = [
 ]
 
 _hooks: list[Hook] = []
-_hooks_lock = threading.Lock()
+_hooks_lock = threading.RLock()
 
 
 # https://openfeature.dev/specification/sections/hooks/#requirement-461
