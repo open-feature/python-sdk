@@ -35,7 +35,11 @@ class FeatureProvider(typing.Protocol):  # pragma: no cover
 
     def detach(self) -> None: ...
 
-    def initialize(self, evaluation_context: EvaluationContext) -> None: ...
+    def initialize(
+        self,
+        evaluation_context: EvaluationContext,
+        domain: str | None = None,
+    ) -> None: ...
 
     def shutdown(self) -> None: ...
 
@@ -140,8 +144,16 @@ class AbstractProvider(FeatureProvider):
         if hasattr(self, "_on_emit"):
             del self._on_emit
 
-    def initialize(self, evaluation_context: EvaluationContext) -> None:
+    def initialize(
+        self,
+        evaluation_context: EvaluationContext,
+        domain: str | None = None,
+    ) -> None:
         pass
+
+    @property
+    def domain_scoped(self) -> bool:
+        return False
 
     def shutdown(self) -> None:
         pass

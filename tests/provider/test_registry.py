@@ -6,6 +6,7 @@ import pytest
 
 from openfeature.exception import GeneralError, ProviderFatalError
 from openfeature.provider import ProviderStatus
+from openfeature.provider.metadata import Metadata
 from openfeature.provider._registry import ProviderRegistry
 from openfeature.provider.no_op_provider import NoOpProvider
 
@@ -424,3 +425,91 @@ def test_stale_shutdown_does_not_clobber_re_registered_provider():
         "stale shutdown of A clobbered the fresh registration's status"
     )
     provider_a.detach.assert_not_called()
+
+
+def test_initialize_receives_bound_domain():
+    registry = ProviderRegistry()
+    provider = Mock()
+
+    registry.set_provider("my-domain", provider, wait_for_init=True)
+
+    provider.initialize.assert_called_once()
+    _, kwargs = provider.initialize.call_args
+    assert kwargs.get("domain") == "my-domain"
+
+
+def test_initialize_receives_none_domain_for_default_provider():
+    registry = ProviderRegistry()
+    provider = Mock()
+
+    registry.set_default_provider(provider, wait_for_init=True)
+
+    provider.initialize.assert_called_once()
+    _, kwargs = provider.initialize.call_args
+    assert kwargs.get("domain") is None
+
+
+def test_domain_scoped_provider_rejects_second_domain():
+    registry = ProviderRegistry()
+    provider = Mock()
+    provider.domain_scoped = True
+
+    registry.set_provider("domain1", provider, wait_for_init=True)
+
+    with pytest.raises(GeneralError) as exc_info:
+        registry.set_provider("domain2", provider)
+
+    assert (
+        exc_info.value.error_message
+        == "Cannot bind domain-scoped provider to more than one domain"
+    )
+    assert registry.get_provider("domain1") is provider
+    provider.initialize.assert_called_once()
+
+
+def test_domain_scoped_provider_rejects_default_after_domain_binding():
+    registry = ProviderRegistry()
+    provider = Mock()
+    provider.domain_scoped = True
+
+    registry.set_provider("domain", provider, wait_for_init=True)
+
+    with pytest.raises(GeneralError):
+        registry.set_default_provider(provider)
+
+    assert registry.get_default_provider() is not provider
+
+
+def test_domain_scoped_provider_rejects_domain_after_default_binding():
+    registry = ProviderRegistry()
+    provider = Mock()
+    provider.domain_scoped = True
+
+    registry.set_default_provider(provider, wait_for_init=True)
+
+    with pytest.raises(GeneralError):
+        registry.set_provider("domain", provider)
+
+    assert registry.get_provider("domain") is registry.get_default_provider()
+
+
+def test_initialize_skips_domain_for_legacy_signature():
+    registry = ProviderRegistry()
+
+    class LegacyProvider:
+        def attach(self, on_emit):
+            pass
+
+        def detach(self):
+            pass
+
+        def get_metadata(self):
+            return Metadata(name="legacy")
+
+        def initialize(self, evaluation_context):
+            self.received_domain = "not-called"
+
+    provider = LegacyProvider()
+    registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
+
+    assert getattr(provider, "received_domain", None) == "not-called"
