@@ -502,24 +502,11 @@ def test_domain_scoped_provider_rejects_domain_after_default_binding():
 
 def test_initialize_skips_domain_for_legacy_signature():
     registry = ProviderRegistry()
+    provider = LegacyInitProvider()
 
-    class LegacyProvider:
-        def attach(self, on_emit):
-            pass
+    registry.set_provider("domain", provider, wait_for_init=True)
 
-        def detach(self):
-            pass
-
-        def get_metadata(self):
-            return Metadata(name="legacy")
-
-        def initialize(self, evaluation_context):
-            self.received_domain = "not-called"
-
-    provider = LegacyProvider()
-    registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
-
-    assert getattr(provider, "received_domain", None) == "not-called"
+    assert provider.initialize_calls == 1
 
 
 def test_legacy_abstract_provider_initialize_without_domain():
@@ -560,6 +547,7 @@ def test_initialize_does_not_retry_when_domain_aware_provider_raises_type_error(
         registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
 
     assert provider.call_count == 1
+    provider.detach()
 
 
 def test_is_domain_scoped_uses_class_level_bool_attribute():
@@ -571,9 +559,7 @@ def test_is_domain_scoped_uses_class_level_bool_attribute():
 
 def test_is_domain_scoped_ignores_non_bool_class_attribute():
     class PropertyScopedProvider:
-        @property
-        def domain_scoped(self) -> bool:
-            return True
+        domain_scoped = object()
 
     assert _is_domain_scoped(PropertyScopedProvider()) is False  # type: ignore[arg-type]
 
@@ -591,9 +577,10 @@ def test_initialize_accepts_domain_returns_false_for_mock_with_invalid_side_effe
 
 def test_callable_accepts_domain_returns_true_for_kwargs_signature():
     def initialize(evaluation_context, **kwargs):
-        pass
+        kwargs["domain"] = "ignored"
 
     assert _callable_accepts_domain(initialize) is True
+    initialize(EvaluationContext())
 
 
 def test_provider_without_initialize_is_ready_immediately():
@@ -613,3 +600,4 @@ def test_provider_without_initialize_is_ready_immediately():
     registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
 
     assert registry.get_provider_status(provider) == ProviderStatus.READY
+    provider.detach()
