@@ -4,11 +4,14 @@ from unittest.mock import Mock
 
 import pytest
 
+from openfeature.evaluation_context import EvaluationContext, set_evaluation_context
 from openfeature.exception import GeneralError, ProviderFatalError
 from openfeature.provider import ProviderStatus
 from openfeature.provider.metadata import Metadata
 from openfeature.provider._registry import ProviderRegistry
 from openfeature.provider.no_op_provider import NoOpProvider
+
+from tests.legacy_init_provider import LegacyInitProvider
 
 
 def test_registry_serves_noop_as_default():
@@ -513,6 +516,19 @@ def test_initialize_skips_domain_for_legacy_signature():
     registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
 
     assert getattr(provider, "received_domain", None) == "not-called"
+
+
+def test_legacy_abstract_provider_initialize_without_domain():
+    registry = ProviderRegistry()
+    evaluation_context = EvaluationContext("targeting_key", {"attr": "val"})
+    set_evaluation_context(evaluation_context)
+    provider = LegacyInitProvider()
+
+    registry.set_provider("domain", provider, wait_for_init=True)
+
+    assert provider.initialize_calls == 1
+    assert provider.last_evaluation_context == evaluation_context
+    assert registry.get_provider_status(provider) == ProviderStatus.READY
 
 
 def test_initialize_does_not_retry_when_domain_aware_provider_raises_type_error():

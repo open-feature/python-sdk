@@ -26,6 +26,7 @@ from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, Metadata, ProviderStatus
 from openfeature.provider._registry import provider_registry
 from openfeature.provider.no_op_provider import NoOpProvider
+from tests.legacy_init_provider import LegacyInitProvider
 from openfeature.transaction_context import (
     ContextVarsTransactionContextPropagator,
     get_transaction_context,
@@ -187,6 +188,21 @@ def test_should_pass_domain_to_provider_initialize():
     set_provider_and_wait(provider, domain="test")
 
     provider.initialize.assert_called_with(evaluation_context, domain="test")
+
+
+def test_legacy_initialize_provider_via_api():
+    evaluation_context = EvaluationContext("targeting_key", {"attr1": "val1"})
+    provider = LegacyInitProvider()
+
+    set_evaluation_context(evaluation_context)
+    set_provider_and_wait(provider, domain="test")
+
+    assert provider.initialize_calls == 1
+    assert provider.last_evaluation_context == evaluation_context
+    assert provider_registry.get_provider_status(provider) == ProviderStatus.READY
+
+    client = get_client("test")
+    assert client.get_boolean_value("flag", True) is True
 
 
 def test_should_reject_domain_scoped_provider_bound_to_second_domain():
