@@ -10,7 +10,6 @@ from openfeature.provider import ProviderStatus
 from openfeature.provider._registry import (
     ProviderRegistry,
     _callable_accepts_domain,
-    _initialize_accepts_domain,
     _is_domain_scoped,
 )
 from openfeature.provider.metadata import Metadata
@@ -248,7 +247,7 @@ def test_set_provider_returns_before_initialization_completes():
     init_may_proceed = threading.Event()
     provider = Mock()
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         init_started.set()
         init_may_proceed.wait()
 
@@ -269,7 +268,7 @@ def test_set_provider_and_wait_blocks_until_ready():
     initialized = threading.Event()
     provider = Mock()
 
-    def tracking_initialize(ctx):
+    def tracking_initialize(ctx, domain=None):
         initialized.set()
 
     provider.initialize.side_effect = tracking_initialize
@@ -298,7 +297,7 @@ def test_concurrent_set_provider_for_same_provider_initializes_once():
     init_count = 0
     start_gate = threading.Event()
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         nonlocal init_count
         # widen the window in which two threads can both observe "not bound"
         start_gate.wait(timeout=2)
@@ -331,7 +330,7 @@ def test_provider_replaced_during_async_init_does_not_set_ready_status():
 
     slow_provider = Mock()
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         init_started.set()
         init_may_proceed.wait(timeout=2)
 
@@ -637,13 +636,6 @@ def test_reregistering_same_provider_after_failed_init_retries():
 
 def test_callable_accepts_domain_returns_false_for_uninspectable_callable():
     assert _callable_accepts_domain(object()) is False  # type: ignore[arg-type]
-
-
-def test_initialize_accepts_domain_returns_false_for_mock_with_invalid_side_effect():
-    provider = Mock()
-    provider.initialize.side_effect = 123
-
-    assert _initialize_accepts_domain(provider) is False
 
 
 def test_callable_accepts_domain_returns_true_for_kwargs_signature():

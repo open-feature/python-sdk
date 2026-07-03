@@ -467,7 +467,7 @@ def test_set_provider_returns_before_initialization_completes():
 
     provider = MagicMock(spec=FeatureProvider)
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         init_started.set()
         init_may_proceed.wait()
 
@@ -487,7 +487,7 @@ def test_provider_status_is_not_ready_during_async_initialization():
     init_may_proceed = threading.Event()
     provider = MagicMock(spec=FeatureProvider)
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         init_may_proceed.wait()
 
     provider.initialize.side_effect = slow_initialize
@@ -508,7 +508,7 @@ def test_set_provider_and_wait_blocks_until_initialization_completes():
     initialized = threading.Event()
     provider = MagicMock(spec=FeatureProvider)
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         initialized.set()
 
     provider.initialize.side_effect = slow_initialize
@@ -536,7 +536,7 @@ def test_set_provider_swallows_error_and_emits_provider_error_event():
     provider = MagicMock(spec=FeatureProvider)
     error_fired = threading.Event()
 
-    def failing_initialize(ctx):
+    def failing_initialize(ctx, domain=None):
         raise ProviderFatalError()
 
     provider.initialize.side_effect = failing_initialize

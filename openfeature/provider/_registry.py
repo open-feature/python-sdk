@@ -1,7 +1,6 @@
 import inspect
 import threading
 from collections.abc import Callable
-from unittest.mock import Mock
 
 from openfeature._event_support import run_handlers_for_provider
 from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
@@ -30,13 +29,7 @@ def _callable_accepts_domain(callable_obj: Callable[..., object]) -> bool:
 
 
 def _initialize_accepts_domain(provider: FeatureProvider) -> bool:
-    initialize = provider.initialize
-    if isinstance(initialize, Mock):
-        effect = initialize.side_effect
-        if callable(effect) and not isinstance(effect, Mock):
-            return _callable_accepts_domain(effect)
-        return effect is None
-    return _callable_accepts_domain(initialize)
+    return _callable_accepts_domain(provider.initialize)
 
 
 def _call_initialize(
