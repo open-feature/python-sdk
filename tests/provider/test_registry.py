@@ -557,11 +557,41 @@ def test_is_domain_scoped_uses_class_level_bool_attribute():
     assert _is_domain_scoped(ClassScopedProvider()) is True  # type: ignore[arg-type]
 
 
-def test_is_domain_scoped_ignores_non_bool_class_attribute():
+def test_is_domain_scoped_uses_property():
     class PropertyScopedProvider:
-        domain_scoped = object()
+        @property
+        def domain_scoped(self) -> bool:
+            return True
 
-    assert _is_domain_scoped(PropertyScopedProvider()) is False  # type: ignore[arg-type]
+    assert _is_domain_scoped(PropertyScopedProvider()) is True  # type: ignore[arg-type]
+
+
+def test_is_domain_scoped_rejects_truthy_non_bool_values():
+    class StrScopedProvider:
+        def __init__(self) -> None:
+            self.domain_scoped = "us-east"
+
+    assert _is_domain_scoped(StrScopedProvider()) is False  # type: ignore[arg-type]
+
+
+def test_domain_scoped_property_provider_rejects_second_domain():
+    registry = ProviderRegistry()
+
+    class PropertyScopedProvider(LegacyInitProvider):
+        @property
+        def domain_scoped(self) -> bool:
+            return True
+
+    provider = PropertyScopedProvider()
+    registry.set_provider("domain1", provider, wait_for_init=True)
+
+    with pytest.raises(GeneralError) as exc_info:
+        registry.set_provider("domain2", provider)
+
+    assert (
+        exc_info.value.error_message
+        == "Cannot bind domain-scoped provider to more than one domain"
+    )
 
 
 def test_callable_accepts_domain_returns_false_for_uninspectable_callable():

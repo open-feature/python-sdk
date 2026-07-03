@@ -10,19 +10,12 @@ from openfeature.event import (
     ProviderEventDetails,
 )
 from openfeature.exception import ErrorCode, GeneralError, OpenFeatureError
-from openfeature.provider import AbstractProvider, FeatureProvider, ProviderStatus
+from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider.no_op_provider import NoOpProvider
 
 
 def _is_domain_scoped(provider: FeatureProvider) -> bool:
-    if isinstance(provider, AbstractProvider):
-        return provider.domain_scoped
-    if "domain_scoped" in getattr(provider, "__dict__", {}):
-        return bool(provider.__dict__["domain_scoped"])
-    class_value = getattr(type(provider), "domain_scoped", False)
-    if isinstance(class_value, bool):
-        return class_value
-    return False
+    return getattr(provider, "domain_scoped", False) is True
 
 
 def _callable_accepts_domain(callable_obj: Callable[..., object]) -> bool:
