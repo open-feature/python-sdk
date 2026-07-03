@@ -513,3 +513,30 @@ def test_initialize_skips_domain_for_legacy_signature():
     registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
 
     assert getattr(provider, "received_domain", None) == "not-called"
+
+
+def test_initialize_does_not_retry_when_domain_aware_provider_raises_type_error():
+    registry = ProviderRegistry()
+
+    class BrokenProvider:
+        def __init__(self):
+            self.call_count = 0
+
+        def attach(self, on_emit):
+            pass
+
+        def detach(self):
+            pass
+
+        def get_metadata(self):
+            return Metadata(name="broken")
+
+        def initialize(self, evaluation_context, domain=None):
+            self.call_count += 1
+            raise TypeError("configuration error")
+
+    provider = BrokenProvider()
+    with pytest.raises(TypeError, match="configuration error"):
+        registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
+
+    assert provider.call_count == 1

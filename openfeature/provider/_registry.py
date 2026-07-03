@@ -1,4 +1,6 @@
+import inspect
 import threading
+from unittest.mock import Mock
 
 from openfeature._event_support import run_handlers_for_provider
 from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
@@ -22,14 +24,37 @@ def _is_domain_scoped(provider: FeatureProvider) -> bool:
     return False
 
 
+def _callable_accepts_domain(callable_obj: object) -> bool:
+    try:
+        signature = inspect.signature(callable_obj)
+    except (TypeError, ValueError):
+        return False
+    return "domain" in signature.parameters or any(
+        param.kind == inspect.Parameter.VAR_KEYWORD
+        for param in signature.parameters.values()
+    )
+
+
+def _initialize_accepts_domain(provider: FeatureProvider) -> bool:
+    initialize = provider.initialize
+    if isinstance(initialize, Mock):
+        effect = initialize.side_effect
+        if callable(effect) and not isinstance(effect, Mock):
+            return _callable_accepts_domain(effect)
+        if effect is None:
+            return True
+        return False
+    return _callable_accepts_domain(initialize)
+
+
 def _call_initialize(
     provider: FeatureProvider,
     evaluation_context: EvaluationContext,
     domain: str | None,
 ) -> None:
-    try:
+    if _initialize_accepts_domain(provider):
         provider.initialize(evaluation_context, domain=domain)
-    except TypeError:
+    else:
         provider.initialize(evaluation_context)
 
 
