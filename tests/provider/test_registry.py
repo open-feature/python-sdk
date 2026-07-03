@@ -7,10 +7,14 @@ import pytest
 from openfeature.evaluation_context import EvaluationContext, set_evaluation_context
 from openfeature.exception import GeneralError, ProviderFatalError
 from openfeature.provider import ProviderStatus
+from openfeature.provider._registry import (
+    ProviderRegistry,
+    _callable_accepts_domain,
+    _initialize_accepts_domain,
+    _is_domain_scoped,
+)
 from openfeature.provider.metadata import Metadata
-from openfeature.provider._registry import ProviderRegistry
 from openfeature.provider.no_op_provider import NoOpProvider
-
 from tests.legacy_init_provider import LegacyInitProvider
 
 
@@ -556,3 +560,56 @@ def test_initialize_does_not_retry_when_domain_aware_provider_raises_type_error(
         registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
 
     assert provider.call_count == 1
+
+
+def test_is_domain_scoped_uses_class_level_bool_attribute():
+    class ClassScopedProvider:
+        domain_scoped = True
+
+    assert _is_domain_scoped(ClassScopedProvider()) is True  # type: ignore[arg-type]
+
+
+def test_is_domain_scoped_ignores_non_bool_class_attribute():
+    class PropertyScopedProvider:
+        @property
+        def domain_scoped(self) -> bool:
+            return True
+
+    assert _is_domain_scoped(PropertyScopedProvider()) is False  # type: ignore[arg-type]
+
+
+def test_callable_accepts_domain_returns_false_for_uninspectable_callable():
+    assert _callable_accepts_domain(object()) is False  # type: ignore[arg-type]
+
+
+def test_initialize_accepts_domain_returns_false_for_mock_with_invalid_side_effect():
+    provider = Mock()
+    provider.initialize.side_effect = 123
+
+    assert _initialize_accepts_domain(provider) is False
+
+
+def test_callable_accepts_domain_returns_true_for_kwargs_signature():
+    def initialize(evaluation_context, **kwargs):
+        pass
+
+    assert _callable_accepts_domain(initialize) is True
+
+
+def test_provider_without_initialize_is_ready_immediately():
+    registry = ProviderRegistry()
+
+    class NoInitProvider:
+        def attach(self, on_emit):
+            pass
+
+        def detach(self):
+            pass
+
+        def get_metadata(self):
+            return Metadata(name="no-init")
+
+    provider = NoInitProvider()
+    registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
+
+    assert registry.get_provider_status(provider) == ProviderStatus.READY

@@ -26,12 +26,12 @@ from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, Metadata, ProviderStatus
 from openfeature.provider._registry import provider_registry
 from openfeature.provider.no_op_provider import NoOpProvider
-from tests.legacy_init_provider import LegacyInitProvider
 from openfeature.transaction_context import (
     ContextVarsTransactionContextPropagator,
     get_transaction_context,
     set_transaction_context_propagator,
 )
+from tests.legacy_init_provider import LegacyInitProvider
 
 
 def wait_for_mock_call(mock: MagicMock, timeout: float = 1.0) -> None:
