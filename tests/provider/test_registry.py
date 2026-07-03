@@ -594,6 +594,47 @@ def test_domain_scoped_property_provider_rejects_second_domain():
     )
 
 
+def test_reregistering_same_provider_on_same_domain_reinitializes():
+    registry = ProviderRegistry()
+    provider = Mock()
+    init_count = 0
+
+    def counting_initialize(evaluation_context, domain=None):
+        nonlocal init_count
+        init_count += 1
+
+    provider.initialize.side_effect = counting_initialize
+
+    registry.set_provider("domain", provider, wait_for_init=True)
+    registry.set_provider("domain", provider, wait_for_init=True)
+
+    assert init_count == 2
+
+
+def test_reregistering_same_provider_after_failed_init_retries():
+    registry = ProviderRegistry()
+    provider = Mock()
+    attempts = 0
+
+    def flaky_initialize(evaluation_context, domain=None):
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            raise ProviderFatalError()
+
+    provider.initialize.side_effect = flaky_initialize
+
+    with pytest.raises(ProviderFatalError):
+        registry.set_provider("domain", provider, wait_for_init=True)
+
+    assert registry.get_provider_status(provider) == ProviderStatus.FATAL
+
+    registry.set_provider("domain", provider, wait_for_init=True)
+
+    assert attempts == 2
+    assert registry.get_provider_status(provider) == ProviderStatus.READY
+
+
 def test_callable_accepts_domain_returns_false_for_uninspectable_callable():
     assert _callable_accepts_domain(object()) is False  # type: ignore[arg-type]
 

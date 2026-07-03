@@ -77,14 +77,10 @@ class ProviderRegistry:
         with self._lock:
             self._reject_domain_scoped_rebind(provider, domain)
             old_provider = self._providers.get(domain)
-            was_bound_elsewhere = provider is self._default_provider or any(
+            already_bound = provider is self._default_provider or any(
                 p is provider for d, p in self._providers.items() if d != domain
             )
-            was_bound_here = (
-                domain in self._providers and self._providers[domain] is provider
-            )
             self._providers[domain] = provider
-            already_bound = was_bound_elsewhere or was_bound_here
             if not already_bound:
                 needs_init = True
                 self._provider_status[provider] = ProviderStatus.NOT_READY
