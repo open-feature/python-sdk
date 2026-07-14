@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.10.1](https://github.com/open-feature/python-sdk/compare/v0.10.0...v0.10.1) (2026-07-14)
+
+
+### 🐛 Bug Fixes
+
+* thread safety issues ([#614](https://github.com/open-feature/python-sdk/issues/614)) ([2bf4a34](https://github.com/open-feature/python-sdk/commit/2bf4a3475a8863ddab439bd28c45ba09ce4c4cbe))
+
+
+### 🧹 Chore
+
+* **deps:** update actions/checkout action to v7 ([#617](https://github.com/open-feature/python-sdk/issues/617)) ([371aca1](https://github.com/open-feature/python-sdk/commit/371aca184371e35f3ddc24a4b297fdf95adc1f32))
+* **deps:** update codecov/codecov-action action to v7 ([#612](https://github.com/open-feature/python-sdk/issues/612)) ([da485f3](https://github.com/open-feature/python-sdk/commit/da485f3ec51822342f88ec7a294500a25c04cf08))
+
 ## [0.10.0](https://github.com/open-feature/python-sdk/compare/v0.9.0...v0.10.0) (2026-06-01)
 
 
