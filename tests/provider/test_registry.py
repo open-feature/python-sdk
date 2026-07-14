@@ -4,10 +4,17 @@ from unittest.mock import Mock
 
 import pytest
 
+from openfeature.evaluation_context import EvaluationContext, set_evaluation_context
 from openfeature.exception import GeneralError, ProviderFatalError
 from openfeature.provider import ProviderStatus
-from openfeature.provider._registry import ProviderRegistry
+from openfeature.provider._registry import (
+    ProviderRegistry,
+    _callable_accepts_domain,
+    _is_domain_scoped,
+)
+from openfeature.provider.metadata import Metadata
 from openfeature.provider.no_op_provider import NoOpProvider
+from tests.legacy_init_provider import LegacyInitProvider
 
 
 def test_registry_serves_noop_as_default():
@@ -240,7 +247,7 @@ def test_set_provider_returns_before_initialization_completes():
     init_may_proceed = threading.Event()
     provider = Mock()
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         init_started.set()
         init_may_proceed.wait()
 
@@ -261,7 +268,7 @@ def test_set_provider_and_wait_blocks_until_ready():
     initialized = threading.Event()
     provider = Mock()
 
-    def tracking_initialize(ctx):
+    def tracking_initialize(ctx, domain=None):
         initialized.set()
 
     provider.initialize.side_effect = tracking_initialize
@@ -290,7 +297,7 @@ def test_concurrent_set_provider_for_same_provider_initializes_once():
     init_count = 0
     start_gate = threading.Event()
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         nonlocal init_count
         # widen the window in which two threads can both observe "not bound"
         start_gate.wait(timeout=2)
@@ -323,7 +330,7 @@ def test_provider_replaced_during_async_init_does_not_set_ready_status():
 
     slow_provider = Mock()
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         init_started.set()
         init_may_proceed.wait(timeout=2)
 
@@ -424,3 +431,236 @@ def test_stale_shutdown_does_not_clobber_re_registered_provider():
         "stale shutdown of A clobbered the fresh registration's status"
     )
     provider_a.detach.assert_not_called()
+
+
+def test_initialize_receives_bound_domain():
+    registry = ProviderRegistry()
+    provider = Mock()
+
+    registry.set_provider("my-domain", provider, wait_for_init=True)
+
+    provider.initialize.assert_called_once()
+    _, kwargs = provider.initialize.call_args
+    assert kwargs.get("domain") == "my-domain"
+
+
+def test_initialize_receives_none_domain_for_default_provider():
+    registry = ProviderRegistry()
+    provider = Mock()
+
+    registry.set_default_provider(provider, wait_for_init=True)
+
+    provider.initialize.assert_called_once()
+    _, kwargs = provider.initialize.call_args
+    assert kwargs.get("domain") is None
+
+
+def test_domain_scoped_provider_rejects_second_domain():
+    registry = ProviderRegistry()
+    provider = Mock()
+    provider.domain_scoped = True
+
+    registry.set_provider("domain1", provider, wait_for_init=True)
+
+    with pytest.raises(GeneralError) as exc_info:
+        registry.set_provider("domain2", provider)
+
+    assert (
+        exc_info.value.error_message
+        == "Cannot bind domain-scoped provider to more than one domain"
+    )
+    assert registry.get_provider("domain1") is provider
+    provider.initialize.assert_called_once()
+
+
+def test_domain_scoped_provider_rejects_default_after_domain_binding():
+    registry = ProviderRegistry()
+    provider = Mock()
+    provider.domain_scoped = True
+
+    registry.set_provider("domain", provider, wait_for_init=True)
+
+    with pytest.raises(GeneralError):
+        registry.set_default_provider(provider)
+
+    assert registry.get_default_provider() is not provider
+
+
+def test_domain_scoped_provider_rejects_domain_after_default_binding():
+    registry = ProviderRegistry()
+    provider = Mock()
+    provider.domain_scoped = True
+
+    registry.set_default_provider(provider, wait_for_init=True)
+
+    with pytest.raises(GeneralError):
+        registry.set_provider("domain", provider)
+
+    assert registry.get_provider("domain") is registry.get_default_provider()
+
+
+def test_initialize_skips_domain_for_legacy_signature():
+    registry = ProviderRegistry()
+    provider = LegacyInitProvider()
+
+    registry.set_provider("domain", provider, wait_for_init=True)
+
+    assert provider.initialize_calls == 1
+
+
+def test_legacy_abstract_provider_initialize_without_domain():
+    registry = ProviderRegistry()
+    evaluation_context = EvaluationContext("targeting_key", {"attr": "val"})
+    set_evaluation_context(evaluation_context)
+    provider = LegacyInitProvider()
+
+    registry.set_provider("domain", provider, wait_for_init=True)
+
+    assert provider.initialize_calls == 1
+    assert provider.last_evaluation_context == evaluation_context
+    assert registry.get_provider_status(provider) == ProviderStatus.READY
+
+
+def test_initialize_does_not_retry_when_domain_aware_provider_raises_type_error():
+    registry = ProviderRegistry()
+
+    class BrokenProvider:
+        def __init__(self):
+            self.call_count = 0
+
+        def attach(self, on_emit):
+            pass
+
+        def detach(self):
+            pass
+
+        def get_metadata(self):
+            return Metadata(name="broken")
+
+        def initialize(self, evaluation_context, domain=None):
+            self.call_count += 1
+            raise TypeError("configuration error")
+
+    provider = BrokenProvider()
+    with pytest.raises(TypeError, match="configuration error"):
+        registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
+
+    assert provider.call_count == 1
+    provider.detach()
+
+
+def test_is_domain_scoped_uses_class_level_bool_attribute():
+    class ClassScopedProvider:
+        domain_scoped = True
+
+    assert _is_domain_scoped(ClassScopedProvider()) is True  # type: ignore[arg-type]
+
+
+def test_is_domain_scoped_uses_property():
+    class PropertyScopedProvider:
+        @property
+        def domain_scoped(self) -> bool:
+            return True
+
+    assert _is_domain_scoped(PropertyScopedProvider()) is True  # type: ignore[arg-type]
+
+
+def test_is_domain_scoped_rejects_truthy_non_bool_values():
+    class StrScopedProvider:
+        def __init__(self) -> None:
+            self.domain_scoped = "us-east"
+
+    assert _is_domain_scoped(StrScopedProvider()) is False  # type: ignore[arg-type]
+
+
+def test_domain_scoped_property_provider_rejects_second_domain():
+    registry = ProviderRegistry()
+
+    class PropertyScopedProvider(LegacyInitProvider):
+        @property
+        def domain_scoped(self) -> bool:
+            return True
+
+    provider = PropertyScopedProvider()
+    registry.set_provider("domain1", provider, wait_for_init=True)
+
+    with pytest.raises(GeneralError) as exc_info:
+        registry.set_provider("domain2", provider)
+
+    assert (
+        exc_info.value.error_message
+        == "Cannot bind domain-scoped provider to more than one domain"
+    )
+
+
+def test_reregistering_same_provider_on_same_domain_reinitializes():
+    registry = ProviderRegistry()
+    provider = Mock()
+    init_count = 0
+
+    def counting_initialize(evaluation_context, domain=None):
+        nonlocal init_count
+        init_count += 1
+
+    provider.initialize.side_effect = counting_initialize
+
+    registry.set_provider("domain", provider, wait_for_init=True)
+    registry.set_provider("domain", provider, wait_for_init=True)
+
+    assert init_count == 2
+
+
+def test_reregistering_same_provider_after_failed_init_retries():
+    registry = ProviderRegistry()
+    provider = Mock()
+    attempts = 0
+
+    def flaky_initialize(evaluation_context, domain=None):
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            raise ProviderFatalError()
+
+    provider.initialize.side_effect = flaky_initialize
+
+    with pytest.raises(ProviderFatalError):
+        registry.set_provider("domain", provider, wait_for_init=True)
+
+    assert registry.get_provider_status(provider) == ProviderStatus.FATAL
+
+    registry.set_provider("domain", provider, wait_for_init=True)
+
+    assert attempts == 2
+    assert registry.get_provider_status(provider) == ProviderStatus.READY
+
+
+def test_callable_accepts_domain_returns_false_for_uninspectable_callable():
+    assert _callable_accepts_domain(object()) is False  # type: ignore[arg-type]
+
+
+def test_callable_accepts_domain_returns_true_for_kwargs_signature():
+    def initialize(evaluation_context, **kwargs):
+        kwargs["domain"] = "ignored"
+
+    assert _callable_accepts_domain(initialize) is True
+    initialize(EvaluationContext())
+
+
+def test_provider_without_initialize_is_ready_immediately():
+    registry = ProviderRegistry()
+
+    class NoInitProvider:
+        def attach(self, on_emit):
+            pass
+
+        def detach(self):
+            pass
+
+        def get_metadata(self):
+            return Metadata(name="no-init")
+
+    provider = NoInitProvider()
+    registry.set_provider("domain", provider, wait_for_init=True)  # type: ignore[arg-type]
+
+    assert registry.get_provider_status(provider) == ProviderStatus.READY
+    provider.detach()
