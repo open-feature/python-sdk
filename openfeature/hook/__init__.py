@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 import typing
 from collections.abc import Mapping, MutableMapping, Sequence
 from datetime import datetime
@@ -24,6 +25,7 @@ __all__ = [
 ]
 
 _hooks: list[Hook] = []
+_hooks_lock = threading.RLock()
 
 
 # https://openfeature.dev/specification/sections/hooks/#requirement-461
@@ -152,13 +154,15 @@ class Hook:
 
 
 def add_hooks(hooks: list[Hook]) -> None:
-    global _hooks
-    _hooks = _hooks + hooks
+    with _hooks_lock:
+        global _hooks
+        _hooks = _hooks + hooks
 
 
 def clear_hooks() -> None:
-    global _hooks
-    _hooks = []
+    with _hooks_lock:
+        global _hooks
+        _hooks = []
 
 
 def get_hooks() -> list[Hook]:
