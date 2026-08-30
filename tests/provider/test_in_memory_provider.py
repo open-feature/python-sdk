@@ -1,8 +1,10 @@
 from numbers import Number
+from unittest.mock import MagicMock
 
 import pytest
 
 from openfeature.evaluation_context import EvaluationContext
+from openfeature.event import ProviderEvent
 from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.provider.in_memory_provider import (
@@ -218,3 +220,54 @@ def test_should_track_event():
             value=1, details={"key": "value"}, eval_context_attributes={"key": "value"}
         )
     }
+
+
+def test_update_flags_replaces_all_flags_and_copies_input():
+    old_flag = InMemoryFlag("old", {"old": True})
+    new_flag = InMemoryFlag("new", {"new": False})
+    provider = InMemoryProvider({"old-key": old_flag})
+
+    provider.update_flags({"new-key": new_flag})
+
+    assert provider.flag("old-key") is None
+    assert provider.flag("new-key") is new_flag
+
+
+def test_update_flags_emits_configuration_changed_for_old_and_new_keys():
+    provider = InMemoryProvider({"old-key": InMemoryFlag("old", {"old": True})})
+    provider._on_emit = MagicMock()
+
+    provider.update_flags({"new-key": InMemoryFlag("new", {"new": False})})
+
+    provider._on_emit.assert_called_once()
+    emitted_provider, event, details = provider._on_emit.call_args.args
+    assert emitted_provider is provider
+    assert event == ProviderEvent.PROVIDER_CONFIGURATION_CHANGED
+    assert details.flags_changed == ["new-key", "old-key"]
+    assert details.message == "flag configuration changed"
+
+
+def test_update_flag_adds_and_replaces_a_flag():
+    original_flag = InMemoryFlag("original", {"original": True})
+    replacement_flag = InMemoryFlag("replacement", {"replacement": False})
+    provider = InMemoryProvider({})
+
+    provider.update_flag("key", original_flag)
+    assert provider.flag("key") is original_flag
+
+    provider.update_flag("key", replacement_flag)
+    assert provider.flag("key") is replacement_flag
+
+
+def test_update_flag_emits_configuration_changed_for_updated_key():
+    provider = InMemoryProvider({})
+    provider._on_emit = MagicMock()
+
+    provider.update_flag("key", InMemoryFlag("default", {"default": True}))
+
+    provider._on_emit.assert_called_once()
+    emitted_provider, event, details = provider._on_emit.call_args.args
+    assert emitted_provider is provider
+    assert event == ProviderEvent.PROVIDER_CONFIGURATION_CHANGED
+    assert details.flags_changed == ["key"]
+    assert details.message == "flag configuration changed"
