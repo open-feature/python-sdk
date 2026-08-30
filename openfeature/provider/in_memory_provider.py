@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 
 from openfeature._backports.strenum import StrEnum
 from openfeature.evaluation_context import EvaluationContext, EvaluationContextAttribute
+from openfeature.event import ProviderEventDetails
 from openfeature.exception import ErrorCode
 from openfeature.flag_evaluation import FlagResolutionDetails, Reason
 from openfeature.provider import AbstractProvider, Metadata
@@ -217,3 +218,32 @@ class InMemoryProvider(AbstractProvider):
             details=details,
             eval_context_attributes=eval_context_attributes,
         )
+
+    def update_flags(self, flags: FlagStorage) -> None:
+        """Replace the whole flag set and emit a configuration-change event.
+
+        The event names the union of the previous and new keys, which is what
+        Appendix A asks for: a consumer caching evaluation needs to know
+        everything that might have changed, and a key that disappeared has
+        changed as much as one that was added.
+        """
+        changed = sorted(set(self._flags) | set(flags))
+        self._flags = flags.copy()
+        self.emit_provider_configuration_changed(
+            ProviderEventDetails(
+                flags_changed=changed, message="flag configuration changed"
+            )
+        )
+
+    def update_flag(self, key: str, flag: InMemoryFlag[typing.Any]) -> None:
+        """Replace a single flag and emit a configuration-change event naming it."""
+        self._flags[key] = flag
+        self.emit_provider_configuration_changed(
+            ProviderEventDetails(
+                flags_changed=[key], message="flag configuration changed"
+            )
+        )
+
+    def flag(self, key: str) -> InMemoryFlag[typing.Any] | None:
+        """Return the flag currently registered under ``key``."""
+        return self._flags.get(key)
