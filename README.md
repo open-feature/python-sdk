@@ -83,7 +83,7 @@ from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvid
 
 # flags defined in memory
 my_flags = {
-  "v2_enabled": InMemoryFlag("on", {"on": True, "off": False})
+    "v2_enabled": InMemoryFlag("on", {"on": True, "off": False}),
 }
 
 # configure a provider
@@ -161,7 +161,7 @@ global_context = EvaluationContext(
     targeting_key="targeting_key1", attributes={"application": "value1"}
 )
 request_context = EvaluationContext(
-    targeting_key="targeting_key2", attributes={"email": request.form['email']}
+    targeting_key="targeting_key2", attributes={"email": request.form["email"]}
 )
 
 ## set global context
@@ -210,10 +210,10 @@ client = api.get_client()
 
 # trigger tracking event action
 client.track(
-    'visited-promo-page',
+    "visited-promo-page",
     evaluation_context=EvaluationContext(),
     tracking_event_details=TrackingEventDetails(99.77).add("currencyCode", "USD"),
-    )
+)
 ```
 
 Note that some providers may not support tracking; check the documentation for your provider for more information.
@@ -243,14 +243,13 @@ If a domain has no associated provider, the global provider is used.
 from openfeature import api
 
 # Registering the default provider
-api.set_provider(MyProvider());
+api.set_provider(MyProvider())
 # Registering a provider to a domain
-api.set_provider(MyProvider(), "my-domain");
-
+api.set_provider(MyProvider(), "my-domain")
 # A client bound to the default provider
-default_client = api.get_client();
+default_client = api.get_client()
 # A client bound to the MyProvider provider
-domain_scoped_client = api.get_client("my-domain");
+domain_scoped_client = api.get_client("my-domain")
 ```
 
 Domains can be defined on a provider during registration.
@@ -266,15 +265,19 @@ Please refer to the documentation of the provider you're using to see what event
 from openfeature import api
 from openfeature.event import EventDetails, ProviderEvent
 
+
 def on_provider_ready(event_details: EventDetails):
     print(f"Provider {event_details.provider_name} is ready")
+
 
 api.add_handler(ProviderEvent.PROVIDER_READY, on_provider_ready)
 
 client = api.get_client()
 
+
 def on_provider_ready(event_details: EventDetails):
     print(f"Provider {event_details.provider_name} is ready")
+
 
 client.add_handler(ProviderEvent.PROVIDER_READY, on_provider_ready)
 ```
@@ -301,26 +304,33 @@ app = Flask(__name__)
 # Set the transaction context propagator
 api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
 
+
 # Middleware to set the transaction context
 # You can call api.set_transaction_context anywhere you have information,
 # you want to have available in the code-paths below the current one.
 @app.before_request
 def set_request_transaction_context():
-  ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-  user_id = request.headers.get("User-Id")  # Assuming we're getting the user ID from a header
-  evaluation_context = EvaluationContext(targeting_key=user_id, attributes={"ipAddress": ip})
-  api.set_transaction_context(evaluation_context)
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    user_id = request.headers.get(
+        "User-Id"
+    )  # Assuming we're getting the user ID from a header
+    evaluation_context = EvaluationContext(
+        targeting_key=user_id, attributes={"ipAddress": ip}
+    )
+    api.set_transaction_context(evaluation_context)
+
 
 def create_response() -> str:
-  # This method can be anywhere in our code.
-  # The feature flag evaluation will automatically contain the transaction context merged with other context
-  new_response = api.get_client().get_string_value("response-message", "Hello User!")
-  return f"Message from server: {new_response}"
+    # This method can be anywhere in our code.
+    # The feature flag evaluation will automatically contain the transaction context merged with other context
+    new_response = api.get_client().get_string_value("response-message", "Hello User!")
+    return f"Message from server: {new_response}"
+
 
 # Example route where we use the transaction context
-@app.route('/greeting')
+@app.route("/greeting")
 def some_endpoint():
-  return create_response()
+    return create_response()
 ```
 
 This also works for asyncio based implementations e.g. FastApi as seen in the following example:
@@ -337,15 +347,21 @@ app = FastAPI()
 # Set the transaction context propagator
 api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
 
+
 # Middleware to set the transaction context
 @app.middleware("http")
 async def set_request_transaction_context(request: Request, call_next):
     ip = request.headers.get("X-Forwarded-For", request.client.host)
-    user_id = request.headers.get("User-Id")  # Assuming we're getting the user ID from a header
-    evaluation_context = EvaluationContext(targeting_key=user_id, attributes={"ipAddress": ip})
+    user_id = request.headers.get(
+        "User-Id"
+    )  # Assuming we're getting the user ID from a header
+    evaluation_context = EvaluationContext(
+        targeting_key=user_id, attributes={"ipAddress": ip}
+    )
     api.set_transaction_context(evaluation_context)
     response = await call_next(request)
     return response
+
 
 def create_response() -> str:
     # This method can be located anywhere in our code.
@@ -353,8 +369,9 @@ def create_response() -> str:
     new_response = api.get_client().get_string_value("response-message", "Hello User!")
     return f"Message from server: {new_response}"
 
+
 # Example route where we use the transaction context
-@app.get('/greeting')
+@app.get("/greeting")
 async def some_endpoint():
     return create_response()
 ```
@@ -368,10 +385,12 @@ import asyncio
 from openfeature import api
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 
-my_flags = { "v2_enabled": InMemoryFlag("on", {"on": True, "off": False}) }
+my_flags = {"v2_enabled": InMemoryFlag("on", {"on": True, "off": False})}
 api.set_provider(InMemoryProvider(my_flags))
 client = api.get_client()
-flag_value = await client.get_boolean_value_async("v2_enabled", False) # API calls are suffixed by _async
+flag_value = await client.get_boolean_value_async(
+    "v2_enabled", False
+)  # API calls are suffixed by _async
 
 print("Value: " + str(flag_value))
 ```
@@ -404,9 +423,9 @@ from openfeature.flag_evaluation import FlagResolutionDetails
 from openfeature.hook import Hook
 from openfeature.provider import AbstractProvider, Metadata
 
+
 class MyProvider(AbstractProvider):
-    def get_metadata(self) -> Metadata:
-        ...
+    def get_metadata(self) -> Metadata: ...
 
     def get_provider_hooks(self) -> List[Hook]:
         return []
@@ -416,40 +435,35 @@ class MyProvider(AbstractProvider):
         flag_key: str,
         default_value: bool,
         evaluation_context: Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[bool]:
-        ...
+    ) -> FlagResolutionDetails[bool]: ...
 
     def resolve_string_details(
         self,
         flag_key: str,
         default_value: str,
         evaluation_context: Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[str]:
-        ...
+    ) -> FlagResolutionDetails[str]: ...
 
     def resolve_integer_details(
         self,
         flag_key: str,
         default_value: int,
         evaluation_context: Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[int]:
-        ...
+    ) -> FlagResolutionDetails[int]: ...
 
     def resolve_float_details(
         self,
         flag_key: str,
         default_value: float,
         evaluation_context: Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[float]:
-        ...
+    ) -> FlagResolutionDetails[float]: ...
 
     def resolve_object_details(
         self,
         flag_key: str,
         default_value: Union[dict, list],
         evaluation_context: Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[Union[dict, list]]:
-        ...
+    ) -> FlagResolutionDetails[Union[dict, list]]: ...
 ```
 
 Providers can also be extended to support async functionality.
@@ -461,46 +475,41 @@ To support add asynchronous calls to a provider:
 ```python
 class MyProvider(AbstractProvider):
     ...
+
     async def resolve_boolean_details_async(
         self,
         flag_key: str,
         default_value: bool,
         evaluation_context: Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[bool]:
-        ...
+    ) -> FlagResolutionDetails[bool]: ...
 
     async def resolve_string_details_async(
         self,
         flag_key: str,
         default_value: str,
         evaluation_context: Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[str]:
-        ...
+    ) -> FlagResolutionDetails[str]: ...
 
     async def resolve_integer_details_async(
         self,
         flag_key: str,
         default_value: int,
         evaluation_context: Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[int]:
-        ...
+    ) -> FlagResolutionDetails[int]: ...
 
     async def resolve_float_details_async(
         self,
         flag_key: str,
         default_value: float,
         evaluation_context: Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[float]:
-        ...
+    ) -> FlagResolutionDetails[float]: ...
 
     async def resolve_object_details_async(
         self,
         flag_key: str,
         default_value: Union[dict, list],
         evaluation_context: Optional[EvaluationContext] = None,
-    ) -> FlagResolutionDetails[Union[dict, list]]:
-        ...
-
+    ) -> FlagResolutionDetails[Union[dict, list]]: ...
 ```
 
 > Built a new provider? [Let us know](https://github.com/open-feature/openfeature.dev/issues/new?assignees=&labels=provider&projects=&template=document-provider.yaml&title=%5BProvider%5D%3A+) so we can add it to the docs!
@@ -516,10 +525,15 @@ Any of the evaluation life-cycle stages (`before`/`after`/`error`/`finally_after
 from openfeature.hook import Hook, HookContext, HookHints
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagValueType
 
-class MyHook(Hook):
-    def after(self, hook_context: HookContext, details: FlagEvaluationDetails[FlagValueType], hints: HookHints):
-        print("This runs after the flag has been evaluated")
 
+class MyHook(Hook):
+    def after(
+        self,
+        hook_context: HookContext,
+        details: FlagEvaluationDetails[FlagValueType],
+        hints: HookHints,
+    ):
+        print("This runs after the flag has been evaluated")
 ```
 
 > Built a new hook? [Let us know](https://github.com/open-feature/openfeature.dev/issues/new?assignees=&labels=hook&projects=&template=document-hook.yaml&title=%5BHook%5D%3A+) so we can add it to the docs!
