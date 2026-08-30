@@ -861,19 +861,6 @@ class OpenFeatureClient:
         default_value: FlagValueType,
         evaluation_context: EvaluationContext | None = None,
     ) -> FlagEvaluationDetails[FlagValueType]:
-        """
-        Resolve a flag asynchronously and validate the returned value.
-
-        Provider-reported errors are returned unchanged. A type mismatch detected
-        by the client returns the caller's default with TYPE_MISMATCH error details.
-
-        :param provider: the provider selected for this evaluation
-        :param flag_type: the requested flag type
-        :param flag_key: the key of the selected flag
-        :param default_value: fallback used for an unknown type or a type mismatch
-        :param evaluation_context: context passed to the provider
-        :return: evaluation details containing the resolved value or fallback
-        """
         get_details_callables_async: Mapping[FlagType, ResolveDetailsCallableAsync] = {
             FlagType.BOOLEAN: provider.resolve_boolean_details_async,
             FlagType.INTEGER: provider.resolve_integer_details_async,
@@ -1004,17 +991,6 @@ class OpenFeatureClient:
 def _typecheck_flag_value(
     value: typing.Any, flag_type: FlagType
 ) -> OpenFeatureError | None:
-    """
-    Check a resolved value against the requested flag type without coercing it.
-
-    Booleans are not integer flag values, even though bool subclasses int in
-    Python. Other subclasses of the expected type remain valid.
-
-    :param value: the value returned by the provider
-    :param flag_type: the requested flag type
-    :return: None for a matching value, TypeMismatchError for an incompatible
-        value, or GeneralError for an unknown flag type
-    """
     type_map: TypeMap = {
         FlagType.BOOLEAN: bool,
         FlagType.STRING: str,
@@ -1025,6 +1001,7 @@ def _typecheck_flag_value(
     py_type = type_map.get(flag_type)
     if not py_type:
         return GeneralError(error_message="Unknown flag type")
+    # bool subclasses int, but booleans are not integer flag values.
     if not isinstance(value, py_type) or (
         flag_type == FlagType.INTEGER and isinstance(value, bool)
     ):

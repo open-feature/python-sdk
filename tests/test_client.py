@@ -424,7 +424,6 @@ async def test_client_type_mismatch_exceptions():
 
 @pytest.mark.asyncio
 async def test_typecheck_flag_value_general_error():
-    """Unknown flag types produce GENERAL rather than TYPE_MISMATCH."""
     # Given
     flag_value = "A"
     flag_type = None
@@ -454,7 +453,6 @@ async def test_typecheck_flag_value_general_error():
 async def test_client_returns_default_on_type_mismatch(
     flag_type, flag_value, default_value, is_async
 ):
-    """Both APIs return typed defaults and pass the fallback to finally hooks."""
     provider = InMemoryProvider(
         {"flag": InMemoryFlag("enabled", {"enabled": flag_value})}
     )
@@ -520,7 +518,6 @@ async def test_client_returns_default_on_type_mismatch(
 async def test_client_preserves_matching_flag_types(
     flag_type, flag_value, default_value, is_async
 ):
-    """Matching values keep their type and successful evaluation details."""
     provider = InMemoryProvider(
         {"flag": InMemoryFlag("enabled", {"enabled": flag_value})}
     )
@@ -548,11 +545,7 @@ async def test_client_preserves_matching_flag_types(
 
 
 def test_typecheck_flag_value_accepts_integer_subclasses():
-    """Rejecting booleans must not reject other integer subclasses."""
-
     class IntegerValue(int):
-        """An integer subtype with the same value semantics as int."""
-
         pass
 
     assert _typecheck_flag_value(IntegerValue(1), FlagType.INTEGER) is None
@@ -560,7 +553,6 @@ def test_typecheck_flag_value_accepts_integer_subclasses():
 
 @pytest.mark.asyncio
 async def test_typecheck_flag_value_type_mismatch_error():
-    """An incompatible value reports both the expected and actual types."""
     # Given
     flag_value = "A"
     flag_type = FlagType.BOOLEAN
