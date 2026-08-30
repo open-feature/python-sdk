@@ -890,7 +890,7 @@ class OpenFeatureClient:
         if err := _typecheck_flag_value(value=resolution.value, flag_type=flag_type):
             return FlagEvaluationDetails(
                 flag_key=flag_key,
-                value=resolution.value,
+                value=default_value,
                 reason=Reason.ERROR,
                 error_code=err.error_code,
                 error_message=err.error_message,
@@ -1001,6 +1001,9 @@ def _typecheck_flag_value(
     py_type = type_map.get(flag_type)
     if not py_type:
         return GeneralError(error_message="Unknown flag type")
-    if not isinstance(value, py_type):
+    # bool is an int subclass in Python, but not an integer flag value.
+    if not isinstance(value, py_type) or (
+        flag_type == FlagType.INTEGER and isinstance(value, bool)
+    ):
         return TypeMismatchError(f"Expected type {py_type} but got {type(value)}")
     return None
