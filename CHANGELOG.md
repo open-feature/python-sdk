@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.10.1](https://github.com/open-feature/python-sdk/compare/v0.10.0...v0.10.1) (2026-09-18)
+
+
+### 🐛 Bug Fixes
+
+* reject boolean values for integer flags ([#621](https://github.com/open-feature/python-sdk/issues/621)) ([7d945ec](https://github.com/open-feature/python-sdk/commit/7d945ec5ed7912a0d80b49fdb7d7267f543f0438))
+* thread safety issues ([#614](https://github.com/open-feature/python-sdk/issues/614)) ([2bf4a34](https://github.com/open-feature/python-sdk/commit/2bf4a3475a8863ddab439bd28c45ba09ce4c4cbe))
+
+
+### ✨ New Features
+
+* add update flag methods to in-memory provider ([#622](https://github.com/open-feature/python-sdk/issues/622)) ([93296c6](https://github.com/open-feature/python-sdk/commit/93296c6e7788d74699746c553993352ece693816))
+
+
+### 🧹 Chore
+
+* **deps:** update actions/checkout action to v7 ([#617](https://github.com/open-feature/python-sdk/issues/617)) ([371aca1](https://github.com/open-feature/python-sdk/commit/371aca184371e35f3ddc24a4b297fdf95adc1f32))
+* **deps:** update actions/checkout action to v7.0.1 ([#631](https://github.com/open-feature/python-sdk/issues/631)) ([a91737d](https://github.com/open-feature/python-sdk/commit/a91737d19c20e02b4807b1051e8c097efa388fc0))
+* **deps:** update actions/checkout digest to 3d3c42e ([#629](https://github.com/open-feature/python-sdk/issues/629)) ([b828933](https://github.com/open-feature/python-sdk/commit/b82893375d60df3b55acde41ecdff2164743749c))
+* **deps:** update amannn/action-semantic-pull-request action to v6.1.1 ([#633](https://github.com/open-feature/python-sdk/issues/633)) ([fb04215](https://github.com/open-feature/python-sdk/commit/fb04215815479c2d0fc69d899ee87ab491fb9dc8))
+* **deps:** update astral-sh/setup-uv action to v10 ([#623](https://github.com/open-feature/python-sdk/issues/623)) ([79b9471](https://github.com/open-feature/python-sdk/commit/79b9471fc3e04c5f930eb8e02c92d135f135cad8))
+* **deps:** update astral-sh/setup-uv action to v10.1.0 ([#634](https://github.com/open-feature/python-sdk/issues/634)) ([76d52be](https://github.com/open-feature/python-sdk/commit/76d52bee5a4b08f7876e785f18a2d621fd597831))
+* **deps:** update codecov/codecov-action action to v7 ([#612](https://github.com/open-feature/python-sdk/issues/612)) ([da485f3](https://github.com/open-feature/python-sdk/commit/da485f3ec51822342f88ec7a294500a25c04cf08))
+* **deps:** update codecov/codecov-action action to v7.1.0 ([#635](https://github.com/open-feature/python-sdk/issues/635)) ([7cdabe9](https://github.com/open-feature/python-sdk/commit/7cdabe925ea1c522354d4e43e0c2d083c6f66207))
+* **deps:** update dependency uv-build to ~=0.12.0 ([#626](https://github.com/open-feature/python-sdk/issues/626)) ([bd3b1e6](https://github.com/open-feature/python-sdk/commit/bd3b1e624b9e835b3d84e48e22621fd281af1358))
+* **deps:** update github/codeql-action action to v4.38.0 ([#636](https://github.com/open-feature/python-sdk/issues/636)) ([5158867](https://github.com/open-feature/python-sdk/commit/5158867efd5b4f713fcc74869a6a05e01e602d32))
+* **deps:** update j178/prek-action action to v3 ([#624](https://github.com/open-feature/python-sdk/issues/624)) ([36ac29b](https://github.com/open-feature/python-sdk/commit/36ac29bdedd23d9f7a36b7726de3c709781f161a))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.16.5 ([#625](https://github.com/open-feature/python-sdk/issues/625)) ([31e4ced](https://github.com/open-feature/python-sdk/commit/31e4ceddd45316f412df750a0a72907091ebda16))
+* **deps:** update pre-commit hook astral-sh/ruff-pre-commit to v0.16.7 ([#632](https://github.com/open-feature/python-sdk/issues/632)) ([82fd2f4](https://github.com/open-feature/python-sdk/commit/82fd2f41118e7568dae32218bb00d9e397f1bb59))
+* **deps:** update pre-commit hook tox-dev/pyproject-fmt to v2.29.4 ([#637](https://github.com/open-feature/python-sdk/issues/637)) ([d561cab](https://github.com/open-feature/python-sdk/commit/d561cab05301041d04e1895ff34a2819160b78c2))
+
 ## [0.10.0](https://github.com/open-feature/python-sdk/compare/v0.9.0...v0.10.0) (2026-06-01)
 
 
