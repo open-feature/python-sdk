@@ -1,4 +1,6 @@
+import inspect
 import threading
+from collections.abc import Callable
 
 from openfeature._event_support import run_handlers_for_provider
 from openfeature.evaluation_context import EvaluationContext, get_evaluation_context
@@ -9,6 +11,36 @@ from openfeature.event import (
 from openfeature.exception import ErrorCode, GeneralError, OpenFeatureError
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider.no_op_provider import NoOpProvider
+
+
+def _is_domain_scoped(provider: FeatureProvider) -> bool:
+    return getattr(provider, "domain_scoped", False) is True
+
+
+def _callable_accepts_domain(callable_obj: Callable[..., object]) -> bool:
+    try:
+        signature = inspect.signature(callable_obj)
+    except (TypeError, ValueError):
+        return False
+    return "domain" in signature.parameters or any(
+        param.kind == inspect.Parameter.VAR_KEYWORD
+        for param in signature.parameters.values()
+    )
+
+
+def _initialize_accepts_domain(provider: FeatureProvider) -> bool:
+    return _callable_accepts_domain(provider.initialize)
+
+
+def _call_initialize(
+    provider: FeatureProvider,
+    evaluation_context: EvaluationContext,
+    domain: str | None,
+) -> None:
+    if _initialize_accepts_domain(provider):
+        provider.initialize(evaluation_context, domain=domain)
+    else:
+        provider.initialize(evaluation_context)
 
 
 class ProviderRegistry:
@@ -36,17 +68,20 @@ class ProviderRegistry:
         old_provider: FeatureProvider | None = None
         needs_init = False
         with self._lock:
+            self._reject_domain_scoped_rebind(provider, domain)
             old_provider = self._providers.get(domain)
-            self._providers[domain] = provider
             already_bound = provider is self._default_provider or any(
                 p is provider for d, p in self._providers.items() if d != domain
             )
+            self._providers[domain] = provider
             if not already_bound:
                 needs_init = True
                 self._provider_status[provider] = ProviderStatus.NOT_READY
 
         if needs_init:
-            self._initialize_provider(provider, wait_for_init=wait_for_init)
+            self._initialize_provider(
+                provider, domain=domain, wait_for_init=wait_for_init
+            )
 
         # old-provider shutdown is always async so a hanging shutdown() cannot
         # block set_provider.
@@ -67,6 +102,7 @@ class ProviderRegistry:
         old_provider: FeatureProvider | None = None
         needs_init = False
         with self._lock:
+            self._reject_domain_scoped_rebind(provider, None)
             old_provider = self._default_provider
             self._default_provider = provider
             if (
@@ -77,7 +113,9 @@ class ProviderRegistry:
                 self._provider_status[provider] = ProviderStatus.NOT_READY
 
         if needs_init:
-            self._initialize_provider(provider, wait_for_init=wait_for_init)
+            self._initialize_provider(
+                provider, domain=None, wait_for_init=wait_for_init
+            )
 
         if old_provider is not None and old_provider is not provider:
             self._shutdown_if_unused(old_provider)
@@ -104,8 +142,32 @@ class ProviderRegistry:
     def _get_evaluation_context(self) -> EvaluationContext:
         return get_evaluation_context()
 
+    def _provider_bindings(self, provider: FeatureProvider) -> list[str | None]:
+        bindings: list[str | None] = []
+        if provider is self._default_provider:
+            bindings.append(None)
+        bindings.extend(d for d, p in self._providers.items() if p is provider)
+        return bindings
+
+    def _reject_domain_scoped_rebind(
+        self, provider: FeatureProvider, domain: str | None
+    ) -> None:
+        if not _is_domain_scoped(provider):
+            return
+        bindings = self._provider_bindings(provider)
+        if bindings and domain not in bindings:
+            raise GeneralError(
+                error_message=(
+                    "Cannot bind domain-scoped provider to more than one domain"
+                )
+            )
+
     def _initialize_provider(
-        self, provider: FeatureProvider, wait_for_init: bool
+        self,
+        provider: FeatureProvider,
+        *,
+        domain: str | None,
+        wait_for_init: bool,
     ) -> None:
         provider.attach(self.dispatch_event)
         if not hasattr(provider, "initialize"):
@@ -115,22 +177,26 @@ class ProviderRegistry:
             )
             return
         if wait_for_init:
-            self._run_initialize(provider, raise_on_error=True)
+            self._run_initialize(provider, domain=domain, raise_on_error=True)
             return
 
         thread = threading.Thread(
             target=self._run_initialize,
             args=(provider,),
-            kwargs={"raise_on_error": False},
+            kwargs={"domain": domain, "raise_on_error": False},
             daemon=True,
         )
         thread.start()
 
     def _run_initialize(
-        self, provider: FeatureProvider, raise_on_error: bool = False
+        self,
+        provider: FeatureProvider,
+        *,
+        domain: str | None,
+        raise_on_error: bool = False,
     ) -> None:
         try:
-            provider.initialize(self._get_evaluation_context())
+            _call_initialize(provider, self._get_evaluation_context(), domain)
             # stale init: provider was replaced/shut down during initialize(); drop event.
             # Check active registration, not _provider_status, since replaced providers
             # remain in _provider_status until async shutdown pops them.
