@@ -1,6 +1,5 @@
 import logging
 import typing
-from functools import reduce
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
@@ -59,19 +58,44 @@ def before_hooks(
     hooks_and_context: list[tuple[Hook, HookContext]],
     hints: HookHints | None = None,
 ) -> EvaluationContext:
-    kwargs = {"hints": hints}
-    executed_hooks = _execute_hooks_unchecked(
-        flag_type=flag_type,
-        hooks_and_context=hooks_and_context,
-        hook_method=HookType.BEFORE,
-        **kwargs,
-    )
-    filtered_hooks = [result for result in executed_hooks if result is not None]
+    # Requirement 4.3.4: Any evaluation context returned from a before hook MUST be
+    # passed to subsequent before hooks (via HookContext).
+    accumulated: EvaluationContext | None = None
+    supported_hooks_and_context = [
+        (hook, hook_context)
+        for (hook, hook_context) in hooks_and_context
+        if hook.supports_flag_value_type(flag_type)
+    ]
 
-    if filtered_hooks:
-        return reduce(lambda a, b: a.merge(b), filtered_hooks)
+    try:
+        for hook, hook_context in supported_hooks_and_context:
+            if accumulated is not None:
+                # Propagate the accumulated context into this hook's HookContext so that
+                # it can observe the evaluation context returned by earlier before hooks.
+                if isinstance(hook_context.evaluation_context, EvaluationContext):
+                    hook_context.evaluation_context = (
+                        hook_context.evaluation_context.merge(accumulated)
+                    )
+                else:
+                    hook_context.evaluation_context = accumulated
 
-    return EvaluationContext()
+            result = hook.before(hook_context=hook_context, hints=hints or {})
+
+            if isinstance(result, EvaluationContext):
+                accumulated = (
+                    accumulated.merge(result) if accumulated is not None else result
+                )
+    finally:
+        if accumulated is not None:
+            for _, hook_context in supported_hooks_and_context:
+                if isinstance(hook_context.evaluation_context, EvaluationContext):
+                    hook_context.evaluation_context = (
+                        hook_context.evaluation_context.merge(accumulated)
+                    )
+                else:
+                    hook_context.evaluation_context = accumulated
+
+    return accumulated if accumulated is not None else EvaluationContext()
 
 
 def _execute_hooks(
