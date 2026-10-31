@@ -31,6 +31,7 @@ from openfeature.transaction_context import (
     get_transaction_context,
     set_transaction_context_propagator,
 )
+from tests.legacy_init_provider import LegacyInitProvider
 
 
 def wait_for_mock_call(mock: MagicMock, timeout: float = 1.0) -> None:
@@ -84,7 +85,7 @@ def test_should_invoke_provider_initialize_function_on_newly_registered_provider
     set_provider_and_wait(provider)
 
     # Then
-    provider.initialize.assert_called_with(evaluation_context)
+    provider.initialize.assert_called_with(evaluation_context, domain=None)
 
 
 def test_should_invoke_provider_shutdown_function_once_provider_is_no_longer_in_use():
@@ -177,6 +178,46 @@ def test_should_provide_a_function_to_bind_provider_through_domain():
 
     assert test_client.provider == provider
     assert test_client.domain == "test"
+
+
+def test_should_pass_domain_to_provider_initialize():
+    evaluation_context = EvaluationContext("targeting_key", {"attr1": "val1"})
+    provider = MagicMock(spec=FeatureProvider)
+
+    set_evaluation_context(evaluation_context)
+    set_provider_and_wait(provider, domain="test")
+
+    provider.initialize.assert_called_with(evaluation_context, domain="test")
+
+
+def test_legacy_initialize_provider_via_api():
+    evaluation_context = EvaluationContext("targeting_key", {"attr1": "val1"})
+    provider = LegacyInitProvider()
+
+    set_evaluation_context(evaluation_context)
+    set_provider_and_wait(provider, domain="test")
+
+    assert provider.initialize_calls == 1
+    assert provider.last_evaluation_context == evaluation_context
+    assert provider_registry.get_provider_status(provider) == ProviderStatus.READY
+
+    client = get_client("test")
+    assert client.get_boolean_value("flag", True) is True
+
+
+def test_should_reject_domain_scoped_provider_bound_to_second_domain():
+    provider = MagicMock(spec=FeatureProvider)
+    provider.domain_scoped = True
+    set_provider_and_wait(provider, "foo")
+
+    with pytest.raises(GeneralError) as exc_info:
+        set_provider(provider, "bar")
+
+    assert (
+        exc_info.value.error_message
+        == "Cannot bind domain-scoped provider to more than one domain"
+    )
+    provider.initialize.assert_called_once()
 
 
 def test_should_not_initialize_provider_already_bound_to_another_domain():
@@ -426,7 +467,7 @@ def test_set_provider_returns_before_initialization_completes():
 
     provider = MagicMock(spec=FeatureProvider)
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         init_started.set()
         init_may_proceed.wait()
 
@@ -446,7 +487,7 @@ def test_provider_status_is_not_ready_during_async_initialization():
     init_may_proceed = threading.Event()
     provider = MagicMock(spec=FeatureProvider)
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         init_may_proceed.wait()
 
     provider.initialize.side_effect = slow_initialize
@@ -467,7 +508,7 @@ def test_set_provider_and_wait_blocks_until_initialization_completes():
     initialized = threading.Event()
     provider = MagicMock(spec=FeatureProvider)
 
-    def slow_initialize(ctx):
+    def slow_initialize(ctx, domain=None):
         initialized.set()
 
     provider.initialize.side_effect = slow_initialize
@@ -495,7 +536,7 @@ def test_set_provider_swallows_error_and_emits_provider_error_event():
     provider = MagicMock(spec=FeatureProvider)
     error_fired = threading.Event()
 
-    def failing_initialize(ctx):
+    def failing_initialize(ctx, domain=None):
         raise ProviderFatalError()
 
     provider.initialize.side_effect = failing_initialize
