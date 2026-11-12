@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "uv_build"
-requires = [ "uv-build~=0.12.0" ]
+requires = [ "uv-build~=0.13.0" ]
 
 [project]
 name = "openfeature-sdk"
@@ -25,6 +25,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
 ]
 dependencies = []
 urls.Homepage = "https://github.com/open-feature/python-sdk"
@@ -33,14 +34,14 @@ urls.Homepage = "https://github.com/open-feature/python-sdk"
 dev = [
   "behave>=1.3.0,<2.0.0",
   "coverage[toml]>=7.10.0,<8.0.0",
-  "poethepoet>=0.40.0,<1.0.0",
+  "poethepoet>=0.42.0,<1.0.0",
   "prek>=0.5.0,<0.6.0",
   "pytest>=9.0.0,<10.0.0",
   "pytest-asyncio>=1.3.0,<2.0.0",
 ]
 
 [tool.uv]
-required-version = ">=0.12.0"
+required-version = ">=0.13.0"
 build-backend.module-name = "openfeature"
 build-backend.module-root = ""
 build-backend.namespace = true
@@ -101,7 +102,7 @@ lint.pyupgrade.keep-runtime-typing = true
 
 [tool.pyproject-fmt]
 keep_full_version = true
-max_supported_python = "3.14"
+max_supported_python = "3.15"
 
 [tool.mypy]
 files = "openfeature,tests/typechecking"
@@ -137,7 +138,7 @@ tasks.e2e = [
   { cmd = "rm tests/features/*.feature" },
 ]
 tasks.pre-commit = "pre-commit run -a"
-tasks.test-all.parallel = [ "test-py310", "test-py311", "test-py312", "test-py313", "test-py314" ]
+tasks.test-all.parallel = [ "test-py310", "test-py311", "test-py312", "test-py313", "test-py314", "test-py315" ]
 tasks.test-py310.cmd = "pytest tests"
 tasks.test-py310.executor = { python = "3.10", isolated = true, frozen = true }
 tasks.test-py311.cmd = "pytest tests"
@@ -148,3 +149,5 @@ tasks.test-py313.cmd = "pytest tests"
 tasks.test-py313.executor = { python = "3.13", isolated = true, frozen = true }
 tasks.test-py314.cmd = "pytest tests"
 tasks.test-py314.executor = { python = "3.14", isolated = true, frozen = true }
+tasks.test-py315.cmd = "pytest tests"
+tasks.test-py315.executor = { python = "3.15", isolated = true, frozen = true }
