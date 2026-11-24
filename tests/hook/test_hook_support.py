@@ -122,6 +122,46 @@ def test_before_hooks_merges_evaluation_contexts():
     assert context == EvaluationContext("bar", {"key_1": "val_1", "key_2": "val_2"})
 
 
+def test_before_hooks_propagates_evaluation_context_to_subsequent_hooks():
+    # Given
+    observed_contexts: list[EvaluationContext] = []
+
+    class RecordingHook(Hook):
+        def __init__(self, returned_context: EvaluationContext | None):
+            self.returned_context = returned_context
+
+        def before(self, hook_context: HookContext, hints):
+            observed_contexts.append(hook_context.evaluation_context)
+            return self.returned_context
+
+    initial = EvaluationContext("initial", {"shared": "init", "from_init": True})
+    ctx_1 = HookContext("flag_key", FlagType.BOOLEAN, True, initial)
+    ctx_2 = HookContext("flag_key", FlagType.BOOLEAN, True, initial)
+    ctx_3 = HookContext("flag_key", FlagType.BOOLEAN, True, initial)
+
+    hook_1 = RecordingHook(EvaluationContext(attributes={"shared": "h1", "k1": "v1"}))
+    hook_2 = RecordingHook(EvaluationContext("target_2", {"k2": "v2"}))
+    hook_3 = RecordingHook(None)
+
+    # When
+    final_context = before_hooks(
+        FlagType.BOOLEAN,
+        [(hook_1, ctx_1), (hook_2, ctx_2), (hook_3, ctx_3)],
+    )
+
+    # Then
+    assert observed_contexts[0] == initial
+    assert observed_contexts[1] == EvaluationContext(
+        "initial", {"shared": "h1", "from_init": True, "k1": "v1"}
+    )
+    assert observed_contexts[2] == EvaluationContext(
+        "target_2", {"shared": "h1", "from_init": True, "k1": "v1", "k2": "v2"}
+    )
+    assert final_context == EvaluationContext(
+        "target_2", {"shared": "h1", "k1": "v1", "k2": "v2"}
+    )
+
+
 def test_after_hooks_run_after_method(mock_hook):
     # Given
     hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")

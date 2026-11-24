@@ -1,6 +1,5 @@
 import logging
 import typing
-from functools import reduce
 
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.flag_evaluation import FlagEvaluationDetails, FlagType
@@ -59,19 +58,22 @@ def before_hooks(
     hooks_and_context: list[tuple[Hook, HookContext]],
     hints: HookHints | None = None,
 ) -> EvaluationContext:
-    kwargs = {"hints": hints}
-    executed_hooks = _execute_hooks_unchecked(
-        flag_type=flag_type,
-        hooks_and_context=hooks_and_context,
-        hook_method=HookType.BEFORE,
-        **kwargs,
-    )
-    filtered_hooks = [result for result in executed_hooks if result is not None]
+    accumulated: EvaluationContext | None = None
 
-    if filtered_hooks:
-        return reduce(lambda a, b: a.merge(b), filtered_hooks)
+    for hook, hook_context in hooks_and_context:
+        if not hook.supports_flag_value_type(flag_type):
+            continue
+        if accumulated is not None and isinstance(
+            hook_context.evaluation_context, EvaluationContext
+        ):
+            hook_context.evaluation_context = hook_context.evaluation_context.merge(
+                accumulated
+            )
+        result = hook.before(hook_context=hook_context, hints=hints)
+        if result is not None:
+            accumulated = result if accumulated is None else accumulated.merge(result)
 
-    return EvaluationContext()
+    return accumulated if accumulated is not None else EvaluationContext()
 
 
 def _execute_hooks(
