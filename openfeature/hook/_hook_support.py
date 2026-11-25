@@ -70,14 +70,10 @@ def before_hooks(
     try:
         for hook, hook_context in supported_hooks_and_context:
             if accumulated is not None:
-                # Propagate the accumulated context into this hook's HookContext so that
-                # it can observe the evaluation context returned by earlier before hooks.
-                if isinstance(hook_context.evaluation_context, EvaluationContext):
-                    hook_context.evaluation_context = (
-                        hook_context.evaluation_context.merge(accumulated)
-                    )
-                else:
-                    hook_context.evaluation_context = accumulated
+                # propagate accumulated context so this hook sees earlier before-hook results
+                hook_context.evaluation_context = hook_context.evaluation_context.merge(
+                    accumulated
+                )
 
             result = hook.before(hook_context=hook_context, hints=hints or {})
 
@@ -87,13 +83,11 @@ def before_hooks(
                 )
     finally:
         if accumulated is not None:
+            # finalize so after/error/finally hooks see the accumulated context
             for _, hook_context in supported_hooks_and_context:
-                if isinstance(hook_context.evaluation_context, EvaluationContext):
-                    hook_context.evaluation_context = (
-                        hook_context.evaluation_context.merge(accumulated)
-                    )
-                else:
-                    hook_context.evaluation_context = accumulated
+                hook_context.evaluation_context = hook_context.evaluation_context.merge(
+                    accumulated
+                )
 
     return accumulated if accumulated is not None else EvaluationContext()
 

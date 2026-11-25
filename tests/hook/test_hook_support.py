@@ -78,7 +78,7 @@ def test_hook_context_has_immutable_and_mutable_fields():
 
 def test_error_hooks_run_error_method(mock_hook):
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
     hook_hints = MappingProxyType({})
     # When
     error_hooks(FlagType.BOOLEAN, Exception, [(mock_hook, hook_context)], hook_hints)
@@ -92,7 +92,7 @@ def test_error_hooks_run_error_method(mock_hook):
 
 def test_before_hooks_run_before_method(mock_hook):
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
     hook_hints = MappingProxyType({})
     # When
     before_hooks(FlagType.BOOLEAN, [(mock_hook, hook_context)], hook_hints)
@@ -104,7 +104,7 @@ def test_before_hooks_run_before_method(mock_hook):
 
 def test_before_hooks_merges_evaluation_contexts():
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
     hook_1 = MagicMock(spec=Hook)
     hook_1.before.return_value = EvaluationContext("foo", {"key_1": "val_1"})
     hook_2 = MagicMock(spec=Hook)
@@ -214,10 +214,10 @@ def test_before_hooks_later_hook_overrides_earlier_on_conflict():
     received_by_hook_c: list[EvaluationContext] = []
 
     hook_a = MagicMock(spec=Hook)
-    hook_a.before.return_value = EvaluationContext(attributes={"shared": "A"})
+    hook_a.before.return_value = EvaluationContext("target_a", {"shared": "A"})
 
     hook_b = MagicMock(spec=Hook)
-    hook_b.before.return_value = EvaluationContext(attributes={"shared": "B"})
+    hook_b.before.return_value = EvaluationContext("target_b", {"shared": "B"})
 
     hook_c = MagicMock(spec=Hook)
 
@@ -236,6 +236,9 @@ def test_before_hooks_later_hook_overrides_earlier_on_conflict():
     # Then
     assert received_by_hook_c[0].attributes.get("shared") == "B", (
         "Later hook (B) result should override earlier hook (A) result for the same attribute"
+    )
+    assert received_by_hook_c[0].targeting_key == "target_b", (
+        "Later hook (B) targeting_key should override earlier hook (A) targeting_key"
     )
 
 
@@ -343,7 +346,7 @@ def test_before_hooks_unsupported_hook_context_is_not_finalized():
 
 def test_after_hooks_run_after_method(mock_hook):
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
     flag_evaluation_details = FlagEvaluationDetails(
         hook_context.flag_key, "val", "unknown"
     )
@@ -365,7 +368,7 @@ def test_after_hooks_run_after_method(mock_hook):
 
 def test_finally_after_hooks_run_finally_after_method(mock_hook):
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
     flag_evaluation_details = FlagEvaluationDetails(
         hook_context.flag_key, "val", "unknown"
     )
