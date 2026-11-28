@@ -16,19 +16,28 @@ from openfeature.api import (
     get_client,
     set_evaluation_context,
     set_provider,
+    set_provider_and_wait,
     set_transaction_context,
 )
 from openfeature.client import OpenFeatureClient, _typecheck_flag_value
 from openfeature.evaluation_context import EvaluationContext
 from openfeature.event import EventDetails, ProviderEvent, ProviderEventDetails
-from openfeature.exception import ErrorCode, OpenFeatureError, ProviderFatalError
+from openfeature.exception import (
+    ErrorCode,
+    GeneralError,
+    OpenFeatureError,
+    ProviderFatalError,
+)
 from openfeature.flag_evaluation import FlagResolutionDetails, FlagType, Reason
 from openfeature.hook import Hook
 from openfeature.provider import FeatureProvider, ProviderStatus
 from openfeature.provider._registry import provider_registry
 from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 from openfeature.provider.no_op_provider import NoOpProvider
-from openfeature.transaction_context import ContextVarsTransactionContextPropagator
+from openfeature.transaction_context import (
+    ContextVarsTransactionContextPropagator,
+    NoOpTransactionContextPropagator,
+)
 
 
 def wait_for_mock_call(mock: MagicMock, timeout: float = 1.0) -> None:
@@ -866,6 +875,8 @@ def test_tracking_merges_evaluation_contexts():
     spy_provider = MagicMock(spec=NoOpProvider)
     api.set_provider(spy_provider)
     client = get_client()
+    # the default NoOp propagator stores nothing; this test needs a real one
+    api.set_transaction_context_propagator(ContextVarsTransactionContextPropagator())
     set_evaluation_context(EvaluationContext("id", attributes={"key": "eval_value"}))
     set_transaction_context(
         EvaluationContext("id", attributes={"transaction_attr": "transaction_value"})
@@ -917,3 +928,165 @@ def test_assert_provider_status_uses_passed_provider_not_current_registry_state(
         assert c._assert_provider_status(ready_provider) is None
     finally:
         client_module.provider_registry = original
+
+
+# hook context lifecycle: context accumulated by before hooks is visible
+# to later hooks of every stage, through the real client (see #628)
+@pytest.fixture(autouse=True)
+def _reset_global_context():
+    # earlier tests leak api-level evaluation and transaction context
+    api.set_evaluation_context(EvaluationContext())
+    api.set_transaction_context_propagator(NoOpTransactionContextPropagator())
+
+
+class CapturingHook(Hook):
+    def __init__(self, return_value=None, raise_in_before=False):
+        self.before_context: EvaluationContext | None = None
+        self.after_context: EvaluationContext | None = None
+        self.error_context: EvaluationContext | None = None
+        self.finally_context: EvaluationContext | None = None
+        self._return_value = return_value
+        self._raise_in_before = raise_in_before
+
+    def before(self, hook_context, hints):
+        self.before_context = hook_context.evaluation_context
+        if self._raise_in_before:
+            raise RuntimeError("before hook failure")
+        return self._return_value
+
+    def after(self, hook_context, details, hints):
+        self.after_context = hook_context.evaluation_context
+
+    def error(self, hook_context, exception, hints):
+        self.error_context = hook_context.evaluation_context
+
+    def finally_after(self, hook_context, details, hints):
+        self.finally_context = hook_context.evaluation_context
+
+    @property
+    def received_context(self) -> EvaluationContext | None:
+        return self.before_context
+
+
+class ContextCapturingProvider(NoOpProvider):
+    def __init__(self):
+        self.received_context: EvaluationContext | None = None
+
+    def resolve_boolean_details(self, flag_key, default_value, evaluation_context):
+        self.received_context = evaluation_context
+        return super().resolve_boolean_details(
+            flag_key, default_value, evaluation_context
+        )
+
+
+class FailingProvider(NoOpProvider):
+    def resolve_boolean_details(self, flag_key, default_value, evaluation_context):
+        raise GeneralError("provider resolution failure")
+
+
+@pytest.mark.asyncio
+async def test_async_third_before_hook_receives_accumulated_context():
+    # Given
+    set_provider_and_wait(NoOpProvider())
+    client = get_client()
+
+    hook_a = CapturingHook(return_value=EvaluationContext(attributes={"from_a": "A"}))
+    hook_b = CapturingHook(return_value=EvaluationContext(attributes={"from_b": "B"}))
+    hook_c = CapturingHook(return_value=None)
+    client.add_hooks([hook_a, hook_b, hook_c])
+
+    # When
+    await client.get_boolean_value_async(flag_key="test-flag", default_value=False)
+
+    # Then
+    assert hook_b.received_context.attributes.get("from_a") == "A", (
+        "Hook B did not receive the evaluation context returned by Hook A (async path)"
+    )
+    assert hook_c.received_context.attributes.get("from_a") == "A", (
+        "Hook C did not receive Hook A's context (async path)"
+    )
+    assert hook_c.received_context.attributes.get("from_b") == "B", (
+        "Hook C did not receive Hook B's context (async path)"
+    )
+
+
+def test_lifecycle_hooks_receive_accumulated_context_on_success():
+    # Given
+    provider = ContextCapturingProvider()
+    set_provider_and_wait(provider)
+    client = get_client()
+
+    hook_a = CapturingHook(return_value=EvaluationContext(attributes={"from_a": "A"}))
+    hook_b = CapturingHook(return_value=EvaluationContext(attributes={"from_b": "B"}))
+    client.add_hooks([hook_a, hook_b])
+
+    # When
+    client.get_boolean_value(
+        flag_key="test-flag",
+        default_value=False,
+        evaluation_context=EvaluationContext(attributes={"initial": "present"}),
+    )
+
+    # Then
+    expected = {"initial": "present", "from_a": "A", "from_b": "B"}
+    assert provider.received_context is not None
+    assert provider.received_context.attributes == expected
+    for hook in (hook_a, hook_b):
+        assert hook.after_context is not None
+        assert hook.after_context.attributes == expected
+        assert hook.finally_context is not None
+        assert hook.finally_context.attributes == expected
+
+
+def test_lifecycle_hooks_receive_accumulated_context_on_before_failure():
+    # Given
+    set_provider_and_wait(NoOpProvider())
+    client = get_client()
+
+    hook_a = CapturingHook(return_value=EvaluationContext(attributes={"from_a": "A"}))
+    hook_b = CapturingHook(raise_in_before=True)
+    hook_c = CapturingHook(return_value=None)
+    client.add_hooks([hook_a, hook_b, hook_c])
+
+    # When
+    res = client.get_boolean_value(
+        flag_key="test-flag",
+        default_value=False,
+        evaluation_context=EvaluationContext(attributes={"initial": "present"}),
+    )
+
+    # Then
+    expected = {"initial": "present", "from_a": "A"}
+    assert res is False
+    assert hook_c.before_context is None
+    for hook in (hook_a, hook_b, hook_c):
+        assert hook.error_context is not None
+        assert hook.error_context.attributes == expected
+        assert hook.finally_context is not None
+        assert hook.finally_context.attributes == expected
+
+
+def test_lifecycle_hooks_receive_accumulated_context_on_provider_failure():
+    # Given
+    set_provider_and_wait(FailingProvider())
+    client = get_client()
+
+    hook_a = CapturingHook(return_value=EvaluationContext(attributes={"from_a": "A"}))
+    hook_b = CapturingHook(return_value=EvaluationContext(attributes={"from_b": "B"}))
+    client.add_hooks([hook_a, hook_b])
+
+    # When
+    details = client.get_boolean_details(
+        flag_key="test-flag",
+        default_value=False,
+        evaluation_context=EvaluationContext(attributes={"initial": "present"}),
+    )
+
+    # Then
+    expected = {"initial": "present", "from_a": "A", "from_b": "B"}
+    assert details.reason == Reason.ERROR
+    for hook in (hook_a, hook_b):
+        assert hook.error_context is not None
+        assert hook.error_context.attributes == expected
+        assert hook.finally_context is not None
+        assert hook.finally_context.attributes == expected

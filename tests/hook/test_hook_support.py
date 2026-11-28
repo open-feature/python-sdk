@@ -78,7 +78,7 @@ def test_hook_context_has_immutable_and_mutable_fields():
 
 def test_error_hooks_run_error_method(mock_hook):
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
     hook_hints = MappingProxyType({})
     # When
     error_hooks(FlagType.BOOLEAN, Exception, [(mock_hook, hook_context)], hook_hints)
@@ -92,7 +92,7 @@ def test_error_hooks_run_error_method(mock_hook):
 
 def test_before_hooks_run_before_method(mock_hook):
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
     hook_hints = MappingProxyType({})
     # When
     before_hooks(FlagType.BOOLEAN, [(mock_hook, hook_context)], hook_hints)
@@ -104,7 +104,7 @@ def test_before_hooks_run_before_method(mock_hook):
 
 def test_before_hooks_merges_evaluation_contexts():
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
     hook_1 = MagicMock(spec=Hook)
     hook_1.before.return_value = EvaluationContext("foo", {"key_1": "val_1"})
     hook_2 = MagicMock(spec=Hook)
@@ -122,9 +122,231 @@ def test_before_hooks_merges_evaluation_contexts():
     assert context == EvaluationContext("bar", {"key_1": "val_1", "key_2": "val_2"})
 
 
+def test_before_hooks_propagates_context_to_subsequent_hook():
+    # Given
+    initial_context = EvaluationContext(attributes={"initial": "present"})
+    hook_context_a = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    hook_context_b = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+
+    received_by_hook_b: list[EvaluationContext] = []
+
+    hook_a = MagicMock(spec=Hook)
+    hook_a.before.return_value = EvaluationContext(
+        attributes={"from_hook_a": "visible"}
+    )
+
+    hook_b = MagicMock(spec=Hook)
+
+    def hook_b_before(hook_context, hints):
+        received_by_hook_b.append(hook_context.evaluation_context)
+        return None
+
+    hook_b.before.side_effect = hook_b_before
+
+    # When
+    before_hooks(
+        FlagType.BOOLEAN,
+        [(hook_a, hook_context_a), (hook_b, hook_context_b)],
+    )
+
+    # Then
+    assert len(received_by_hook_b) == 1
+    assert received_by_hook_b[0].attributes.get("from_hook_a") == "visible", (
+        "Hook B did not receive the evaluation context returned by Hook A"
+    )
+    assert received_by_hook_b[0].attributes.get("initial") == "present"
+
+
+def test_before_hooks_accumulates_context_across_three_hooks():
+    # Given
+    initial_context = EvaluationContext(attributes={"initial": "present"})
+    ctx_a = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    ctx_b = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    ctx_c = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+
+    received_by_hook_b: list[EvaluationContext] = []
+    received_by_hook_c: list[EvaluationContext] = []
+
+    hook_a = MagicMock(spec=Hook)
+    hook_a.before.return_value = EvaluationContext(attributes={"from_a": "A"})
+
+    hook_b = MagicMock(spec=Hook)
+
+    def hook_b_before(hook_context, hints):
+        received_by_hook_b.append(hook_context.evaluation_context)
+        return EvaluationContext(attributes={"from_b": "B"})
+
+    hook_b.before.side_effect = hook_b_before
+
+    hook_c = MagicMock(spec=Hook)
+
+    def hook_c_before(hook_context, hints):
+        received_by_hook_c.append(hook_context.evaluation_context)
+        return None
+
+    hook_c.before.side_effect = hook_c_before
+
+    # When
+    before_hooks(
+        FlagType.BOOLEAN,
+        [(hook_a, ctx_a), (hook_b, ctx_b), (hook_c, ctx_c)],
+    )
+
+    # Then
+    assert received_by_hook_b[0].attributes.get("from_a") == "A", (
+        "Hook B did not receive the evaluation context returned by Hook A"
+    )
+    assert received_by_hook_c[0].attributes.get("from_a") == "A", (
+        "Hook C did not receive the evaluation context returned by Hook A"
+    )
+    assert received_by_hook_c[0].attributes.get("from_b") == "B", (
+        "Hook C did not receive the evaluation context returned by Hook B"
+    )
+
+
+def test_before_hooks_later_hook_overrides_earlier_on_conflict():
+    # Given
+    initial_context = EvaluationContext(attributes={"initial": "present"})
+    ctx_a = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    ctx_b = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    ctx_c = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+
+    received_by_hook_c: list[EvaluationContext] = []
+
+    hook_a = MagicMock(spec=Hook)
+    hook_a.before.return_value = EvaluationContext("target_a", {"shared": "A"})
+
+    hook_b = MagicMock(spec=Hook)
+    hook_b.before.return_value = EvaluationContext("target_b", {"shared": "B"})
+
+    hook_c = MagicMock(spec=Hook)
+
+    def hook_c_before(hook_context, hints):
+        received_by_hook_c.append(hook_context.evaluation_context)
+        return None
+
+    hook_c.before.side_effect = hook_c_before
+
+    # When
+    before_hooks(
+        FlagType.BOOLEAN,
+        [(hook_a, ctx_a), (hook_b, ctx_b), (hook_c, ctx_c)],
+    )
+
+    # Then
+    assert received_by_hook_c[0].attributes.get("shared") == "B", (
+        "Later hook (B) result should override earlier hook (A) result for the same attribute"
+    )
+    assert received_by_hook_c[0].targeting_key == "target_b", (
+        "Later hook (B) targeting_key should override earlier hook (A) targeting_key"
+    )
+
+
+def test_before_hooks_none_result_does_not_corrupt_accumulated_context():
+    # Given
+    initial_context = EvaluationContext(attributes={"initial": "present"})
+    ctx_a = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    ctx_b = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    ctx_c = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+
+    received_by_hook_c: list[EvaluationContext] = []
+
+    hook_a = MagicMock(spec=Hook)
+    hook_a.before.return_value = EvaluationContext(attributes={"from_a": "A"})
+
+    hook_b = MagicMock(spec=Hook)
+    hook_b.before.return_value = None
+
+    hook_c = MagicMock(spec=Hook)
+
+    def hook_c_before(hook_context, hints):
+        received_by_hook_c.append(hook_context.evaluation_context)
+        return None
+
+    hook_c.before.side_effect = hook_c_before
+
+    # When
+    before_hooks(
+        FlagType.BOOLEAN,
+        [(hook_a, ctx_a), (hook_b, ctx_b), (hook_c, ctx_c)],
+    )
+
+    # Then
+    assert received_by_hook_c[0].attributes.get("from_a") == "A", (
+        "Hook C should still see Hook A's context even though Hook B returned None"
+    )
+
+
+def test_before_hooks_finalizes_hook_contexts_for_all_participating_hooks():
+    # Given
+    initial_context = EvaluationContext(attributes={"initial": "present"})
+    ctx_a = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    ctx_b = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+
+    hook_a = MagicMock(spec=Hook)
+    hook_a.before.return_value = EvaluationContext(attributes={"from_a": "A"})
+    hook_b = MagicMock(spec=Hook)
+    hook_b.before.return_value = EvaluationContext(attributes={"from_b": "B"})
+
+    # When
+    before_hooks(FlagType.BOOLEAN, [(hook_a, ctx_a), (hook_b, ctx_b)])
+
+    # Then
+    expected = {"initial": "present", "from_a": "A", "from_b": "B"}
+    assert ctx_a.evaluation_context.attributes == expected
+    assert ctx_b.evaluation_context.attributes == expected
+
+
+def test_before_hooks_finalizes_hook_contexts_on_exception():
+    # Given
+    initial_context = EvaluationContext(attributes={"initial": "present"})
+    ctx_a = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    ctx_b = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    ctx_c = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+
+    hook_a = MagicMock(spec=Hook)
+    hook_a.before.return_value = EvaluationContext(attributes={"from_a": "A"})
+    hook_b = MagicMock(spec=Hook)
+    hook_b.before.side_effect = RuntimeError("hook_b error")
+    hook_c = MagicMock(spec=Hook)
+
+    # When
+    with pytest.raises(RuntimeError, match="hook_b error"):
+        before_hooks(
+            FlagType.BOOLEAN, [(hook_a, ctx_a), (hook_b, ctx_b), (hook_c, ctx_c)]
+        )
+
+    # Then
+    expected = {"initial": "present", "from_a": "A"}
+    assert hook_c.before.call_count == 0
+    assert ctx_a.evaluation_context.attributes == expected
+    assert ctx_b.evaluation_context.attributes == expected
+    assert ctx_c.evaluation_context.attributes == expected
+
+
+def test_before_hooks_unsupported_hook_context_is_not_finalized():
+    # Given
+    initial_context = EvaluationContext(attributes={"initial": "present"})
+    ctx_a = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+    ctx_b = HookContext("flag_key", FlagType.BOOLEAN, True, initial_context)
+
+    hook_a = MagicMock(spec=Hook)
+    hook_a.before.return_value = EvaluationContext(attributes={"from_a": "A"})
+    hook_b = MagicMock(spec=Hook)
+    hook_b.supports_flag_value_type.return_value = False
+
+    # When
+    before_hooks(FlagType.BOOLEAN, [(hook_a, ctx_a), (hook_b, ctx_b)])
+
+    # Then
+    assert hook_b.before.call_count == 0
+    assert ctx_a.evaluation_context.attributes.get("from_a") == "A"
+    assert ctx_b.evaluation_context.attributes.get("from_a") is None
+
+
 def test_after_hooks_run_after_method(mock_hook):
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
     flag_evaluation_details = FlagEvaluationDetails(
         hook_context.flag_key, "val", "unknown"
     )
@@ -146,7 +368,7 @@ def test_after_hooks_run_after_method(mock_hook):
 
 def test_finally_after_hooks_run_finally_after_method(mock_hook):
     # Given
-    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, "")
+    hook_context = HookContext("flag_key", FlagType.BOOLEAN, True, EvaluationContext())
     flag_evaluation_details = FlagEvaluationDetails(
         hook_context.flag_key, "val", "unknown"
     )
